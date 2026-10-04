@@ -34,7 +34,8 @@ function doGet(e) {
       const userId = e.parameter.userId || "";
       const phone = e.parameter.phone || "";
       const orderId = e.parameter.orderId || "";
-      responseData = getOrdersData(userId, phone, orderId);
+      const limit = e.parameter.limit ? parseInt(e.parameter.limit, 10) : 500;
+      responseData = getOrdersData(userId, phone, orderId, limit);
     } else if (action === "getQueueStatus") {
       responseData = getQueueStatus();
     } else if (action === "createOrder") {
@@ -334,7 +335,7 @@ function getMenuData() {
  * ค้นหาประวัติออเดอร์ตามเงื่อนไข (LINE UID, เบอร์โทร, หรือ Order ID)
  * ค้นหาตำแหน่งคอลัมน์แบบไดนามิกเพื่อความเข้ากันได้ 100%
  */
-function getOrdersData(userId, phone, orderId) {
+function getOrdersData(userId, phone, orderId, limit = 500) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const ordersSheet = ss.getSheetByName(CONFIG.SHEET_ORDERS);
 
@@ -364,6 +365,7 @@ function getOrdersData(userId, phone, orderId) {
 
   const data = ordersSheet.getDataRange().getValues();
   const matched = [];
+  const maxLimit = limit ? parseInt(limit, 10) : 500;
 
   for (let i = data.length - 1; i >= 1; i--) {
     const row = data[i];
@@ -382,6 +384,7 @@ function getOrdersData(userId, phone, orderId) {
       let itemsVal = (getCol("รายการอาหาร", 15, row) || "").toString().trim();
       let noteVal = (getCol("หมายเหตุจากลูกค้า", 17, row) || "").toString().trim();
       let updatedVal = (getCol("อัปเดตล่าสุด", 18, row) || "").toString().trim();
+      let itemsDetailVal = (getCol("JSON ละเอียด", 19, row) || "").toString().trim();
 
       // Self-healing: ถ้า statusVal ในชีตเป็นคำว่า "ชำระเงินสด" หรือ "โอนผ่านพร้อมเพย์" (เกิดจากคอลัมน์เลื่อน)
       if (statusVal === "ชำระเงินสด" || statusVal === "โอนผ่านพร้อมเพย์" || statusVal === "พร้อมเพย์" || !statusVal) {
@@ -420,10 +423,11 @@ function getOrdersData(userId, phone, orderId) {
         orderStatus: statusVal,
         status: statusVal, // รองรับทั้งสองชื่อ
         customerNote: noteVal,
-        updatedAt: updatedVal
+        updatedAt: updatedVal,
+        itemsDetail: itemsDetailVal
       });
 
-      if (matched.length >= 35) break;
+      if (matched.length >= maxLimit) break;
     }
   }
 

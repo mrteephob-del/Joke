@@ -196,6 +196,16 @@
           <i id="refreshIcon" class="fa-solid fa-rotate text-xs"></i>
         </button>
 
+        <!-- Link to Analytics Dashboard -->
+        <a 
+          href="dashboard.html" 
+          class="px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5 transition-all shadow-xs"
+          title="เปิดดูแดชบอร์ดภาพรวมร้าน เมนูขายดี และลูกค้าประจำ"
+        >
+          <i class="fa-solid fa-chart-pie text-xs text-indigo-200"></i>
+          <span>📊 แดชบอร์ดภาพรวม</span>
+        </a>
+
         <!-- Customer Menu Link -->
         <a 
           href="index.html" 
@@ -213,7 +223,7 @@
   <main class="max-w-6xl mx-auto px-4 mt-4">
 
     <!-- KPI / Statistics Summary Bar -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
         <div>
           <span class="text-[11px] font-medium text-slate-500 block">รอทำอาหาร (ใหม่)</span>
@@ -246,13 +256,72 @@
 
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
         <div>
-          <span class="text-[11px] font-medium text-slate-500 block">ออเดอร์ทั้งหมดวันนี้</span>
-          <span id="kpiTotal" class="text-2xl font-black text-slate-800 font-display">0</span>
+          <span id="kpiTotalLabel" class="text-[11px] font-medium text-slate-500 block truncate">ออเดอร์ทั้งหมดวันนี้</span>
+          <div class="flex items-baseline gap-2">
+            <span id="kpiTotal" class="text-2xl font-black text-slate-800 font-display">0</span>
+            <span id="kpiTotalRevenue" class="text-xs font-bold text-orange-600 font-display">฿0</span>
+          </div>
         </div>
         <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg">
           <i class="fa-solid fa-receipt"></i>
         </div>
       </div>
+    </div>
+
+    <!-- Date Filter Bar (เรียกดูออเดอร์เป็นรายวัน) -->
+    <div class="flex items-center justify-between flex-wrap gap-2.5 mb-3 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-xs">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-xs font-bold text-slate-600 flex items-center gap-1 mr-1">
+          <i class="fa-regular fa-calendar-days text-orange-600"></i>
+          <span>เลือกดูตามวัน:</span>
+        </span>
+        <button onclick="setDateFilter('today')" id="dateBtnToday" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow-xs transition-all cursor-pointer">
+          วันนี้
+        </button>
+        <button onclick="setDateFilter('yesterday')" id="dateBtnYesterday" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer">
+          เมื่อวาน
+        </button>
+        <button onclick="setDateFilter('7days')" id="dateBtn7days" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer">
+          7 วันล่าสุด
+        </button>
+        <button onclick="setDateFilter('all')" id="dateBtnAll" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer">
+          ทั้งหมด
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs">
+          <label for="datePickerInput" class="text-slate-500 font-medium flex items-center gap-1 cursor-pointer">
+            <i class="fa-solid fa-calendar text-[11px] text-orange-500"></i> เลือกวันที่:
+          </label>
+          <input 
+            type="date" 
+            id="datePickerInput" 
+            onchange="setCustomDateFilter(this.value)"
+            class="bg-transparent text-slate-800 font-bold focus:outline-none cursor-pointer text-xs"
+          />
+        </div>
+        <button 
+          id="dateResetBtn" 
+          onclick="setDateFilter('today')" 
+          class="hidden px-2.5 py-1 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 border border-orange-200 rounded-xl transition-all cursor-pointer flex items-center gap-1"
+          title="กลับมาดูออเดอร์สดของวันนี้"
+        >
+          <i class="fa-solid fa-rotate-left text-[10px]"></i>
+          <span>กลับมาดูวันนี้</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Date Notice Banner (Shows when viewing a non-today date) -->
+    <div id="dateNoticeBanner" class="hidden items-center justify-between gap-2 p-3 mb-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-calendar-day text-amber-600 text-sm"></i>
+        <span>กำลังดูประวัติออเดอร์: <strong id="dateNoticeText" class="font-bold text-slate-800">-</strong></span>
+      </div>
+      <button onclick="setDateFilter('today')" class="px-2.5 py-1 bg-amber-200/80 hover:bg-amber-300 font-bold text-amber-900 rounded-lg text-[11px] transition-all cursor-pointer">
+        กลับมาดูออเดอร์สดวันนี้ ➔
+      </button>
     </div>
 
     <!-- Filter Tabs -->
@@ -375,6 +444,8 @@
       knownOrderKeys: new Set(),
       acknowledgedOrderKeys: new Set(),
       activeFilter: "active", // active, ready, completed, all
+      dateFilter: "today",    // today, yesterday, 7days, all, custom
+      customDateStr: "",      // e.g. "2026-10-04"
       soundEnabled: true,
       audioUnlocked: false,
       audioContext: null,
@@ -748,6 +819,154 @@
       return `${order.orderId || ''}__${order.orderDate || ''}__${order.customerPhone || ''}__${order.itemsSummary || ''}`;
     }
 
+    // ==========================================
+    // Date Helpers & Daily Order Filtering (เรียกดูออเดอร์รายวัน)
+    // ==========================================
+
+    function getOrderDateStr(order) {
+      if (!order) return "";
+      // 1. Try orderId: JK-YYYYMMDD-xxx
+      if (order.orderId) {
+        const m = String(order.orderId).match(/JK-(\d{4})(\d{2})(\d{2})-/i);
+        if (m) {
+          return `${m[1]}-${m[2]}-${m[3]}`;
+        }
+      }
+      // 2. Try orderDate
+      if (order.orderDate) {
+        const s = String(order.orderDate).trim();
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const mo = String(d.getMonth() + 1).padStart(2, "0");
+          const da = String(d.getDate()).padStart(2, "0");
+          return `${y}-${mo}-${da}`;
+        }
+      }
+      return "";
+    }
+
+    function getTodayDateStr() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function getYesterdayDateStr() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function formatThaiDateDisplay(dateStr) {
+      if (!dateStr) return "-";
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return dateStr;
+      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      const y = parseInt(parts[0], 10) + 543;
+      const m = thaiMonths[parseInt(parts[1], 10) - 1] || parts[1];
+      const d = parseInt(parts[2], 10);
+      return `${d} ${m} ${y}`;
+    }
+
+    function filterOrdersByDate(ordersList) {
+      if (!Array.isArray(ordersList)) return [];
+      const filter = kdsState.dateFilter;
+      const todayStr = getTodayDateStr();
+
+      if (filter === "today") {
+        return ordersList.filter(o => getOrderDateStr(o) === todayStr);
+      } else if (filter === "yesterday") {
+        const yestStr = getYesterdayDateStr();
+        return ordersList.filter(o => getOrderDateStr(o) === yestStr);
+      } else if (filter === "7days") {
+        const now = new Date();
+        const past7 = new Date();
+        past7.setDate(now.getDate() - 6);
+        past7.setHours(0, 0, 0, 0);
+        return ordersList.filter(o => {
+          const dStr = getOrderDateStr(o);
+          if (!dStr) return false;
+          const od = new Date(`${dStr}T00:00:00`);
+          return !isNaN(od.getTime()) && od >= past7;
+        });
+      } else if (filter === "custom") {
+        if (!kdsState.customDateStr) return ordersList;
+        return ordersList.filter(o => getOrderDateStr(o) === kdsState.customDateStr);
+      }
+      // "all"
+      return ordersList;
+    }
+
+    function setDateFilter(type) {
+      kdsState.dateFilter = type;
+      if (type !== "custom") {
+        kdsState.customDateStr = "";
+        const picker = document.getElementById("datePickerInput");
+        if (picker) picker.value = "";
+      }
+      updateDateFilterUI();
+      updateKpis();
+      renderOrders();
+    }
+
+    function setCustomDateFilter(val) {
+      if (!val) {
+        setDateFilter("today");
+        return;
+      }
+      kdsState.dateFilter = "custom";
+      kdsState.customDateStr = val;
+      updateDateFilterUI();
+      updateKpis();
+      renderOrders();
+    }
+
+    function updateDateFilterUI() {
+      const type = kdsState.dateFilter;
+      const todayBtn = document.getElementById("dateBtnToday");
+      const yestBtn = document.getElementById("dateBtnYesterday");
+      const weekBtn = document.getElementById("dateBtn7days");
+      const allBtn = document.getElementById("dateBtnAll");
+      const resetBtn = document.getElementById("dateResetBtn");
+      const banner = document.getElementById("dateNoticeBanner");
+      const noticeText = document.getElementById("dateNoticeText");
+
+      const inactiveClass = "px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer";
+      const activeClass = "px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow-xs transition-all cursor-pointer";
+
+      if (todayBtn) todayBtn.className = type === "today" ? activeClass : inactiveClass;
+      if (yestBtn) yestBtn.className = type === "yesterday" ? activeClass : inactiveClass;
+      if (weekBtn) weekBtn.className = type === "7days" ? activeClass : inactiveClass;
+      if (allBtn) allBtn.className = type === "all" ? activeClass : inactiveClass;
+
+      if (resetBtn) {
+        if (type === "today") resetBtn.classList.add("hidden");
+        else resetBtn.classList.remove("hidden");
+      }
+
+      if (banner && noticeText) {
+        if (type === "today") {
+          banner.classList.add("hidden");
+          banner.classList.remove("flex");
+        } else {
+          banner.classList.remove("hidden");
+          banner.classList.add("flex");
+          if (type === "yesterday") noticeText.textContent = `เมื่อวาน (${formatThaiDateDisplay(getYesterdayDateStr())})`;
+          else if (type === "7days") noticeText.textContent = "7 วันล่าสุด";
+          else if (type === "all") noticeText.textContent = "ทั้งหมดตั้งแต่เปิดร้าน";
+          else if (type === "custom") noticeText.textContent = `วันที่ ${formatThaiDateDisplay(kdsState.customDateStr)}`;
+        }
+      }
+    }
+
     async function fetchOrders(manual = false) {
       const refreshIcon = document.getElementById("refreshIcon");
       if (manual && refreshIcon) refreshIcon.classList.add("fa-spin");
@@ -758,7 +977,7 @@
       }
 
       try {
-        const response = await fetch(`${APP_CONFIG.GAS_API_URL}?action=getOrders`);
+        const response = await fetch(`${APP_CONFIG.GAS_API_URL}?action=getOrders&limit=500`);
         const data = await response.json();
 
         if (data && data.success && Array.isArray(data.orders)) {
@@ -796,7 +1015,8 @@
         }
       });
 
-      const pendingOrders = newOrders.filter(o => o.orderStatus === "รอยืนยัน");
+      const todayStr = getTodayDateStr();
+      const pendingTodayOrders = newOrders.filter(o => o.orderStatus === "รอยืนยัน" && getOrderDateStr(o) === todayStr);
       let newlyDetectedOrder = null;
 
       if (kdsState.isFirstLoad) {
@@ -804,11 +1024,11 @@
         newOrders.forEach(o => kdsState.knownOrderKeys.add(getOrderKey(o)));
         kdsState.isFirstLoad = false;
 
-        // ถ้าเปิดหน้าจอมาครั้งแรกแล้วพบว่ามีออเดอร์สถานะ "รอยืนยัน" ค้างอยู่
-        if (pendingOrders.length > 0) {
-          const unack = pendingOrders.find(o => !kdsState.acknowledgedOrderKeys.has(getOrderKey(o)));
+        // ถ้าเปิดหน้าจอมาครั้งแรกแล้วพบว่ามีออเดอร์สถานะ "รอยืนยัน" ของวันนี้ค้างอยู่
+        if (pendingTodayOrders.length > 0) {
+          const unack = pendingTodayOrders.find(o => !kdsState.acknowledgedOrderKeys.has(getOrderKey(o)));
           if (unack) {
-            triggerNewOrderAlert(unack, pendingOrders.length);
+            triggerNewOrderAlert(unack, pendingTodayOrders.length);
           }
         }
       } else {
@@ -826,7 +1046,7 @@
 
         // มีออเดอร์ใหม่เข้ามา! ส่งเสียงแจ้งเตือนทันที
         if (newlyDetectedOrder) {
-          triggerNewOrderAlert(newlyDetectedOrder, pendingOrders.length);
+          triggerNewOrderAlert(newlyDetectedOrder, pendingTodayOrders.length);
         }
       }
 
@@ -881,21 +1101,42 @@
     }
 
     function updateKpis() {
-      const orders = kdsState.orders;
-      const pendingCount = orders.filter(o => o.orderStatus === "รอยืนยัน").length;
-      const cookingCount = orders.filter(o => o.orderStatus === "กำลังปรุง").length;
-      const readyCount = orders.filter(o => o.orderStatus === "พร้อมส่ง/รับ").length;
-      const completedCount = orders.filter(o => o.orderStatus === "สำเร็จ").length;
+      // คำนวณสรุปตามวันที่เลือกในปัจจุบัน
+      const dateFiltered = filterOrdersByDate(kdsState.orders);
+
+      const pendingCount = dateFiltered.filter(o => o.orderStatus === "รอยืนยัน").length;
+      const cookingCount = dateFiltered.filter(o => o.orderStatus === "กำลังปรุง").length;
+      const readyCount = dateFiltered.filter(o => o.orderStatus === "พร้อมส่ง/รับ").length;
+      const completedCount = dateFiltered.filter(o => o.orderStatus === "สำเร็จ").length;
+
+      // รายรับรวมของวันที่เลือก (ไม่รวมออเดอร์ที่ถูกยกเลิก)
+      const validOrders = dateFiltered.filter(o => o.orderStatus !== "ยกเลิก");
+      const totalRevenue = validOrders.reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
 
       document.getElementById("kpiPending").textContent = pendingCount;
       document.getElementById("kpiCooking").textContent = cookingCount;
       document.getElementById("kpiReady").textContent = readyCount;
-      document.getElementById("kpiTotal").textContent = orders.length;
+      document.getElementById("kpiTotal").textContent = dateFiltered.length;
+
+      const revEl = document.getElementById("kpiTotalRevenue");
+      if (revEl) {
+        revEl.textContent = `฿${totalRevenue.toLocaleString()}`;
+      }
+
+      const labelEl = document.getElementById("kpiTotalLabel");
+      if (labelEl) {
+        const type = kdsState.dateFilter;
+        if (type === "today") labelEl.textContent = "ออเดอร์ทั้งหมดวันนี้";
+        else if (type === "yesterday") labelEl.textContent = "ออเดอร์เมื่อวาน";
+        else if (type === "7days") labelEl.textContent = "ออเดอร์ 7 วันล่าสุด";
+        else if (type === "all") labelEl.textContent = "ออเดอร์ทั้งหมด";
+        else if (type === "custom") labelEl.textContent = `ออเดอร์ ${formatThaiDateDisplay(kdsState.customDateStr)}`;
+      }
 
       document.getElementById("countActive").textContent = pendingCount + cookingCount;
       document.getElementById("countReady").textContent = readyCount;
       document.getElementById("countCompleted").textContent = completedCount;
-      document.getElementById("countAll").textContent = orders.length;
+      document.getElementById("countAll").textContent = dateFiltered.length;
     }
 
     function renderOrders() {
@@ -903,9 +1144,10 @@
       const emptyState = document.getElementById("ordersEmptyState");
       const search = document.getElementById("orderFilterInput")?.value.trim().toLowerCase() || "";
 
-      let list = kdsState.orders;
+      // 1. กรองตามวันที่เลือก
+      let list = filterOrdersByDate(kdsState.orders);
 
-      // Filter by tab
+      // 2. กรองตามแท็บสถานะ
       if (kdsState.activeFilter === "active") {
         list = list.filter(o => o.orderStatus === "รอยืนยัน" || o.orderStatus === "กำลังปรุง");
       } else if (kdsState.activeFilter === "ready") {
@@ -914,13 +1156,13 @@
         list = list.filter(o => o.orderStatus === "สำเร็จ" || o.orderStatus === "ยกเลิก");
       }
 
-      // Search filter
+      // 3. กรองตามคำค้นหา
       if (search) {
         list = list.filter(o => 
           (o.queueNo && o.queueNo.toLowerCase().includes(search)) ||
           (o.orderId && o.orderId.toLowerCase().includes(search)) ||
           (o.customerName && o.customerName.toLowerCase().includes(search)) ||
-          (o.customerPhone && o.customerPhone.includes(search))
+          (o.customerPhone && String(o.customerPhone).includes(search))
         );
       }
 

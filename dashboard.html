@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>แดชบอร์ดภาพรวมร้านค้า | ร้านข้าวต้มนายเจ็ก วงเวียนตาคลี</title>
+
+  <!-- PWA & Favicon Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ea580c">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+  <!-- Google Fonts: Prompt & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+            display: ['Kanit', 'sans-serif'],
+          },
+          colors: {
+            orange: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              300: '#fdba74',
+              400: '#fb923c',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+              800: '#9a3412',
+              900: '#7c2d12',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #0f172a;
+      color: #f1f5f9;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Print optimization */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+      .print-dark-text {
+        color: #0f172a !important;
+      }
+    }
+
+    /* Custom subtle scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    /* Glowing card hover */
+    .glow-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glow-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px -8px rgba(234, 88, 12, 0.18);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+
+  <!-- ========================================== -->
+  <!-- Top Navigation Bar -->
+  <!-- ========================================== -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between flex-wrap gap-3">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
+          <i class="fa-solid fa-chart-line text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-black font-display text-white tracking-wide">
+              แดชบอร์ดภาพรวมร้านค้า
+            </h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">
+              Live Analytics
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-medium">
+            ร้านข้าวต้มนายเจ็ก วงเวียนตาคลี
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Live Status Pill -->
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="lastUpdatedTime">อัปเดต: กำลังโหลด...</span>
+        </div>
+
+        <!-- Sync Button -->
+        <button 
+          onclick="fetchDashboardData(true)" 
+          id="refreshBtn"
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition-all flex items-center gap-1.5 cursor-pointer"
+          title="ซิงค์ข้อมูลล่าสุดจาก Google Sheets"
+        >
+          <i id="refreshIcon" class="fa-solid fa-rotate text-xs text-orange-400"></i>
+          <span class="hidden sm:inline">รีเฟรช</span>
+        </button>
+
+        <!-- Print Report Button -->
+        <button 
+          onclick="window.print()" 
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition-all flex items-center gap-1.5 cursor-pointer"
+          title="พิมพ์สรุปรายงาน / บันทึกเป็น PDF"
+        >
+          <i class="fa-solid fa-print text-xs text-sky-400"></i>
+          <span class="hidden sm:inline">พิมพ์รายงาน</span>
+        </button>
+
+        <!-- Link to Kitchen KDS -->
+        <a 
+          href="kitchen.html" 
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white transition-all shadow-sm flex items-center gap-1.5"
+          title="กลับไปยังหน้าจอห้องครัว & แคชเชียร์"
+        >
+          <i class="fa-solid fa-kitchen-set text-xs"></i>
+          <span>หน้าจอห้องครัว</span>
+        </a>
+
+        <!-- Link to Customer Menu -->
+        <a 
+          href="index.html" 
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all flex items-center gap-1.5"
+          title="ไปหน้าเมนูสั่งอาหารของลูกค้า"
+        >
+          <i class="fa-solid fa-store text-xs text-amber-400"></i>
+          <span class="hidden md:inline">หน้าร้านสั่งอาหาร</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- Main Dashboard Content Container -->
+  <!-- ========================================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-5 space-y-6">
+
+    <!-- Date Range Filter Bar (เรียกดูออเดอร์เป็นรายวัน & ช่วงเวลา) -->
+    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl space-y-4 no-print">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        
+        <!-- Filter Presets -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5 mr-1">
+            <i class="fa-regular fa-calendar-days text-orange-500"></i>
+            <span>ช่วงเวลา:</span>
+          </span>
+          <button onclick="setDashboardDatePreset('today')" id="dashBtnToday" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow-xs transition-all cursor-pointer">
+            วันนี้
+          </button>
+          <button onclick="setDashboardDatePreset('yesterday')" id="dashBtnYesterday" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+            เมื่อวาน
+          </button>
+          <button onclick="setDashboardDatePreset('7days')" id="dashBtn7days" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+            7 วันล่าสุด
+          </button>
+          <button onclick="setDashboardDatePreset('30days')" id="dashBtn30days" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+            30 วันล่าสุด
+          </button>
+          <button onclick="setDashboardDatePreset('month')" id="dashBtnMonth" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+            เดือนนี้
+          </button>
+          <button onclick="setDashboardDatePreset('all')" id="dashBtnAll" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+            ทั้งหมด
+          </button>
+        </div>
+
+        <!-- Custom Date Range Inputs -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 bg-slate-800/80 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs">
+            <span class="text-slate-400 font-medium">จาก:</span>
+            <input 
+              type="date" 
+              id="customStartDate" 
+              class="bg-transparent text-white font-bold focus:outline-none cursor-pointer text-xs"
+            />
+          </div>
+          <div class="flex items-center gap-1.5 bg-slate-800/80 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs">
+            <span class="text-slate-400 font-medium">ถึง:</span>
+            <input 
+              type="date" 
+              id="customEndDate" 
+              class="bg-transparent text-white font-bold focus:outline-none cursor-pointer text-xs"
+            />
+          </div>
+          <button 
+            onclick="applyCustomDateRange()" 
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600/90 hover:bg-orange-600 text-white transition-all cursor-pointer"
+          >
+            กรอง
+          </button>
+          <button 
+            onclick="setDashboardDatePreset('today')" 
+            id="dashResetBtn"
+            class="hidden px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 bg-slate-800 border border-slate-700 transition-all cursor-pointer"
+            title="ล้างตัวกรองและกลับมาดูวันนี้"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Active Filter Status Banner -->
+      <div class="flex items-center justify-between flex-wrap gap-2 pt-3 border-t border-slate-800 text-xs">
+        <div class="flex items-center gap-2 text-slate-300">
+          <i class="fa-solid fa-circle-info text-orange-500 text-sm"></i>
+          <span>ช่วงเวลาที่แสดง: <strong id="filterSummaryText" class="font-bold text-white">วันนี้ (กำลังโหลด...)</strong></span>
+        </div>
+        <div class="flex items-center gap-3 text-slate-400 text-[11px]">
+          <span>ออเดอร์ในช่วงนี้: <strong id="filterOrderCount" class="text-orange-400 font-bold">0 บิล</strong></span>
+          <span>•</span>
+          <span>ยอดขายสุทธิ: <strong id="filterRevenueSum" class="text-emerald-400 font-bold">฿0</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- Executive KPI Summary Cards (6 Cards) -->
+    <!-- ========================================== -->
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+      
+      <!-- Card 1: ยอดขายรวมสุทธิ -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
+        <div class="absolute -right-3 -top-3 w-16 h-16 bg-orange-500/10 rounded-full blur-xl pointer-events-none"></div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-400">ยอดขายรวมสุทธิ</span>
+          <div class="w-7 h-7 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-coins"></i>
+          </div>
+        </div>
+        <div class="text-xl sm:text-2xl font-black font-display text-white tracking-tight" id="kpiRevenue">
+          ฿0
+        </div>
+        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
+          <span>ค่าอาหาร: <strong class="text-slate-300 font-semibold" id="kpiFoodSubtotal">฿0</strong></span>
+          <span>ค่าส่ง: <strong class="text-slate-300 font-semibold" id="kpiDeliveryTotal">฿0</strong></span>
+        </div>
+      </div>
+
+      <!-- Card 2: จำนวนออเดอร์ -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-400">จำนวนออเดอร์</span>
+          <div class="w-7 h-7 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+        </div>
+        <div class="text-xl sm:text-2xl font-black font-display text-white tracking-tight" id="kpiTotalOrders">
+          0
+        </div>
+        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
+          <span class="text-emerald-400 font-semibold">สำเร็จ: <strong id="kpiCompletedOrders">0</strong></span>
+          <span class="text-amber-400 font-semibold">รอดำเนินการ: <strong id="kpiPendingOrders">0</strong></span>
+        </div>
+      </div>
+
+      <!-- Card 3: ยอดเฉลี่ยต่อบิล (AOV) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-400">เฉลี่ยต่อบิล (AOV)</span>
+          <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-calculator"></i>
+          </div>
+        </div>
+        <div class="text-xl sm:text-2xl font-black font-display text-white tracking-tight" id="kpiAov">
+          ฿0
+        </div>
+        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
+          <span>เฉลี่ย/จาน: <strong class="text-slate-300 font-semibold" id="kpiAvgDishPerOrder">0 จาน</strong></span>
+        </div>
+      </div>
+
+      <!-- Card 4: ลูกค้าทั้งหมด -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-400">ลูกค้าทั้งหมด</span>
+          <div class="w-7 h-7 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+        <div class="text-xl sm:text-2xl font-black font-display text-white tracking-tight" id="kpiCustomers">
+          0
+        </div>
+        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
+          <span class="text-purple-400 font-semibold">สั่งซ้ำ/VIP: <strong id="kpiRepeatCustomers">0</strong></span>
+        </div>
+      </div>
+
+      <!-- Card 5: สัดส่วนชำระเงิน -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-400">การชำระเงิน</span>
+          <div class="w-7 h-7 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-qrcode"></i>
+          </div>
+        </div>
+        <div class="text-sm font-bold text-white tracking-tight flex items-baseline gap-2">
+          <span id="kpiPromptPayShare">พร้อมเพย์ 0%</span>
+        </div>
+        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
+          <span>เงินสด: <strong class="text-slate-300 font-semibold" id="kpiCashShare">0%</strong></span>
+        </div>
+      </div>
+
+      <!-- Card 6: ช่องทางรับอาหาร -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-400">รูปแบบรับอาหาร</span>
+          <div class="w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-motorcycle"></i>
+          </div>
+        </div>
+        <div class="text-sm font-bold text-white tracking-tight flex items-baseline gap-2">
+          <span id="kpiStorePickupShare">หน้าร้าน 0%</span>
+        </div>
+        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
+          <span>จัดส่ง: <strong class="text-slate-300 font-semibold" id="kpiDeliveryShare">0%</strong></span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- Two-Column Analytics: Best-Selling Menus & Top Customers -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- ========================================== -->
+      <!-- SECTION 1: เมนูที่มีคนซื้อมากที่สุด (Top Best-Selling Menus) -->
+      <!-- ========================================== -->
+      <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-col justify-between print-card">
+        <div>
+          <!-- Section Header -->
+          <div class="flex items-center justify-between pb-3.5 border-b border-slate-800 flex-wrap gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+                <i class="fa-solid fa-fire"></i>
+              </div>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold font-display text-white">
+                  เมนูที่มีคนซื้อมากที่สุด (Best Sellers)
+                </h2>
+                <p class="text-[11px] text-slate-400">
+                  อันดับเมนูยอดฮิตตามจำนวนจานและยอดขายรวม
+                </p>
+              </div>
+            </div>
+
+            <!-- Ranking Metric Toggle -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-xl text-[11px] no-print">
+              <button 
+                onclick="setMenuRankSort('qty')" 
+                id="menuSortQtyBtn"
+                class="px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer"
+              >
+                ตามจำนวน (จาน)
+              </button>
+              <button 
+                onclick="setMenuRankSort('revenue')" 
+                id="menuSortRevBtn"
+                class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer"
+              >
+                ตามรายได้ (฿)
+              </button>
+            </div>
+          </div>
+
+          <!-- Top Menus Table / List Container -->
+          <div class="mt-3 overflow-x-auto">
+            <div id="topMenusList" class="space-y-2.5">
+              <div class="text-center py-8 text-xs text-slate-500">
+                <i class="fa-solid fa-spinner fa-spin text-lg mb-2 text-orange-500"></i>
+                <p>กำลังคำนวณอันดับเมนูขายดี...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
+          <span>รวมเมนูที่ถูกสั่งซื้อ: <strong id="totalUniqueDishes" class="text-slate-300 font-bold">0</strong> รายการ</span>
+          <span>ปริมาณรวม: <strong id="totalDishPortions" class="text-orange-400 font-bold">0</strong> ชาม/จาน</span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SECTION 2: ลูกค้าที่ซื้อมากที่สุด (Top Spending Customers & VIPs) -->
+      <!-- ========================================== -->
+      <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-col justify-between print-card">
+        <div>
+          <!-- Section Header -->
+          <div class="flex items-center justify-between pb-3.5 border-b border-slate-800 flex-wrap gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm">
+                <i class="fa-solid fa-crown"></i>
+              </div>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold font-display text-white">
+                  ลูกค้าที่ซื้อมากที่สุด (VIP Regulars)
+                </h2>
+                <p class="text-[11px] text-slate-400">
+                  จัดอันดับลูกค้าประจำยอดใช้จ่ายสะสมสูงสุด
+                </p>
+              </div>
+            </div>
+
+            <!-- Customer Sorting Toggle -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-xl text-[11px] no-print">
+              <button 
+                onclick="setCustomerSort('spend')" 
+                id="custSortSpendBtn"
+                class="px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer"
+              >
+                ยอดใช้จ่าย (฿)
+              </button>
+              <button 
+                onclick="setCustomerSort('orders')" 
+                id="custSortOrdersBtn"
+                class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer"
+              >
+                สั่งบ่อยสุด (บิล)
+              </button>
+            </div>
+          </div>
+
+          <!-- Top Customers Table / List Container -->
+          <div class="mt-3 overflow-x-auto">
+            <div id="topCustomersList" class="space-y-2.5">
+              <div class="text-center py-8 text-xs text-slate-500">
+                <i class="fa-solid fa-spinner fa-spin text-lg mb-2 text-purple-500"></i>
+                <p>กำลังคำนวณลูกค้า VIP...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
+          <span>ฐานลูกค้าทั้งหมด: <strong id="totalCustomerProfiles" class="text-slate-300 font-bold">0</strong> ท่าน</span>
+          <span>แตะเบอร์โทรเพื่อโทรหาลูกค้าได้ทันที 📞</span>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 3: วิเคราะห์ช่วงเวลาขายดี (Peak Ordering Hours Distribution) -->
+    <!-- ========================================== -->
+    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl print-card">
+      <div class="flex items-center justify-between pb-3.5 border-b border-slate-800 flex-wrap gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div>
+            <h2 class="text-sm sm:text-base font-bold font-display text-white">
+              ช่วงเวลาที่ขายดีที่สุดในแต่ละวัน (Peak Hours)
+            </h2>
+            <p class="text-[11px] text-slate-400">
+              กราฟแท่งแจกแจงปริมาณออเดอร์ในแต่ละชั่วโมงของวัน
+            </p>
+          </div>
+        </div>
+
+        <div id="peakHourBadge" class="px-3 py-1 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+          <i class="fa-solid fa-bolt text-amber-400"></i>
+          <span>ช่วงเวลาพีค: กำลังคำนวณ...</span>
+        </div>
+      </div>
+
+      <!-- Hourly Distribution Bars Container -->
+      <div class="mt-4">
+        <div id="hourlyBarsContainer" class="grid grid-cols-6 sm:grid-cols-12 md:grid-cols-18 gap-2 items-end min-h-[140px] pt-6">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 4: ตารางบันทึกประวัติออเดอร์ทั้งหมด (Order Ledger & Audit) -->
+    <!-- ========================================== -->
+    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl print-card">
+      
+      <!-- Table Controls -->
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div>
+            <h2 class="text-sm sm:text-base font-bold font-display text-white">
+              บันทึกรายการออเดอร์ (Order Ledger)
+            </h2>
+            <p class="text-[11px] text-slate-400">
+              รายละเอียดออเดอร์ทั้งหมดในช่วงเวลาที่เลือก
+            </p>
+          </div>
+        </div>
+
+        <!-- Search and Filter inside Table -->
+        <div class="flex items-center gap-2 flex-wrap no-print">
+          <!-- Status Dropdown -->
+          <select 
+            id="tableStatusFilter" 
+            onchange="renderOrdersLedgerTable()"
+            class="bg-slate-800 text-xs text-slate-200 border border-slate-700 rounded-xl px-3 py-2 focus:outline-none cursor-pointer"
+          >
+            <option value="all">สถานะ: ทั้งหมด</option>
+            <option value="สำเร็จ">เฉพาะ: สำเร็จ</option>
+            <option value="รอยืนยัน">เฉพาะ: รอยืนยัน</option>
+            <option value="กำลังปรุง">เฉพาะ: กำลังปรุง</option>
+            <option value="พร้อมส่ง/รับ">เฉพาะ: พร้อมส่ง/รับ</option>
+            <option value="ยกเลิก">เฉพาะ: ยกเลิก</option>
+          </select>
+
+          <!-- Search Input -->
+          <div class="relative">
+            <i class="fa-solid fa-search absolute left-3 top-2.5 text-xs text-slate-500"></i>
+            <input 
+              type="text" 
+              id="tableSearchInput" 
+              oninput="renderOrdersLedgerTable()"
+              placeholder="ค้นหาคิว, เลขบิล, ลูกค้า, เบอร์..." 
+              class="bg-slate-800 text-xs text-white placeholder-slate-500 pl-8 pr-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-orange-500 w-48 sm:w-64"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="overflow-x-auto mt-3">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="text-slate-400 border-b border-slate-800 text-[11px] font-semibold">
+              <th class="py-2.5 px-3">คิว / เลขที่บิล</th>
+              <th class="py-2.5 px-3">วัน-เวลา</th>
+              <th class="py-2.5 px-3">ลูกค้า & เบอร์ติดต่อ</th>
+              <th class="py-2.5 px-3">รายการอาหารที่สั่ง</th>
+              <th class="py-2.5 px-3 text-center">รับอาหาร / ชำระ</th>
+              <th class="py-2.5 px-3 text-right">ยอดรวม (฿)</th>
+              <th class="py-2.5 px-3 text-center">สถานะ</th>
+              <th class="py-2.5 px-3 text-center no-print">การจัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="ordersLedgerBody" class="divide-y divide-slate-800/60 text-slate-200">
+            <!-- Populated by JavaScript -->
+          </tbody>
+        </table>
+        
+        <div id="tableEmptyState" class="hidden text-center py-10 text-xs text-slate-500">
+          <i class="fa-solid fa-inbox text-2xl mb-2 text-slate-600 block"></i>
+          ไม่พบออเดอร์ตามเงื่อนไขที่เลือก
+        </div>
+      </div>
+
+      <!-- Table Footer / Count -->
+      <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
+        <span>แสดง <strong id="tableShowingCount" class="text-slate-300 font-bold">0</strong> จากทั้งหมด <strong id="tableTotalCount" class="text-slate-300 font-bold">0</strong> ออเดอร์</span>
+        <span>ระบบซิงค์ข้อมูลกับคลาวด์ Google Sheets แบบเรียลไทม์</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- Order Receipt Modal -->
+  <!-- ========================================== -->
+  <div id="orderModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-3xl p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Close Button -->
+      <button 
+        onclick="closeOrderModal()" 
+        class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm transition-colors cursor-pointer"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span id="modalQueueNo" class="text-2xl font-black font-display text-orange-400">Q00</span>
+          <span id="modalStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">สำเร็จ</span>
+        </div>
+        <p id="modalOrderId" class="text-xs font-mono text-slate-400 mt-1">JK-XXXXXXXX-XXX</p>
+        <p id="modalOrderDate" class="text-[11px] text-slate-500 mt-0.5">วันเวลา...</p>
+      </div>
+
+      <!-- Customer Info Card -->
+      <div class="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/60 text-xs space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400 font-medium">ลูกค้า:</span>
+          <strong id="modalCustomerName" class="text-white font-bold">-</strong>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400 font-medium">เบอร์โทรศัพท์:</span>
+          <a id="modalCustomerPhone" href="#" class="text-orange-400 font-bold hover:underline">-</a>
+        </div>
+        <div class="flex items-start justify-between">
+          <span class="text-slate-400 font-medium">รูปแบบ / ที่อยู่:</span>
+          <span id="modalDestination" class="text-right text-slate-300 max-w-[65%]">-</span>
+        </div>
+        <div class="flex items-center justify-between pt-1 border-t border-slate-700/50">
+          <span class="text-slate-400 font-medium">การชำระเงิน:</span>
+          <span id="modalPaymentMethod" class="text-emerald-400 font-semibold">-</span>
+        </div>
+      </div>
+
+      <!-- Items Ordered -->
+      <div>
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+          รายการอาหารที่สั่ง:
+        </span>
+        <div id="modalItemsList" class="space-y-1.5 text-xs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Customer Note (If any) -->
+      <div id="modalNoteBox" class="hidden p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200">
+        <strong class="block mb-0.5">หมายเหตุจากลูกค้า:</strong>
+        <span id="modalCustomerNoteText">-</span>
+      </div>
+
+      <!-- Pricing Summary -->
+      <div class="bg-slate-800/50 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-1">
+        <div class="flex items-center justify-between text-slate-400">
+          <span>ค่าอาหารรวม:</span>
+          <span id="modalSubtotal" class="text-slate-200 font-semibold">฿0</span>
+        </div>
+        <div class="flex items-center justify-between text-slate-400">
+          <span>ค่าจัดส่ง:</span>
+          <span id="modalDeliveryFee" class="text-slate-200 font-semibold">฿0</span>
+        </div>
+        <div class="flex items-center justify-between text-sm pt-2 border-t border-slate-700 text-white font-bold">
+          <span>ยอดรวมทั้งสิ้น:</span>
+          <span id="modalGrandTotal" class="text-orange-400 font-black font-display text-base">฿0</span>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button 
+          onclick="closeOrderModal()" 
+          class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+        >
+          ปิดหน้าต่าง
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Include App Config -->
+  <script src="js/config.js"></script>
+
+  <!-- ========================================== -->
+  <!-- Dashboard JavaScript Logic -->
+  <!-- ========================================== -->
+  <script>
+    // State
+    const dashState = {
+      allOrders: [],
+      filteredOrders: [],
+      datePreset: "today", // today, yesterday, 7days, 30days, month, all, custom
+      customStart: "",
+      customEnd: "",
+      menuSortBy: "qty",   // "qty" or "revenue"
+      customerSortBy: "spend", // "spend" or "orders"
+      selectedOrder: null
+    };
+
+    // Initialize Dashboard
+    document.addEventListener("DOMContentLoaded", () => {
+      // Set default date input values
+      const todayStr = getTodayDateStr();
+      const startInput = document.getElementById("customStartDate");
+      const endInput = document.getElementById("customEndDate");
+      if (startInput) startInput.value = todayStr;
+      if (endInput) endInput.value = todayStr;
+
+      // Initial Fetch
+      fetchDashboardData(false);
+
+      // Auto-poll every 15 seconds in background
+      setInterval(() => {
+        fetchDashboardData(false);
+      }, 15000);
+    });
+
+    // ==========================================
+    // 1. Data Fetching from GAS API
+    // ==========================================
+    async function fetchDashboardData(isManual = false) {
+      const refreshIcon = document.getElementById("refreshIcon");
+      if (isManual && refreshIcon) refreshIcon.classList.add("fa-spin");
+
+      if (!APP_CONFIG.GAS_API_URL) {
+        console.warn("GAS_API_URL not configured");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${APP_CONFIG.GAS_API_URL}?action=getOrders&limit=500`);
+        const data = await response.json();
+
+        if (data && data.success && Array.isArray(data.orders)) {
+          // Normalize orders
+          data.orders.forEach(o => {
+            const rawStatus = (o.orderStatus || o.status || "").trim();
+            if (rawStatus === "ชำระเงินสด" || rawStatus === "โอนผ่านพร้อมเพย์" || rawStatus === "พร้อมเพย์" || !rawStatus) {
+              if (o.updatedAt === "สำเร็จ" || o.updatedAt === "พร้อมส่ง/รับ" || o.updatedAt === "กำลังปรุง") {
+                o.orderStatus = o.updatedAt;
+                o.status = o.updatedAt;
+              } else {
+                o.orderStatus = "รอยืนยัน";
+                o.status = "รอยืนยัน";
+              }
+            }
+          });
+
+          dashState.allOrders = data.orders;
+          applyDateFilter();
+        }
+      } catch (err) {
+        console.warn("Fetch dashboard error:", err);
+      } finally {
+        if (isManual && refreshIcon) refreshIcon.classList.remove("fa-spin");
+        const timeEl = document.getElementById("lastUpdatedTime");
+        if (timeEl) {
+          timeEl.textContent = `อัปเดต: ${new Date().toLocaleTimeString("th-TH")}`;
+        }
+      }
+    }
+
+    // ==========================================
+    // 2. Date Filtering Logic
+    // ==========================================
+    function getOrderDateStr(order) {
+      if (!order) return "";
+      // 1. Try orderId: JK-YYYYMMDD-xxx
+      if (order.orderId) {
+        const m = String(order.orderId).match(/JK-(\d{4})(\d{2})(\d{2})-/i);
+        if (m) {
+          return `${m[1]}-${m[2]}-${m[3]}`;
+        }
+      }
+      // 2. Try orderDate ISO string
+      if (order.orderDate) {
+        const s = String(order.orderDate).trim();
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const mo = String(d.getMonth() + 1).padStart(2, "0");
+          const da = String(d.getDate()).padStart(2, "0");
+          return `${y}-${mo}-${da}`;
+        }
+      }
+      return "";
+    }
+
+    function getOrderHour(order) {
+      if (!order) return 12;
+      // 1. Try updatedAt e.g. "Fri Apr 10 2026 15:40:08 GMT+0700"
+      if (order.updatedAt) {
+        const m = String(order.updatedAt).match(/(\d{2}):(\d{2}):(\d{2})/);
+        if (m) return parseInt(m[1], 10);
+      }
+      // 2. Try orderDate
+      if (order.orderDate) {
+        const d = new Date(order.orderDate);
+        if (!isNaN(d.getTime())) return d.getHours();
+        const m = String(order.orderDate).match(/(\d{2}):(\d{2})/);
+        if (m) return parseInt(m[1], 10);
+      }
+      return 18; // default evening rush
+    }
+
+    function getTodayDateStr() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function getYesterdayDateStr() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function formatThaiDateDisplay(dateStr) {
+      if (!dateStr) return "-";
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return dateStr;
+      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      const y = parseInt(parts[0], 10) + 543;
+      const m = thaiMonths[parseInt(parts[1], 10) - 1] || parts[1];
+      const d = parseInt(parts[2], 10);
+      return `${d} ${m} ${y}`;
+    }
+
+    function setDashboardDatePreset(preset) {
+      dashState.datePreset = preset;
+      dashState.customStart = "";
+      dashState.customEnd = "";
+      updatePresetButtonsUI();
+      applyDateFilter();
+    }
+
+    function applyCustomDateRange() {
+      const sVal = document.getElementById("customStartDate")?.value;
+      const eVal = document.getElementById("customEndDate")?.value;
+      if (!sVal || !eVal) return;
+
+      dashState.datePreset = "custom";
+      dashState.customStart = sVal <= eVal ? sVal : eVal;
+      dashState.customEnd = sVal <= eVal ? eVal : sVal;
+      updatePresetButtonsUI();
+      applyDateFilter();
+    }
+
+    function updatePresetButtonsUI() {
+      const p = dashState.datePreset;
+      const buttons = {
+        today: document.getElementById("dashBtnToday"),
+        yesterday: document.getElementById("dashBtnYesterday"),
+        "7days": document.getElementById("dashBtn7days"),
+        "30days": document.getElementById("dashBtn30days"),
+        month: document.getElementById("dashBtnMonth"),
+        all: document.getElementById("dashBtnAll")
+      };
+
+      const inactive = "px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer";
+      const active = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow-xs transition-all cursor-pointer";
+
+      Object.keys(buttons).forEach(k => {
+        if (buttons[k]) {
+          buttons[k].className = (k === p) ? active : inactive;
+        }
+      });
+
+      const resetBtn = document.getElementById("dashResetBtn");
+      if (resetBtn) {
+        if (p === "today") resetBtn.classList.add("hidden");
+        else resetBtn.classList.remove("hidden");
+      }
+    }
+
+    function applyDateFilter() {
+      const preset = dashState.datePreset;
+      const todayStr = getTodayDateStr();
+      const yestStr = getYesterdayDateStr();
+      let list = dashState.allOrders;
+      let summaryText = "";
+
+      if (preset === "today") {
+        list = list.filter(o => getOrderDateStr(o) === todayStr);
+        summaryText = `วันนี้ (${formatThaiDateDisplay(todayStr)})`;
+      } else if (preset === "yesterday") {
+        list = list.filter(o => getOrderDateStr(o) === yestStr);
+        summaryText = `เมื่อวาน (${formatThaiDateDisplay(yestStr)})`;
+      } else if (preset === "7days") {
+        const now = new Date();
+        const past7 = new Date();
+        past7.setDate(now.getDate() - 6);
+        past7.setHours(0, 0, 0, 0);
+        list = list.filter(o => {
+          const dStr = getOrderDateStr(o);
+          if (!dStr) return false;
+          const od = new Date(`${dStr}T00:00:00`);
+          return !isNaN(od.getTime()) && od >= past7;
+        });
+        summaryText = "7 วันล่าสุด";
+      } else if (preset === "30days") {
+        const now = new Date();
+        const past30 = new Date();
+        past30.setDate(now.getDate() - 29);
+        past30.setHours(0, 0, 0, 0);
+        list = list.filter(o => {
+          const dStr = getOrderDateStr(o);
+          if (!dStr) return false;
+          const od = new Date(`${dStr}T00:00:00`);
+          return !isNaN(od.getTime()) && od >= past30;
+        });
+        summaryText = "30 วันล่าสุด";
+      } else if (preset === "month") {
+        const currentYearMonth = todayStr.substring(0, 7); // "YYYY-MM"
+        list = list.filter(o => getOrderDateStr(o).startsWith(currentYearMonth));
+        summaryText = `เดือนนี้ (${formatThaiDateDisplay(todayStr).split(" ").slice(1).join(" ")})`;
+      } else if (preset === "custom") {
+        list = list.filter(o => {
+          const od = getOrderDateStr(o);
+          return od >= dashState.customStart && od <= dashState.customEnd;
+        });
+        summaryText = `ระหว่าง ${formatThaiDateDisplay(dashState.customStart)} ถึง ${formatThaiDateDisplay(dashState.customEnd)}`;
+      } else {
+        // "all"
+        summaryText = "ทั้งหมดตั้งแต่เปิดร้าน";
+      }
+
+      dashState.filteredOrders = list;
+
+      // Update Filter Summary Bar
+      const sumEl = document.getElementById("filterSummaryText");
+      if (sumEl) sumEl.textContent = summaryText;
+
+      const validList = list.filter(o => o.orderStatus !== "ยกเลิก");
+      const revTotal = validList.reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
+
+      document.getElementById("filterOrderCount").textContent = `${list.length} บิล`;
+      document.getElementById("filterRevenueSum").textContent = `฿${revTotal.toLocaleString()}`;
+
+      // Render Components
+      renderKpis();
+      renderTopMenus();
+      renderTopCustomers();
+      renderPeakHours();
+      renderOrdersLedgerTable();
+    }
+
+    // ==========================================
+    // 3. Render Executive KPI Cards
+    // ==========================================
+    function renderKpis() {
+      const orders = dashState.filteredOrders;
+      const validOrders = orders.filter(o => o.orderStatus !== "ยกเลิก");
+      const completedOrders = orders.filter(o => o.orderStatus === "สำเร็จ");
+      const pendingOrders = orders.filter(o => o.orderStatus === "รอยืนยัน" || o.orderStatus === "กำลังปรุง" || o.orderStatus === "พร้อมส่ง/รับ");
+
+      const totalRevenue = validOrders.reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
+      const foodSubtotal = validOrders.reduce((sum, o) => sum + (Number(o.itemsSubtotal) || 0), 0);
+      const deliveryTotal = validOrders.reduce((sum, o) => sum + (Number(o.deliveryFee) || 0), 0);
+
+      const aov = validOrders.length > 0 ? Math.round(totalRevenue / validOrders.length) : 0;
+
+      // Customers
+      const custMap = new Map();
+      orders.forEach(o => {
+        const key = (o.customerPhone && String(o.customerPhone).trim()) || o.customerName || o.lineUserId || "guest";
+        custMap.set(key, (custMap.get(key) || 0) + 1);
+      });
+      const uniqueCustomers = custMap.size;
+      let repeatCustomers = 0;
+      custMap.forEach(count => {
+        if (count > 1) repeatCustomers++;
+      });
+
+      // Payment Breakdown
+      let promptpayCount = 0;
+      let cashCount = 0;
+      validOrders.forEach(o => {
+        const pm = (o.paymentMethod || o.paymentStatus || "").toLowerCase();
+        if (pm.includes("พร้อมเพย์") || pm.includes("promptpay") || pm.includes("qr") || pm.includes("โอน")) {
+          promptpayCount++;
+        } else {
+          cashCount++;
+        }
+      });
+      const totalPay = validOrders.length || 1;
+      const ppPct = Math.round((promptpayCount / totalPay) * 100);
+      const cashPct = 100 - ppPct;
+
+      // Fulfillment Breakdown
+      let storeCount = 0;
+      let deliveryCount = 0;
+      validOrders.forEach(o => {
+        const ft = (o.fulfillmentType || "").toLowerCase();
+        if (ft.includes("ส่ง") || ft.includes("delivery") || (Number(o.deliveryFee) > 0)) {
+          deliveryCount++;
+        } else {
+          storeCount++;
+        }
+      });
+      const storePct = Math.round((storeCount / totalPay) * 100);
+      const delivPct = 100 - storePct;
+
+      // Dish count
+      let totalDishes = 0;
+      validOrders.forEach(o => {
+        const items = parseOrderItems(o);
+        totalDishes += items.reduce((s, it) => s + it.qty, 0);
+      });
+      const avgDish = validOrders.length > 0 ? (totalDishes / validOrders.length).toFixed(1) : 0;
+
+      // Populate KPI elements
+      document.getElementById("kpiRevenue").textContent = `฿${totalRevenue.toLocaleString()}`;
+      document.getElementById("kpiFoodSubtotal").textContent = `฿${foodSubtotal.toLocaleString()}`;
+      document.getElementById("kpiDeliveryTotal").textContent = `฿${deliveryTotal.toLocaleString()}`;
+
+      document.getElementById("kpiTotalOrders").textContent = orders.length;
+      document.getElementById("kpiCompletedOrders").textContent = completedOrders.length;
+      document.getElementById("kpiPendingOrders").textContent = pendingOrders.length;
+
+      document.getElementById("kpiAov").textContent = `฿${aov.toLocaleString()}`;
+      document.getElementById("kpiAvgDishPerOrder").textContent = `${avgDish} จาน`;
+
+      document.getElementById("kpiCustomers").textContent = uniqueCustomers;
+      document.getElementById("kpiRepeatCustomers").textContent = repeatCustomers;
+
+      document.getElementById("kpiPromptPayShare").textContent = `พร้อมเพย์ ${ppPct}%`;
+      document.getElementById("kpiCashShare").textContent = `${cashPct}%`;
+
+      document.getElementById("kpiStorePickupShare").textContent = `หน้าร้าน ${storePct}%`;
+      document.getElementById("kpiDeliveryShare").textContent = `${delivPct}%`;
+    }
+
+    // ==========================================
+    // 4. Menu Items Dual-Parser
+    // ==========================================
+    function parseOrderItems(order) {
+      const items = [];
+      if (!order) return items;
+
+      // 1. Try itemsDetail JSON
+      if (order.itemsDetail && typeof order.itemsDetail === "string" && order.itemsDetail.trim().startsWith("[")) {
+        try {
+          const parsed = JSON.parse(order.itemsDetail);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            parsed.forEach(it => {
+              const qty = parseInt(it.qty || it.quantity || 1, 10) || 1;
+              const price = parseFloat(it.price || 0) || 0;
+              const name = (it.name || it.title || "รายการอาหาร").trim();
+              items.push({ name, qty, price, total: price * qty });
+            });
+            return items;
+          }
+        } catch (e) {
+          // fallback
+        }
+      }
+
+      // 2. Parse from itemsSummary text
+      if (order.itemsSummary && typeof order.itemsSummary === "string") {
+        const lines = order.itemsSummary.split(/\r?\n|<br\s*\/?>/i).map(l => l.trim()).filter(Boolean);
+        for (const line of lines) {
+          // Regex: "1x หมูสามชั้นทอดน้ำปลา (฿100)"
+          const match = line.match(/^(?:(\d+)\s*[xX]\s*)?([^(\n]+?)(?:\s*\([฿B]?\s*([\d,.]+)\s*\))?$/);
+          if (match) {
+            const qty = parseInt(match[1] || 1, 10) || 1;
+            let name = (match[2] || "").trim();
+            const cleanName = name.replace(/\[.*?\]/g, "").trim();
+            const total = match[3] ? parseFloat(match[3].replace(/,/g, "")) || 0 : 0;
+            const price = qty > 0 && total > 0 ? Math.round(total / qty) : total;
+            items.push({
+              name: cleanName || name || "อาหาร",
+              qty,
+              price,
+              total: total > 0 ? total : price * qty
+            });
+          } else {
+            items.push({ name: line, qty: 1, price: 0, total: 0 });
+          }
+        }
+      }
+      return items;
+    }
+
+    // ==========================================
+    // 5. Render Top Best-Selling Menus (เมนูขายดี)
+    // ==========================================
+    function setMenuRankSort(metric) {
+      dashState.menuSortBy = metric;
+      const qBtn = document.getElementById("menuSortQtyBtn");
+      const rBtn = document.getElementById("menuSortRevBtn");
+      if (metric === "qty") {
+        qBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer";
+        rBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer";
+      } else {
+        rBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer";
+        qBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer";
+      }
+      renderTopMenus();
+    }
+
+    function renderTopMenus() {
+      const container = document.getElementById("topMenusList");
+      if (!container) return;
+
+      const validOrders = dashState.filteredOrders.filter(o => o.orderStatus !== "ยกเลิก");
+      const menuMap = new Map();
+      let grandTotalFoodRevenue = 0;
+      let totalPortionsCount = 0;
+
+      validOrders.forEach(order => {
+        const items = parseOrderItems(order);
+        items.forEach(it => {
+          const key = it.name.trim();
+          if (!key) return;
+          const curr = menuMap.get(key) || { name: key, qty: 0, revenue: 0, orderCount: 0 };
+          curr.qty += it.qty;
+          curr.revenue += (it.total || it.price * it.qty || 0);
+          curr.orderCount += 1;
+          menuMap.set(key, curr);
+
+          grandTotalFoodRevenue += (it.total || it.price * it.qty || 0);
+          totalPortionsCount += it.qty;
+        });
+      });
+
+      const menuList = Array.from(menuMap.values());
+
+      // Sort
+      if (dashState.menuSortBy === "qty") {
+        menuList.sort((a, b) => b.qty - a.qty || b.revenue - a.revenue);
+      } else {
+        menuList.sort((a, b) => b.revenue - a.revenue || b.qty - a.qty);
+      }
+
+      document.getElementById("totalUniqueDishes").textContent = menuList.length;
+      document.getElementById("totalDishPortions").textContent = totalPortionsCount;
+
+      if (menuList.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-xs text-slate-500">
+            <i class="fa-solid fa-bowl-food text-2xl mb-2 text-slate-600 block"></i>
+            ไม่มีข้อมูลเมนูที่ขายในช่วงเวลานี้
+          </div>
+        `;
+        return;
+      }
+
+      const topLimit = Math.min(10, menuList.length);
+      const maxVal = dashState.menuSortBy === "qty" ? menuList[0].qty : menuList[0].revenue;
+
+      container.innerHTML = menuList.slice(0, topLimit).map((item, idx) => {
+        const rank = idx + 1;
+        let rankBadge = `<span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 font-bold flex items-center justify-center text-xs">${rank}</span>`;
+        if (rank === 1) {
+          rankBadge = `<span class="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shadow-sm shadow-amber-500/50">🥇</span>`;
+        } else if (rank === 2) {
+          rankBadge = `<span class="w-6 h-6 rounded-lg bg-slate-300 text-slate-900 font-black flex items-center justify-center text-xs">🥈</span>`;
+        } else if (rank === 3) {
+          rankBadge = `<span class="w-6 h-6 rounded-lg bg-amber-700 text-white font-black flex items-center justify-center text-xs">🥉</span>`;
+        }
+
+        const pct = grandTotalFoodRevenue > 0 ? Math.round((item.revenue / grandTotalFoodRevenue) * 100) : 0;
+        const barWidth = maxVal > 0 ? Math.max(8, Math.round(((dashState.menuSortBy === "qty" ? item.qty : item.revenue) / maxVal) * 100)) : 10;
+
+        return `
+          <div class="p-2.5 rounded-2xl bg-slate-800/40 border border-slate-800 hover:border-slate-700 transition-all flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 min-w-0">
+                ${rankBadge}
+                <span class="text-xs font-bold text-white truncate max-w-[180px] sm:max-w-[260px]" title="${item.name}">
+                  ${item.name}
+                </span>
+              </div>
+              <div class="text-right flex items-center gap-3">
+                <span class="text-xs font-bold text-orange-400 font-display">
+                  ${item.qty} ชาม
+                </span>
+                <span class="text-xs font-bold text-slate-300 font-display w-16 text-right">
+                  ฿${item.revenue.toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="flex items-center gap-2">
+              <div class="flex-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400 transition-all duration-500" style="width: ${barWidth}%"></div>
+              </div>
+              <span class="text-[10px] text-slate-500 font-mono w-9 text-right">${pct}%</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // ==========================================
+    // 6. Render Top Spending Customers (ลูกค้าประจำ & VIP)
+    // ==========================================
+    function setCustomerSort(metric) {
+      dashState.customerSortBy = metric;
+      const sBtn = document.getElementById("custSortSpendBtn");
+      const oBtn = document.getElementById("custSortOrdersBtn");
+      if (metric === "spend") {
+        sBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer";
+        oBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer";
+      } else {
+        oBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer";
+        sBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer";
+      }
+      renderTopCustomers();
+    }
+
+    function formatPhone(phone) {
+      if (!phone) return "-";
+      let s = String(phone).replace(/\D/g, "");
+      if (s.length === 9) s = "0" + s;
+      if (s.length === 10) {
+        return `${s.slice(0, 3)}-${s.slice(3, 6)}-${s.slice(6)}`;
+      }
+      return String(phone);
+    }
+
+    function getRawPhone(phone) {
+      if (!phone) return "";
+      let s = String(phone).replace(/\D/g, "");
+      if (s.length === 9) s = "0" + s;
+      return s;
+    }
+
+    function renderTopCustomers() {
+      const container = document.getElementById("topCustomersList");
+      if (!container) return;
+
+      const validOrders = dashState.filteredOrders.filter(o => o.orderStatus !== "ยกเลิก");
+      const customerMap = new Map();
+
+      validOrders.forEach(order => {
+        const rawPhone = getRawPhone(order.customerPhone);
+        const name = (order.customerName || "ลูกค้าทั่วไป").trim();
+        // Unique grouping key: phone if exists, else name
+        const key = rawPhone ? `phone_${rawPhone}` : `name_${name}`;
+
+        const curr = customerMap.get(key) || {
+          name: name,
+          phone: rawPhone,
+          ordersCount: 0,
+          totalSpend: 0,
+          paymentMethods: {},
+          lastOrderDate: ""
+        };
+
+        curr.ordersCount += 1;
+        curr.totalSpend += (Number(order.grandTotal) || 0);
+
+        const pm = order.paymentMethod || "เงินสด";
+        curr.paymentMethods[pm] = (curr.paymentMethods[pm] || 0) + 1;
+
+        const od = getOrderDateStr(order);
+        if (!curr.lastOrderDate || od > curr.lastOrderDate) {
+          curr.lastOrderDate = od;
+        }
+
+        customerMap.set(key, curr);
+      });
+
+      const custList = Array.from(customerMap.values());
+
+      // Sort
+      if (dashState.customerSortBy === "spend") {
+        custList.sort((a, b) => b.totalSpend - a.totalSpend || b.ordersCount - a.ordersCount);
+      } else {
+        custList.sort((a, b) => b.ordersCount - a.ordersCount || b.totalSpend - a.totalSpend);
+      }
+
+      document.getElementById("totalCustomerProfiles").textContent = custList.length;
+
+      if (custList.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-xs text-slate-500">
+            <i class="fa-solid fa-user-xmark text-2xl mb-2 text-slate-600 block"></i>
+            ไม่มีข้อมูลประวัติลูกค้าในช่วงเวลานี้
+          </div>
+        `;
+        return;
+      }
+
+      const topLimit = Math.min(10, custList.length);
+
+      container.innerHTML = custList.slice(0, topLimit).map((c, idx) => {
+        const rank = idx + 1;
+        let vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-800 text-slate-400">#${rank}</span>`;
+        if (rank === 1) {
+          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-xs">👑 VIP #1</span>`;
+        } else if (rank === 2) {
+          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-700 text-slate-200">⭐ VIP #2</span>`;
+        } else if (rank === 3) {
+          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-900/60 text-purple-300 border border-purple-700">VIP #3</span>`;
+        }
+
+        const avgSpend = c.ordersCount > 0 ? Math.round(c.totalSpend / c.ordersCount) : 0;
+        const displayPhone = formatPhone(c.phone);
+
+        return `
+          <div class="p-3 rounded-2xl bg-slate-800/40 border border-slate-800 hover:border-slate-700 transition-all flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs shrink-0">
+                ${c.name.charAt(0) || '👤'}
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-bold text-white truncate max-w-[140px] sm:max-w-[190px]" title="${c.name}">
+                    ${c.name}
+                  </span>
+                  ${vipTag}
+                </div>
+                <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                  ${c.phone ? `
+                    <a href="tel:${c.phone}" class="hover:text-orange-400 flex items-center gap-1 font-mono transition-colors">
+                      <i class="fa-solid fa-phone text-[9px] text-orange-500"></i> ${displayPhone}
+                    </a>
+                  ` : `<span class="text-slate-500">ไม่ระบุเบอร์</span>`}
+                  <span>•</span>
+                  <span>สั่ง ${c.ordersCount} ครั้ง</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-right shrink-0">
+              <span class="text-xs font-black text-emerald-400 font-display block">
+                ฿${c.totalSpend.toLocaleString()}
+              </span>
+              <span class="text-[10px] text-slate-500 block">
+                เฉลี่ย ฿${avgSpend}/ครั้ง
+              </span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // ==========================================
+    // 7. Render Peak Ordering Hours Distribution
+    // ==========================================
+    function renderPeakHours() {
+      const container = document.getElementById("hourlyBarsContainer");
+      if (!container) return;
+
+      const validOrders = dashState.filteredOrders.filter(o => o.orderStatus !== "ยกเลิก");
+      const hourCounts = new Array(24).fill(0);
+      const hourRevenue = new Array(24).fill(0);
+
+      validOrders.forEach(o => {
+        const h = getOrderHour(o);
+        if (h >= 0 && h < 24) {
+          hourCounts[h]++;
+          hourRevenue[h] += (Number(o.grandTotal) || 0);
+        }
+      });
+
+      // Find restaurant active hours (typically 07:00 to 23:00)
+      const displayHours = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+      const maxCount = Math.max(...displayHours.map(h => hourCounts[h]), 1);
+
+      let peakH = -1;
+      let peakMax = 0;
+      displayHours.forEach(h => {
+        if (hourCounts[h] > peakMax) {
+          peakMax = hourCounts[h];
+          peakH = h;
+        }
+      });
+
+      const peakBadge = document.getElementById("peakHourBadge");
+      if (peakBadge) {
+        if (peakMax > 0 && peakH !== -1) {
+          peakBadge.innerHTML = `<i class="fa-solid fa-bolt text-amber-400"></i> <span>ช่วงเวลาพีค: <strong>${peakH}:00 - ${peakH + 1}:00 น.</strong> (${peakMax} บิล)</span>`;
+          peakBadge.classList.remove("hidden");
+        } else {
+          peakBadge.innerHTML = `<span>ช่วงเวลาพีค: -</span>`;
+        }
+      }
+
+      container.innerHTML = displayHours.map(h => {
+        const count = hourCounts[h];
+        const rev = hourRevenue[h];
+        const isPeak = count > 0 && count === peakMax;
+        const heightPct = Math.max(8, Math.round((count / maxCount) * 100));
+
+        return `
+          <div class="flex flex-col items-center gap-1.5 group cursor-pointer" title="${h}:00 - ${h+1}:00 น. | ${count} ออเดอร์ (฿${rev.toLocaleString()})">
+            <!-- Count label above bar -->
+            <span class="text-[10px] font-bold ${count > 0 ? (isPeak ? 'text-amber-400' : 'text-slate-300') : 'text-slate-600'}">
+              ${count > 0 ? count : ''}
+            </span>
+
+            <!-- The Bar -->
+            <div class="w-full max-w-[28px] h-24 bg-slate-800 rounded-xl flex items-end p-0.5 overflow-hidden">
+              <div 
+                class="w-full rounded-lg transition-all duration-500 ${isPeak ? 'bg-gradient-to-t from-orange-600 to-amber-400 shadow-sm shadow-amber-500/50' : count > 0 ? 'bg-orange-500/80 hover:bg-orange-500' : 'bg-transparent'}" 
+                style="height: ${count > 0 ? heightPct : 0}%"
+              ></div>
+            </div>
+
+            <!-- Hour label -->
+            <span class="text-[10px] ${isPeak ? 'font-black text-amber-400' : 'font-medium text-slate-500'}">
+              ${h}:00
+            </span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // ==========================================
+    // 8. Render Orders Ledger Table
+    // ==========================================
+    function renderOrdersLedgerTable() {
+      const tbody = document.getElementById("ordersLedgerBody");
+      const emptyState = document.getElementById("tableEmptyState");
+      if (!tbody) return;
+
+      const statusFilter = document.getElementById("tableStatusFilter")?.value || "all";
+      const search = (document.getElementById("tableSearchInput")?.value || "").trim().toLowerCase();
+
+      let list = dashState.filteredOrders;
+
+      // Filter by status
+      if (statusFilter !== "all") {
+        list = list.filter(o => o.orderStatus === statusFilter);
+      }
+
+      // Search
+      if (search) {
+        list = list.filter(o => 
+          (o.queueNo && o.queueNo.toLowerCase().includes(search)) ||
+          (o.orderId && o.orderId.toLowerCase().includes(search)) ||
+          (o.customerName && o.customerName.toLowerCase().includes(search)) ||
+          (o.customerPhone && String(o.customerPhone).includes(search)) ||
+          (o.itemsSummary && o.itemsSummary.toLowerCase().includes(search))
+        );
+      }
+
+      document.getElementById("tableShowingCount").textContent = list.length;
+      document.getElementById("tableTotalCount").textContent = dashState.filteredOrders.length;
+
+      if (list.length === 0) {
+        tbody.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+
+      tbody.innerHTML = list.map(order => {
+        const status = order.orderStatus || "รอยืนยัน";
+        let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">รอยืนยัน</span>`;
+        if (status === "กำลังปรุง") {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">กำลังปรุง</span>`;
+        } else if (status === "พร้อมส่ง/รับ") {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">พร้อมรับ/ส่ง</span>`;
+        } else if (status === "สำเร็จ") {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300">สำเร็จ</span>`;
+        } else if (status === "ยกเลิก") {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-500/20 text-rose-400 border border-rose-500/30">ยกเลิก</span>`;
+        }
+
+        const dateStr = getOrderDateStr(order);
+        const timeStr = order.orderDate ? (order.orderDate.split(" ")[1] || "") : "";
+        const formattedPhone = formatPhone(order.customerPhone);
+
+        // First item preview
+        const items = parseOrderItems(order);
+        const firstItem = items.length > 0 ? `${items[0].qty}x ${items[0].name}` : (order.itemsSummary || "-");
+        const moreItems = items.length > 1 ? ` (+อีก ${items.length - 1} รายการ)` : "";
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <!-- Queue & ID -->
+            <td class="py-3 px-3">
+              <span class="font-black text-sm font-display text-white block">${order.queueNo || '-'}</span>
+              <span class="text-[10px] font-mono text-slate-400">${order.orderId || '-'}</span>
+            </td>
+
+            <!-- Date & Time -->
+            <td class="py-3 px-3">
+              <span class="font-medium text-slate-300 block">${formatThaiDateDisplay(dateStr)}</span>
+              <span class="text-[10px] text-slate-500">${timeStr || '-'}</span>
+            </td>
+
+            <!-- Customer -->
+            <td class="py-3 px-3">
+              <span class="font-bold text-white block">${order.customerName || 'ลูกค้าทั่วไป'}</span>
+              ${order.customerPhone ? `
+                <a href="tel:${order.customerPhone}" class="text-[11px] text-orange-400 hover:underline flex items-center gap-1">
+                  <i class="fa-solid fa-phone text-[9px]"></i> ${formattedPhone}
+                </a>
+              ` : `<span class="text-[10px] text-slate-500">-</span>`}
+            </td>
+
+            <!-- Food Items -->
+            <td class="py-3 px-3 max-w-xs">
+              <div class="line-clamp-2 text-slate-300" title="${order.itemsSummary || ''}">
+                <span class="font-medium">${firstItem}</span>
+                <span class="text-[10px] text-slate-400 font-bold">${moreItems}</span>
+              </div>
+            </td>
+
+            <!-- Fulfillment & Payment -->
+            <td class="py-3 px-3 text-center">
+              <span class="px-2 py-0.5 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 inline-block mb-1">
+                ${order.fulfillmentType || 'รับหน้าร้าน'}
+              </span>
+              <span class="text-[10px] text-slate-400 block">
+                ${order.paymentMethod ? (order.paymentMethod.includes('พร้อมเพย์') ? 'พร้อมเพย์' : 'เงินสด') : 'พร้อมเพย์'}
+              </span>
+            </td>
+
+            <!-- Grand Total -->
+            <td class="py-3 px-3 text-right">
+              <span class="font-black text-sm font-display text-orange-400 block">
+                ฿${Number(order.grandTotal).toLocaleString()}
+              </span>
+              ${Number(order.deliveryFee) > 0 ? `<span class="text-[10px] text-slate-500">ค่าส่ง ฿${order.deliveryFee}</span>` : ''}
+            </td>
+
+            <!-- Status -->
+            <td class="py-3 px-3 text-center">
+              ${statusBadge}
+            </td>
+
+            <!-- Actions -->
+            <td class="py-3 px-3 text-center no-print">
+              <button 
+                onclick="openOrderReceipt('${order.orderId}')" 
+                class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1 mx-auto"
+                title="ดูบิลฉบับเต็ม"
+              >
+                <i class="fa-solid fa-file-invoice text-orange-400 text-xs"></i>
+                <span>ดูบิล</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // ==========================================
+    // 9. Receipt Details Modal
+    // ==========================================
+    function openOrderReceipt(orderId) {
+      const order = dashState.allOrders.find(o => o.orderId === orderId);
+      if (!order) return;
+
+      dashState.selectedOrder = order;
+
+      document.getElementById("modalQueueNo").textContent = order.queueNo || "Q-";
+      document.getElementById("modalOrderId").textContent = order.orderId;
+      document.getElementById("modalOrderDate").textContent = `วันที่: ${formatThaiDateDisplay(getOrderDateStr(order))} ${order.orderDate ? (order.orderDate.split(' ')[1] || '') : ''}`;
+
+      const statusEl = document.getElementById("modalStatusBadge");
+      statusEl.textContent = order.orderStatus || "รอยืนยัน";
+
+      document.getElementById("modalCustomerName").textContent = order.customerName || "-";
+      
+      const phoneEl = document.getElementById("modalCustomerPhone");
+      phoneEl.textContent = formatPhone(order.customerPhone);
+      phoneEl.href = order.customerPhone ? `tel:${order.customerPhone}` : "#";
+
+      document.getElementById("modalDestination").textContent = `${order.fulfillmentType || 'รับที่ร้าน'} • ${order.destination || '-'}`;
+      document.getElementById("modalPaymentMethod").textContent = order.paymentMethod || "ชำระเงินสด";
+
+      // Items list
+      const itemsListEl = document.getElementById("modalItemsList");
+      const items = parseOrderItems(order);
+
+      itemsListEl.innerHTML = items.map(it => `
+        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
+          <span class="font-medium text-white">${it.qty}x ${it.name}</span>
+          <span class="font-bold text-slate-300 font-display">฿${it.total.toLocaleString()}</span>
+        </div>
+      `).join("");
+
+      // Customer Note
+      const noteBox = document.getElementById("modalNoteBox");
+      const noteText = document.getElementById("modalCustomerNoteText");
+      if (order.customerNote && order.customerNote.trim()) {
+        noteBox.classList.remove("hidden");
+        noteText.textContent = order.customerNote;
+      } else {
+        noteBox.classList.add("hidden");
+      }
+
+      // Subtotals
+      document.getElementById("modalSubtotal").textContent = `฿${Number(order.itemsSubtotal || 0).toLocaleString()}`;
+      document.getElementById("modalDeliveryFee").textContent = `฿${Number(order.deliveryFee || 0).toLocaleString()}`;
+      document.getElementById("modalGrandTotal").textContent = `฿${Number(order.grandTotal || 0).toLocaleString()}`;
+
+      const modal = document.getElementById("orderModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeOrderModal() {
+      const modal = document.getElementById("orderModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      dashState.selectedOrder = null;
+    }
+
+    // Close modal on click outside
+    window.addEventListener("click", (e) => {
+      const modal = document.getElementById("orderModal");
+      if (e.target === modal) {
+        closeOrderModal();
+      }
+    });
+
+  </script>
+</body>
+</html>
