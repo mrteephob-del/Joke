@@ -1,7 +1,6 @@
 /**
  * ข้อมูลรายการอาหารเริ่มต้น: ร้านข้าวต้มนายเจ๊ก วงเวียนตาคลี
- * ข้อมูลนี้ใช้เป็นข้อมูลเริ่มต้น (Default Local Data) เพื่อให้หน้าเว็บทำงานได้ทันที
- * และสามารถซิงค์ข้อมูลล่าสุดจาก Google Sheets ผ่าน Google Apps Script API ได้
+ * มีฟิลด์ image สำหรับแสดงรูปภาพอาหาร (สามารถแก้ไข/ใส่ลิงก์รูปได้ในชีต Menu คอลัมน์ "รูปภาพ (Image URL)")
  */
 
 const RESTAURANT_INFO = {
@@ -10,14 +9,13 @@ const RESTAURANT_INFO = {
   address: "บริเวณวงเวียนตาคลี หน้าร้านธนชาต อ.ตาคลี จ.นครสวรรค์",
   phone: "064-279-3664",
   openHours: "เปิดทุกวัน 16:30 - 23:30 น.",
-  // พิกัดร้าน: วงเวียนตาคลี หน้าร้านธนชาต (ละติจูด, ลองจิจูด)
   coords: {
     lat: 15.26352,
     lng: 100.34445
   },
   deliveryPolicy: {
-    freeDistanceKm: 3.0,     // 0 - 3 กม. แรก ส่งฟรี
-    extraPerKm: 5.0          // เกิน 3 กม. กิโลเมตรละ 5 บาท
+    freeDistanceKm: 3.0,
+    extraPerKm: 5.0
   }
 };
 
@@ -41,7 +39,7 @@ const INITIAL_MENU_ITEMS = [
     popular: true,
     description: "หมูสามชั้นคัดพิเศษ ทอดกรอบนอกนุ่มใน หอมน้ำปลาแท้",
     status: "available",
-    image: "assets/images/f01.jpg"
+    image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80"
   },
   {
     id: "f02",
@@ -50,7 +48,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: true,
     description: "คั่วพริกกระเทียมสด หอมเจียว รสชาติจัดจ้านถึงใจ",
-    status: "available"
+    status: "available",
+    image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=600&auto=format&fit=crop&q=80"
   },
   {
     id: "f03",
@@ -59,7 +58,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: false,
     description: "ไก่คั่วกรอบแห้ง รสเค็มกำลังดี ทานคู่ข้าวต้มร้อนๆ อร่อยเพลิน",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f04",
@@ -68,7 +68,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: true,
     description: "เนื้อเป็ดแน่นคัดเกรด คั่วหอมเค็มกลมกล่อม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f05",
@@ -77,7 +78,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: false,
     description: "ปลาสลิดบางบ่อทอดกรอบเหลืองทอง แกะทานง่าย ทานกับข้าวต้มฟินสุดๆ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f06",
@@ -86,7 +88,8 @@ const INITIAL_MENU_ITEMS = [
     price: 50,
     popular: false,
     description: "ไข่เจียวฟูนุ่ม หมูสับปรุงรส อิ่มอร่อยคลาสสิก",
-    status: "available"
+    status: "available",
+    image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80"
   },
   {
     id: "f07",
@@ -95,7 +98,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: false,
     description: "ไข่เจียวใส่แหนมสด รสเปรี้ยวกำลังดี ทอดหอมฟู",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f08",
@@ -104,7 +108,8 @@ const INITIAL_MENU_ITEMS = [
     price: 50,
     popular: false,
     description: "หมูยออุบลเกรดพรีเมียม ทอดกรอบนอกนุ่มใน หอมพริกไทย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f09",
@@ -113,7 +118,8 @@ const INITIAL_MENU_ITEMS = [
     price: 50,
     popular: false,
     description: "กุนเชียงเนื้อแน่น ทอดไร้น้ำมัน หวานหอมกลมกล่อม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f10",
@@ -122,7 +128,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: false,
     description: "หมูแดดเดียวหมักสูตรเด็ด ทอดนุ่มไม่เหนียว หอมกลิ่นกระเทียมพริกไทย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f11",
@@ -131,7 +138,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: false,
     description: "เม็ดมะม่วงเม็ดโต ทอดใหม่กรอบมัน โรยเกลือหอมอร่อย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f12",
@@ -140,7 +148,8 @@ const INITIAL_MENU_ITEMS = [
     price: 120,
     popular: false,
     description: "กุ้งสดตัวโต ชุบเกล็ดขนมปังทอดสีทองกรอบ พร้อมน้ำจิ้มบ๊วย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "f13",
@@ -149,7 +158,8 @@ const INITIAL_MENU_ITEMS = [
     price: 200,
     popular: true,
     description: "ปลาทับทิมสดตัวใหญ่ ทอดกรอบทั้งตัว โรยกระเทียมเจียวพูนๆ",
-    status: "available"
+    status: "available",
+    image: ""
   },
 
   // =================== หมวดยำ (salad) ===================
@@ -160,7 +170,8 @@ const INITIAL_MENU_ITEMS = [
     price: 120,
     popular: true,
     description: "กระเพาะปลากรอบ ปลาหมึกกรอบ เม็ดมะม่วง น้ำยำรสแซ่บจัดจ้าน",
-    status: "available"
+    status: "available",
+    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80"
   },
   {
     id: "y02",
@@ -169,7 +180,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: true,
     description: "ไส้อ่อนล้างสะอาดต้มเปื่อยนุ่ม คลุกเคล้าน้ำยำมะนาวแท้",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y03",
@@ -178,7 +190,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: false,
     description: "ไข่เค็มไชยาแดงฉ่ำ มันอร่อย ราดน้ำยำรสกลมกล่อม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y04",
@@ -187,7 +200,8 @@ const INITIAL_MENU_ITEMS = [
     price: 70,
     popular: false,
     description: "ไข่เยี่ยวม้าเนื้อเด้ง โรยขิงดอง หอมแดง พริกขี้หนูสด",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y05",
@@ -196,7 +210,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: false,
     description: "ผักกาดดองเกี่ยมฉ่ายกรอบๆ ยำใส่พริกขี้หนู มะนาว ทานคู่ข้าวต้มเลิศมาก",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y06",
@@ -205,7 +220,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: false,
     description: "กุนเชียงทอดหอมหวาน ยำใส่มะนาวสด แตงกวาและขึ้นฉ่าย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y07",
@@ -214,7 +230,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: false,
     description: "ไข่ดาวทอดกรอบขอบกรอบๆ ยำแซ่บ ใส่หมูสับและผักสมุนไพร",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y08",
@@ -223,7 +240,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: false,
     description: "เนื้อปลาสลิดทอดกรอบแกะชิ้นพอดีคำ ยำเปรี้ยวหวานเผ็ดลงตัว",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y09",
@@ -232,7 +250,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: false,
     description: "ผักกระเฉดยอดอ่อนลวกกรอบ ยำกับหมูสับและกุ้งลวก",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y10",
@@ -241,7 +260,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: false,
     description: "กุ้งแห้งตัวโตไม่เค็มจัด ยำรสแซ่บ เมนูคู่ข้าวต้มในตำนาน",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y11",
@@ -250,7 +270,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: false,
     description: "ปลาหมึกกล้วยสดเนื้อเด้ง ลวกสุกกำลังดี น้ำยำมะนาวคั้นสด",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y12",
@@ -259,7 +280,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: false,
     description: "วุ้นเส้นเหนียวนุ่ม ยำรวมมิตรกุ้ง หมูสับ หมูยอ แซ่บจัดจ้าน",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y13",
@@ -268,7 +290,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: false,
     description: "ปลาอินทรีย์เค็มทอดหอม ยำบีบมะนาว โรยหอมแดง พริกซอย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "y14",
@@ -277,7 +300,8 @@ const INITIAL_MENU_ITEMS = [
     price: 120,
     popular: true,
     description: "กุ้งแก้วสดๆ แช่น้ำปลาอย่างดี เสิร์ฟพร้อมกระเทียม มะระสด และน้ำจิ้มซีฟู้ดรสเด็ด",
-    status: "available"
+    status: "available",
+    image: ""
   },
 
   // =================== หมวดผัด (stirfry) ===================
@@ -288,7 +312,8 @@ const INITIAL_MENU_ITEMS = [
     price: 40,
     popular: true,
     description: "ผักบุ้งจีนสด ผัดไฟลุก กลิ่นเต้าเจี้ยวหอมกรุ่น พริกกระเทียมจัดเต็ม",
-    status: "available"
+    status: "available",
+    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80"
   },
   {
     id: "p02",
@@ -297,7 +322,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: true,
     description: "ผักแขนงสดหวานกรอบ ผัดน้ำมันหอยใส่หมูกรอบเคี้ยวเพลิน",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p03",
@@ -306,7 +332,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: false,
     description: "ผักแขนงผัดเคล้าปลาเค็มทอดหอมๆ หอมเตะจมูก",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p04",
@@ -315,7 +342,8 @@ const INITIAL_MENU_ITEMS = [
     price: 50,
     popular: false,
     description: "ยอดผักกระเฉดอ่อนไม่เหนียว ผัดไฟแรงรสเข้มข้น",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p05",
@@ -324,7 +352,8 @@ const INITIAL_MENU_ITEMS = [
     price: 70,
     popular: true,
     description: "กุ้ยช่ายขาวหวานกรอบ ผัดเต้าหู้ไข่เหลืองและหมูสับนุ่มๆ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p06",
@@ -333,7 +362,8 @@ const INITIAL_MENU_ITEMS = [
     price: 50,
     popular: false,
     description: "ยอดมะพร้าวอ่อนกรุบกรอบ ผัดน้ำมันหอยรสกลมกล่อม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p07",
@@ -342,7 +372,8 @@ const INITIAL_MENU_ITEMS = [
     price: 70,
     popular: false,
     description: "ผักสดหลากชนิด ผัดร้อนๆ สดสะอาด ได้ประโยชน์ครบ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p08",
@@ -351,7 +382,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: false,
     description: "วุ้นเส้นผัดรวมมิตรเครื่อง 8 อย่าง กุ้ง หมึก เห็ดหอม คื่นฉ่าย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p09",
@@ -360,7 +392,8 @@ const INITIAL_MENU_ITEMS = [
     price: 70,
     popular: false,
     description: "มะระจีนหั่นบางไม่ขม ผัดไข่ไก่หอมกลิ่นกระทะไหม้นิดๆ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p10",
@@ -369,7 +402,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: true,
     description: "เนื้อปลาช่อนทอดผัดขึ้นฉ่ายหอมเต้าเจี้ยว รสดั้งเดิม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p11",
@@ -378,7 +412,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: false,
     description: "กระเพาะหมูล้างสะอาดเคี่ยวเปื่อย ผัดเกี่ยมฉ่ายรสกลมกล่อม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p12",
@@ -387,7 +422,8 @@ const INITIAL_MENU_ITEMS = [
     price: 50,
     popular: false,
     description: "ต้นอ่อนทานตะวันสด ผัดน้ำมันหอยไฟแดง หอม อร่อย สุขภาพดี",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p13",
@@ -396,7 +432,8 @@ const INITIAL_MENU_ITEMS = [
     price: 50,
     popular: false,
     description: "ถั่วลันเตาหวานกรอบ ผัดไฟแรงรสชาติกลมกล่อม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p14",
@@ -405,7 +442,8 @@ const INITIAL_MENU_ITEMS = [
     price: 70,
     popular: true,
     description: "หนำเลี้ยบแท้ผัดหมูสับแห้งๆ หอมกลิ่นคั่วกระทะ เมนูข้าวต้มอันดับหนึ่ง",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p15",
@@ -414,7 +452,8 @@ const INITIAL_MENU_ITEMS = [
     price: 70,
     popular: false,
     description: "หมูสับผัดคลุกเคล้าไข่เค็มแดง มันนัวหอมกลมกล่อม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p16",
@@ -423,7 +462,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: true,
     description: "ปลาหมึกสดชิ้นโต คลุกซอสไข่เค็มเยิ้มๆ รสชาติเข้มข้น",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p17",
@@ -432,7 +472,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: true,
     description: "หอยลายสดตัวโต ผัดน้ำพริกเผาโหระพา หอมเข้มข้นถึงเครื่อง",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p18",
@@ -449,7 +490,8 @@ const INITIAL_MENU_ITEMS = [
       { name: "ปลาช่อน", price: 100 },
       { name: "หมูกรอบ", price: 100 }
     ],
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "p19",
@@ -465,7 +507,8 @@ const INITIAL_MENU_ITEMS = [
       { name: "หมูกรอบ", price: 100 },
       { name: "ทะเล", price: 100 }
     ],
-    status: "available"
+    status: "available",
+    image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80"
   },
 
   // =================== หมวดต้มหรือแกง (soup) ===================
@@ -476,7 +519,8 @@ const INITIAL_MENU_ITEMS = [
     price: 150,
     popular: true,
     description: "ต้มยำน้ำข้น/น้ำใส เครื่องทะเล กุ้ง หมึก ปลา รสแซ่บจัดจ้านถึงใจ",
-    status: "available"
+    status: "available",
+    image: "https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=600&auto=format&fit=crop&q=80"
   },
   {
     id: "s02",
@@ -485,7 +529,8 @@ const INITIAL_MENU_ITEMS = [
     price: 150,
     popular: true,
     description: "เครื่องในหมูคัดสะอาด นุ่มเปื่อย ปรุงรสต้มแซ่บเปรี้ยวเผ็ดสะใจ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s03",
@@ -494,7 +539,8 @@ const INITIAL_MENU_ITEMS = [
     price: 150,
     popular: true,
     description: "แกงส้มใต้/ภาคกลาง รสเปรี้ยวนำ เนื้อปลาช่อนสดแน่น ผักกาดขาวหรือผักรวม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s04",
@@ -503,7 +549,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: false,
     description: "ไข่เจียวทอดหอม ซดกับน้ำซุปใสกลมกล่อม หมูสับและสาหร่าย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s05",
@@ -512,7 +559,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: false,
     description: "เต้าหู้ไข่นุ่มๆ หมูสับปั้นก้อน ซุปร้อนๆ ซดคล่องคอ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s06",
@@ -521,7 +569,8 @@ const INITIAL_MENU_ITEMS = [
     price: 60,
     popular: false,
     description: "มะระต้มซี่โครงหมู ตุ๋นยาจีนจนน้ำซุปหอมหวานกลมกล่อม ไม่ขม",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s07",
@@ -530,7 +579,8 @@ const INITIAL_MENU_ITEMS = [
     price: 120,
     popular: true,
     description: "กระเพาะหมูเคี่ยวเปื่อย เกี่ยมฉ่ายรสเปรี้ยวเค็มตัดกัน พริกไทยเม็ดหอมๆ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s08",
@@ -539,7 +589,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: true,
     description: "หมูสับปรุงรสในน้ำซุปต้มบ๊วยดอง เปรี้ยวเค็มสดชื่น สร่างเมาซดคล่องคอ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s09",
@@ -548,7 +599,8 @@ const INITIAL_MENU_ITEMS = [
     price: 80,
     popular: true,
     description: "เนื้อเป็ดตุ๋นเครื่องพะโล้สูตรโบราณ เนื้อนุ่มชุ่มฉ่ำ น้ำพะโล้หอมเครื่องเทศ",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s10",
@@ -557,7 +609,8 @@ const INITIAL_MENU_ITEMS = [
     price: 70,
     popular: false,
     description: "รวมเครื่องพะโล้ ไส้นุ่ม เลือดนุ่มละมุน เต้าหู้พะโล้ฉ่ำซอส",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s11",
@@ -571,7 +624,8 @@ const INITIAL_MENU_ITEMS = [
       { name: "หมู", price: 100 },
       { name: "ไก่", price: 100 }
     ],
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "s12",
@@ -580,7 +634,8 @@ const INITIAL_MENU_ITEMS = [
     price: 100,
     popular: false,
     description: "เนื้อปลาช่อนสดต้มแกงป่ารสจัดจ้าน พริกแกงตำเองหอมเตะจมูก",
-    status: "available"
+    status: "available",
+    image: ""
   },
 
   // =================== หมวดข้าวและเครื่องเคียง (rice) ===================
@@ -591,7 +646,8 @@ const INITIAL_MENU_ITEMS = [
     price: 10,
     popular: true,
     description: "ข้าวต้มหอมมะลิเคี่ยวใบเตยแท้ หอมกรุ่น นุ่มละมุนลิ้น",
-    status: "available"
+    status: "available",
+    image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=600&auto=format&fit=crop&q=80"
   },
   {
     id: "r02",
@@ -600,7 +656,8 @@ const INITIAL_MENU_ITEMS = [
     price: 10,
     popular: false,
     description: "ข้าวหอมมะลิแท้ หุงสุกใหม่ เมล็ดนุ่มสวย",
-    status: "available"
+    status: "available",
+    image: ""
   },
   {
     id: "r03",
@@ -609,7 +666,8 @@ const INITIAL_MENU_ITEMS = [
     price: 15,
     popular: false,
     description: "ไข่ดาวทอดขอบกรอบ ไข่แดงเยิ้ม",
-    status: "available"
+    status: "available",
+    image: ""
   }
 ];
 
