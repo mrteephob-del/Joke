@@ -123,6 +123,9 @@ function handleCreateOrder(data) {
     ordersSheet = ss.getSheetByName(CONFIG.SHEET_ORDERS);
   }
 
+  // ปรับหัวตาราง Orders ให้ได้มาตรฐาน 20 คอลัมน์โดยอัตโนมัติ
+  ensureOrdersSheetHeaders(ordersSheet);
+
   const now = new Date();
   const dateStr = Utilities.formatDate(now, CONFIG.TIMEZONE, "yyyyMMdd");
   const timeStr = Utilities.formatDate(now, CONFIG.TIMEZONE, "dd/MM/yyyy HH:mm:ss");
@@ -318,6 +321,9 @@ function getOrdersData(userId, phone, orderId) {
     return { success: true, orders: [] };
   }
 
+  // ซ่อมแซมหัวตาราง Orders อัตโนมัติให้ตรงตามมาตรฐาน 20 คอลัมน์
+  ensureOrdersSheetHeaders(ordersSheet);
+
   // อ่านหัวตารางเพื่อ Map คอลัมน์แบบไดนามิก
   const headers = ordersSheet.getRange(1, 1, 1, ordersSheet.getLastColumn()).getValues()[0];
   const colMap = {};
@@ -346,7 +352,28 @@ function getOrdersData(userId, phone, orderId) {
     else if (!orderId && !userId && !phone) isMatch = true;
 
     if (isMatch) {
-      const statusVal = getCol("สถานะออเดอร์", 16, row) || "รอยืนยัน";
+      let statusVal = (getCol("สถานะออเดอร์", 16, row) || "รอยืนยัน").toString().trim();
+      let itemsVal = (getCol("รายการอาหาร", 15, row) || "").toString().trim();
+      let noteVal = (getCol("หมายเหตุจากลูกค้า", 17, row) || "").toString().trim();
+      let updatedVal = (getCol("อัปเดตล่าสุด", 18, row) || "").toString().trim();
+
+      // Self-healing: ถ้า statusVal ในชีตเป็นคำว่า "ชำระเงินสด" หรือ "โอนผ่านพร้อมเพย์" (เกิดจากคอลัมน์เลื่อน)
+      if (statusVal === "ชำระเงินสด" || statusVal === "โอนผ่านพร้อมเพย์" || statusVal === "พร้อมเพย์" || !statusVal) {
+        if (updatedVal === "สำเร็จ" || updatedVal === "พร้อมส่ง/รับ" || updatedVal === "กำลังปรุง") {
+          statusVal = updatedVal;
+        } else {
+          statusVal = "รอยืนยัน";
+        }
+      }
+
+      // Self-healing: ถ้ารายการอาหารกลายเป็นวิธีชำระเงิน และในช่องหมายเหตุมีรายการอาหารจริง
+      if (itemsVal === "ชำระเงินสด" || itemsVal === "โอนผ่านพร้อมเพย์" || itemsVal === "พร้อมเพย์" || !itemsVal) {
+        if (noteVal && (noteVal.indexOf("1x") > -1 || noteVal.indexOf("x ") > -1 || noteVal.indexOf("฿") > -1)) {
+          itemsVal = noteVal;
+          noteVal = "";
+        }
+      }
+
       matched.push({
         orderId: row[0],
         queueNo: row[1],
@@ -363,11 +390,11 @@ function getOrdersData(userId, phone, orderId) {
         grandTotal: row[12],
         paymentMethod: getCol("วิธีชำระเงิน", 13, row) || "พร้อมเพย์",
         paymentStatus: getCol("สถานะการชำระเงิน", 14, row) || "-",
-        itemsSummary: getCol("รายการอาหาร", 15, row),
-        orderStatus: statusVal.toString().trim(),
-        status: statusVal.toString().trim(), // รองรับทั้งสองชื่อ
-        customerNote: getCol("หมายเหตุจากลูกค้า", 17, row),
-        updatedAt: getCol("อัปเดตล่าสุด", 18, row)
+        itemsSummary: itemsVal,
+        orderStatus: statusVal,
+        status: statusVal, // รองรับทั้งสองชื่อ
+        customerNote: noteVal,
+        updatedAt: updatedVal
       });
 
       if (matched.length >= 35) break;
@@ -420,6 +447,8 @@ function handleUpdateStatus(data) {
   const ordersSheet = ss.getSheetByName(CONFIG.SHEET_ORDERS);
   if (!ordersSheet) return { success: false, message: "Orders sheet not found" };
 
+  ensureOrdersSheetHeaders(ordersSheet);
+
   const targetOrderId = data.orderId ? data.orderId.toString().trim() : "";
   const newStatus = data.newStatus ? data.newStatus.toString().trim() : "";
   if (!targetOrderId || !newStatus) {
@@ -460,6 +489,35 @@ function handleUpdateStatus(data) {
   }
 
   return { success: false, message: "Order ID not found: " + targetOrderId };
+}
+
+/**
+ * ตรวจสอบและตั้งค่าหัวตาราง Orders ให้เป็นมาตรฐาน 20 คอลัมน์โดยอัตโนมัติ (ป้องกันปัญหาคอลัมน์เลื่อน 100%)
+ */
+function ensureOrdersSheetHeaders(ordersSheet) {
+  if (!ordersSheet) return;
+  const standardHeaders = [
+    "เลขที่ออเดอร์", "คิวที่", "วันเวลาที่สั่ง", "LINE User ID", "ชื่อลูกค้า",
+    "เบอร์โทรติดต่อ", "รูปแบบการรับ", "เวลานัดรับ / ที่อยู่จัดส่ง", "พิกัด GPS",
+    "ระยะทาง (กม.)", "ค่าจัดส่ง (บาท)", "ยอดรวมอาหาร (บาท)", "ยอดชำระสุทธิ (บาท)",
+    "วิธีชำระเงิน", "สถานะการชำระเงิน", "รายการอาหาร", "สถานะออเดอร์", "หมายเหตุจากลูกค้า", "อัปเดตล่าสุด", "JSON ละเอียด"
+  ];
+
+  const lastCol = Math.max(ordersSheet.getLastColumn(), 1);
+  const row1 = ordersSheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  const row1Str = row1.map(function(h) { return (h || "").toString().trim(); }).join("|");
+
+  // ถ้ายังไม่มีหัว "วิธีชำระเงิน" หรือจำนวนคอลัมน์ไม่ถึง 20 คอลัมน์
+  if (row1Str.indexOf("วิธีชำระเงิน") === -1 || lastCol < standardHeaders.length) {
+    ordersSheet.getRange(1, 1, 1, standardHeaders.length)
+      .setValues([standardHeaders])
+      .setBackground("#059669")
+      .setFontColor("#ffffff")
+      .setFontWeight("bold")
+      .setHorizontalAlignment("center");
+    ordersSheet.setFrozenRows(1);
+    ordersSheet.autoResizeColumns(1, standardHeaders.length);
+  }
 }
 
 /**

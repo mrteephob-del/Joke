@@ -686,6 +686,26 @@
     }
 
     function handleIncomingOrders(newOrders) {
+      // แก้ไขข้อมูลอัตโนมัติในกรณีที่ Google Sheets คอลัมน์เลื่อนจากชีตเวอร์ชันเก่า (Self-Healing)
+      newOrders.forEach(o => {
+        const rawStatus = (o.orderStatus || o.status || "").trim();
+        if (rawStatus === "ชำระเงินสด" || rawStatus === "โอนผ่านพร้อมเพย์" || rawStatus === "พร้อมเพย์" || !rawStatus) {
+          if (o.updatedAt === "สำเร็จ" || o.updatedAt === "พร้อมส่ง/รับ" || o.updatedAt === "กำลังปรุง") {
+            o.orderStatus = o.updatedAt;
+            o.status = o.updatedAt;
+          } else {
+            o.orderStatus = "รอยืนยัน";
+            o.status = "รอยืนยัน";
+          }
+        }
+        if (o.itemsSummary === "ชำระเงินสด" || o.itemsSummary === "โอนผ่านพร้อมเพย์" || !o.itemsSummary) {
+          if (o.customerNote && (o.customerNote.includes("1x") || o.customerNote.includes("x ") || o.customerNote.includes("฿"))) {
+            o.itemsSummary = o.customerNote;
+            o.customerNote = "";
+          }
+        }
+      });
+
       const pendingOrders = newOrders.filter(o => o.orderStatus === "รอยืนยัน");
       let newlyDetectedOrder = null;
 

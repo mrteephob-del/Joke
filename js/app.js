@@ -1126,7 +1126,16 @@ async function syncCustomerOrderStatus(manual = false) {
         }
 
         if (remoteOrder) {
-          const remoteStatus = (remoteOrder.orderStatus || remoteOrder.status || "").trim();
+          let remoteStatus = (remoteOrder.orderStatus || remoteOrder.status || "").trim();
+          // Self-healing: ถ้าค่าสถานะในชีตเลื่อนกลายเป็นวิธีชำระเงิน
+          if (remoteStatus === "ชำระเงินสด" || remoteStatus === "โอนผ่านพร้อมเพย์" || remoteStatus === "พร้อมเพย์" || !remoteStatus) {
+            if (remoteOrder.updatedAt === "สำเร็จ" || remoteOrder.updatedAt === "พร้อมส่ง/รับ" || remoteOrder.updatedAt === "กำลังปรุง") {
+              remoteStatus = remoteOrder.updatedAt;
+            } else {
+              remoteStatus = "รอยืนยัน";
+            }
+          }
+
           if (remoteStatus && remoteStatus !== localOrder.status) {
             localOrder.status = remoteStatus;
             localOrder.orderStatus = remoteStatus;
