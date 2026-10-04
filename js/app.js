@@ -1083,12 +1083,50 @@ async function syncCustomerOrderStatus(manual = false) {
 
     if (data && data.success && Array.isArray(data.orders)) {
       let hasChange = false;
+      const usedRemoteIndices = new Set();
 
       // ตรวจสอบออเดอร์ของลูกค้าและอัปเดตสถานะให้ตรงกับ Google Sheets
-      history.forEach(localOrder => {
-        const remoteOrder = data.orders.find(r => r.orderId === localOrder.orderId);
+      history.forEach((localOrder) => {
+        let remoteOrder = null;
+        let matchedIdx = -1;
+
+        // 1. ค้นหาแถวที่ตรงกับ orderId และ orderDate หรือ grandTotal ที่ยังไม่ได้ถูกจับคู่
+        for (let i = 0; i < data.orders.length; i++) {
+          if (usedRemoteIndices.has(i)) continue;
+          const r = data.orders[i];
+          if (r.orderId === localOrder.orderId) {
+            if (localOrder.orderDate && r.orderDate && (r.orderDate === localOrder.orderDate || localOrder.orderDate.includes(r.orderDate) || r.orderDate.includes(localOrder.orderDate))) {
+              remoteOrder = r;
+              matchedIdx = i;
+              break;
+            }
+          }
+        }
+
+        // 2. ถ้ายังไม่พบ ให้จับคู่กับแถวที่มี orderId เดียวกันที่ยังไม่ถูกใช้
+        if (!remoteOrder) {
+          for (let i = 0; i < data.orders.length; i++) {
+            if (usedRemoteIndices.has(i)) continue;
+            const r = data.orders[i];
+            if (r.orderId === localOrder.orderId) {
+              remoteOrder = r;
+              matchedIdx = i;
+              break;
+            }
+          }
+        }
+
+        // 3. Fallback
+        if (!remoteOrder) {
+          remoteOrder = data.orders.find(r => r.orderId === localOrder.orderId);
+        }
+
+        if (matchedIdx !== -1) {
+          usedRemoteIndices.add(matchedIdx);
+        }
+
         if (remoteOrder) {
-          const remoteStatus = remoteOrder.orderStatus || remoteOrder.status;
+          const remoteStatus = (remoteOrder.orderStatus || remoteOrder.status || "").trim();
           if (remoteStatus && remoteStatus !== localOrder.status) {
             localOrder.status = remoteStatus;
             localOrder.orderStatus = remoteStatus;
@@ -1165,59 +1203,43 @@ function renderTrackView() {
     const isDone = rawStatus === "สำเร็จ";
     const isCancelled = rawStatus === "ยกเลิก";
 
-    // กำหนดสีและสเต็ปของ Stepper ตามสถานะจริง
-    let step1Bg = "bg-slate-200 text-slate-500";
-    let step2Bg = "bg-slate-200 text-slate-500";
-    let step3Bg = "bg-slate-200 text-slate-500";
+    // กำหนดสถานะ 4 ขั้นตอนที่ตรงกับร้านค้า 100%
+    // 1. รอยืนยัน (ส่งออเดอร์แล้ว) -> 2. กำลังปรุง (ร้านรับและเริ่มทำ) -> 3. พร้อมรับ/ส่ง (เสร็จแล้ว) -> 4. สำเร็จ (เสร็จสิ้น)
+    let progressPercent = 0;
+    if (isCooking) progressPercent = 33.3;
+    else if (isReady) progressPercent = 66.6;
+    else if (isDone) progressPercent = 100;
 
-    let step1Line = "bg-slate-200";
-    let step2Line = "bg-slate-200";
-
-    let statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-orange-100 text-orange-700 border border-orange-200">รอยืนยัน</span>`;
+    let statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-orange-100 text-orange-700 border border-orange-200">รอยืนยัน ⏳</span>`;
     let statusNotice = `
       <div class="mt-3 p-3 rounded-xl bg-orange-50 border border-orange-200 text-xs text-orange-800 flex items-center gap-2">
-        <i class="fa-solid fa-hourglass-half text-orange-600"></i>
-        <span>ร้านได้รับคำสั่งซื้อแล้ว กำลังจัดคิวเข้าเตาครับ</span>
+        <i class="fa-solid fa-hourglass-half text-orange-600 text-sm"></i>
+        <span><strong>ส่งออเดอร์แล้ว:</strong> ร้านได้รับรายการแล้ว รอยืนยันคิวเข้าเตาปรุงครับ</span>
       </div>
     `;
 
-    if (isNew) {
-      step1Bg = "bg-orange-600 text-white font-bold ring-4 ring-orange-100";
-    } else if (isCooking) {
-      step1Bg = "bg-emerald-600 text-white";
-      step1Line = "bg-emerald-500";
-      step2Bg = "bg-sky-600 text-white font-bold ring-4 ring-sky-100 pulse-badge";
-      statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-sky-100 text-sky-800 border border-sky-300 pulse-badge">กำลังปรุงอาหาร 🔥</span>`;
+    if (isCooking) {
+      statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-sky-100 text-sky-800 border border-sky-300">กำลังปรุงอาหาร 🔥</span>`;
       statusNotice = `
         <div class="mt-3 p-3 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-900 flex items-center gap-2">
           <i class="fa-solid fa-fire-burner text-sky-600 text-sm animate-bounce"></i>
-          <span><strong>พ่อครัวกำลังปรุงอาหาร</strong> ทำสดใหม่ร้อนๆ ให้คุณอยู่ครับ!</span>
+          <span><strong>พ่อครัวกำลังปรุง:</strong> ร้านรับออเดอร์แล้ว กำลังปรุงอาหารสดใหม่ให้คุณอยู่ครับ!</span>
         </div>
       `;
     } else if (isReady) {
-      step1Bg = "bg-emerald-600 text-white";
-      step1Line = "bg-emerald-500";
-      step2Bg = "bg-emerald-600 text-white";
-      step2Line = "bg-emerald-500";
-      step3Bg = "bg-emerald-600 text-white font-bold ring-4 ring-emerald-100 animate-bounce";
-      statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">พร้อมรับ/ส่งแล้ว! 🎉</span>`;
+      statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">พร้อมรับ/ส่งแล้ว! 📦</span>`;
       statusNotice = `
         <div class="mt-3 p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-900 flex items-center gap-2 shadow-xs">
-          <i class="fa-solid fa-bell text-emerald-600 text-sm"></i>
-          <span><strong>อาหารเสร็จเรียบร้อยแล้ว!</strong> พร้อมรับหน้าร้านหรือเตรียมจัดส่งครับ</span>
+          <i class="fa-solid fa-box-open text-emerald-600 text-sm"></i>
+          <span><strong>อาหารปรุงเสร็จแล้ว:</strong> พร้อมให้รับที่หน้าร้านหรือเตรียมจัดส่งครับ</span>
         </div>
       `;
     } else if (isDone) {
-      step1Bg = "bg-emerald-600 text-white";
-      step1Line = "bg-emerald-500";
-      step2Bg = "bg-emerald-600 text-white";
-      step2Line = "bg-emerald-500";
-      step3Bg = "bg-emerald-600 text-white";
       statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">สำเร็จเรียบร้อย ✅</span>`;
       statusNotice = `
-        <div class="mt-3 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
+        <div class="mt-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
           <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-          <span>ออเดอร์นี้เสร็จสมบูรณ์แล้ว ขอบคุณที่อุดหนุนร้านข้าวต้มนายเจ๊กครับ 🙏</span>
+          <span><strong>ออเดอร์เสร็จสมบูรณ์:</strong> ขอบคุณที่อุดหนุนร้านข้าวต้มนายเจ๊กครับ ทานให้อร่อยนะครับ 🙏</span>
         </div>
       `;
     } else if (isCancelled) {
@@ -1229,6 +1251,45 @@ function renderTrackView() {
         </div>
       `;
     }
+
+    // กำหนดสีและไอคอนทั้ง 4 สเต็ป
+    // Step 1: รอยืนยัน
+    const s1Class = isCooking || isReady || isDone
+      ? "bg-emerald-600 text-white" 
+      : isNew 
+        ? "bg-orange-500 text-white font-bold ring-4 ring-orange-100 shadow-xs" 
+        : "bg-slate-200 text-slate-500";
+    const s1Icon = isCooking || isReady || isDone 
+      ? '<i class="fa-solid fa-check text-[10px]"></i>' 
+      : '<i class="fa-solid fa-hourglass-half text-[10px]"></i>';
+
+    // Step 2: กำลังปรุง
+    const s2Class = isReady || isDone 
+      ? "bg-emerald-600 text-white" 
+      : isCooking 
+        ? "bg-sky-600 text-white font-bold ring-4 ring-sky-100 shadow-xs" 
+        : "bg-slate-100 text-slate-400 border border-slate-200";
+    const s2Icon = isReady || isDone 
+      ? '<i class="fa-solid fa-check text-[10px]"></i>' 
+      : '<i class="fa-solid fa-fire-burner text-[10px]"></i>';
+
+    // Step 3: พร้อมรับ/ส่ง
+    const s3Class = isDone 
+      ? "bg-emerald-600 text-white" 
+      : isReady 
+        ? "bg-emerald-600 text-white font-bold ring-4 ring-emerald-100 shadow-xs" 
+        : "bg-slate-100 text-slate-400 border border-slate-200";
+    const s3Icon = isDone 
+      ? '<i class="fa-solid fa-check text-[10px]"></i>' 
+      : '<i class="fa-solid fa-box text-[10px]"></i>';
+
+    // Step 4: สำเร็จ
+    const s4Class = isDone 
+      ? "bg-emerald-600 text-white font-bold ring-4 ring-emerald-100 shadow-xs" 
+      : "bg-slate-100 text-slate-400 border border-slate-200";
+    const s4Icon = isDone 
+      ? '<i class="fa-solid fa-check-double text-[10px]"></i>' 
+      : '<i class="fa-solid fa-flag-checkered text-[9px]"></i>';
 
     return `
       <div class="minimal-card rounded-2xl p-4 mb-3.5 border border-slate-200 shadow-xs">
@@ -1248,36 +1309,44 @@ function renderTrackView() {
           </div>
         </div>
 
-        <!-- Dynamic Stepper Component -->
+        <!-- Dynamic Stepper Component (ตรงกับร้านค้า 4 ขั้นตอน) -->
         <div class="mt-3.5 pt-3 border-t border-slate-100">
           <div class="relative flex items-center justify-between text-center text-[10px]">
-            <!-- Progress Line 1 -->
-            <div class="absolute left-[18%] right-[50%] top-3 h-0.5 ${step1Line} -z-0 transition-colors duration-300"></div>
-            <!-- Progress Line 2 -->
-            <div class="absolute left-[50%] right-[18%] top-3 h-0.5 ${step2Line} -z-0 transition-colors duration-300"></div>
-
-            <!-- Step 1 -->
-            <div class="flex-1 flex flex-col items-center relative z-10">
-              <div class="w-6 h-6 rounded-full ${step1Bg} flex items-center justify-center mb-1 text-[10px] shadow-xs transition-colors duration-300">
-                ${isCooking || isReady || isDone ? '<i class="fa-solid fa-check"></i>' : '1'}
-              </div>
-              <span class="font-bold ${isNew ? 'text-orange-600' : 'text-slate-600'}">รับออเดอร์</span>
+            <!-- Continuous Progress Line Track -->
+            <div class="absolute left-[12%] right-[12%] top-3.5 h-1 bg-slate-100 rounded-full -z-0">
+              <div class="h-full bg-emerald-500 rounded-full transition-all duration-500 ease-out" style="width: ${progressPercent}%;"></div>
             </div>
 
-            <!-- Step 2 -->
+            <!-- Step 1: รอยืนยัน -->
             <div class="flex-1 flex flex-col items-center relative z-10">
-              <div class="w-6 h-6 rounded-full ${step2Bg} flex items-center justify-center mb-1 text-[10px] shadow-xs transition-colors duration-300">
-                ${isReady || isDone ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-fire-burner text-[9px]"></i>'}
+              <div class="w-7 h-7 rounded-full ${s1Class} flex items-center justify-center mb-1 text-[10px] shadow-2xs transition-colors duration-300">
+                ${s1Icon}
               </div>
-              <span class="font-bold ${isCooking ? 'text-sky-600' : 'text-slate-600'}">กำลังปรุง</span>
+              <span class="font-bold ${isNew ? 'text-orange-600' : isCooking || isReady || isDone ? 'text-emerald-700' : 'text-slate-500'}">รอยืนยัน</span>
             </div>
 
-            <!-- Step 3 -->
+            <!-- Step 2: กำลังปรุง -->
             <div class="flex-1 flex flex-col items-center relative z-10">
-              <div class="w-6 h-6 rounded-full ${step3Bg} flex items-center justify-center mb-1 text-[10px] shadow-xs transition-colors duration-300">
-                ${isDone ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-box text-[9px]"></i>'}
+              <div class="w-7 h-7 rounded-full ${s2Class} flex items-center justify-center mb-1 text-[10px] shadow-2xs transition-colors duration-300">
+                ${s2Icon}
               </div>
-              <span class="font-bold ${isReady || isDone ? 'text-emerald-600' : 'text-slate-600'}">พร้อมรับ/ส่ง</span>
+              <span class="font-bold ${isCooking ? 'text-sky-600' : isReady || isDone ? 'text-emerald-700' : 'text-slate-400'}">กำลังปรุง</span>
+            </div>
+
+            <!-- Step 3: พร้อมรับ/ส่ง -->
+            <div class="flex-1 flex flex-col items-center relative z-10">
+              <div class="w-7 h-7 rounded-full ${s3Class} flex items-center justify-center mb-1 text-[10px] shadow-2xs transition-colors duration-300">
+                ${s3Icon}
+              </div>
+              <span class="font-bold ${isReady ? 'text-emerald-600' : isDone ? 'text-emerald-700' : 'text-slate-400'}">พร้อมรับ/ส่ง</span>
+            </div>
+
+            <!-- Step 4: สำเร็จ -->
+            <div class="flex-1 flex flex-col items-center relative z-10">
+              <div class="w-7 h-7 rounded-full ${s4Class} flex items-center justify-center mb-1 text-[10px] shadow-2xs transition-colors duration-300">
+                ${s4Icon}
+              </div>
+              <span class="font-bold ${isDone ? 'text-emerald-600' : 'text-slate-400'}">สำเร็จ</span>
             </div>
           </div>
         </div>
