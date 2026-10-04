@@ -459,8 +459,82 @@
       pollTimer: null
     };
 
+    // ==========================================
+    // 0. State Persistence (PWA Resume & Auto-Restore)
+    // ==========================================
+    function loadKdsPersistedState() {
+      try {
+        const savedOrders = localStorage.getItem("kds_cached_orders");
+        if (savedOrders) {
+          const parsed = JSON.parse(savedOrders);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            kdsState.orders = parsed;
+          }
+        }
+        const savedChecks = localStorage.getItem("kds_checked_items");
+        if (savedChecks) {
+          kdsState.checkedItemKeys = new Set(JSON.parse(savedChecks));
+        }
+        const savedAck = localStorage.getItem("kds_ack_keys");
+        if (savedAck) {
+          kdsState.acknowledgedOrderKeys = new Set(JSON.parse(savedAck));
+        }
+        const savedKnown = localStorage.getItem("kds_known_keys");
+        if (savedKnown) {
+          kdsState.knownOrderKeys = new Set(JSON.parse(savedKnown));
+          kdsState.isFirstLoad = false;
+        }
+        const savedActiveFilter = localStorage.getItem("kds_active_filter");
+        if (savedActiveFilter) {
+          kdsState.activeFilter = savedActiveFilter;
+        }
+        const savedDateFilter = localStorage.getItem("kds_date_filter");
+        if (savedDateFilter) {
+          kdsState.dateFilter = savedDateFilter;
+        }
+        const savedCustomDate = localStorage.getItem("kds_custom_date_str");
+        if (savedCustomDate) {
+          kdsState.customDateStr = savedCustomDate;
+          const picker = document.getElementById("datePickerInput");
+          if (picker) picker.value = savedCustomDate;
+        }
+        const savedAudio = localStorage.getItem("kds_audio_unlocked");
+        if (savedAudio === "true") {
+          kdsState.audioUnlocked = true;
+          const banner = document.getElementById("audioUnlockBanner");
+          if (banner) banner.classList.add("hidden");
+        }
+      } catch (e) {
+        console.warn("Load KDS persisted state error:", e);
+      }
+    }
+
     // Initialize
     document.addEventListener("DOMContentLoaded", () => {
+      // 0. คืนค่าสถานะเดิมที่เคยทำไว้ทันที (ออเดอร์, เช็กลิสต์ติ๊กถูก, ตัวกรอง, เสียง)
+      loadKdsPersistedState();
+      updateDateFilterUI();
+
+      // คืนค่าปุ่มแท็บสถานะที่เคยเลือกค้างไว้
+      const activeBtnId = 
+        kdsState.activeFilter === "active" ? "tabActive" : 
+        kdsState.activeFilter === "ready" ? "tabReady" : 
+        kdsState.activeFilter === "completed" ? "tabCompleted" : "tabAll";
+      const activeEl = document.getElementById(activeBtnId);
+      if (activeEl) {
+        ["tabActive", "tabReady", "tabCompleted", "tabAll"].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.className = "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all";
+        });
+        activeEl.className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow-xs transition-all";
+      }
+
+      // แสดงผลออเดอร์จากแคชเดิมทันที (หน้าจอไม่ว่างเปล่า 0ms)
+      if (kdsState.orders.length > 0) {
+        updateKpis();
+        renderOrders();
+      }
+
       // 1. Pre-synthesize loud 16-bit WAV chime for instant HTML5 Audio fallback
       initWavChime();
 
@@ -470,11 +544,22 @@
       initNotificationPermissionUI();
       initWakeLock();
 
-      // 3. Initial fetch
+      // 3. ซิงค์ออเดอร์ล่าสุดจากเซิร์ฟเวอร์แบบเงียบๆ
       fetchOrders(false);
 
       // 4. Smart Non-Blocking Poller every 3.5 seconds
       scheduleNextPoll(3500);
+
+      // 5. จับเหตุการณ์เมื่อสลับแอปกลับมาใช้งานใหม่บนมือถือ (PWA Resume)
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          if (!screenWakeLock) initWakeLock();
+          fetchOrders(false);
+        }
+      });
+      window.addEventListener("pageshow", () => {
+        fetchOrders(false);
+      });
     });
 
     function scheduleNextPoll(delayMs = 3500) {
@@ -563,6 +648,9 @@
      */
     function unlockAudio(playTest = false) {
       kdsState.audioUnlocked = true;
+      try {
+        localStorage.setItem("kds_audio_unlocked", "true");
+      } catch (e) {}
 
       // 1. Un-suspend Web Audio
       try {
@@ -814,6 +902,9 @@
           kdsState.acknowledgedOrderKeys.add(getOrderKey(o));
         }
       });
+      try {
+        localStorage.setItem("kds_ack_keys", JSON.stringify([...kdsState.acknowledgedOrderKeys]));
+      } catch (e) {}
     }
 
     // ==========================================
@@ -921,6 +1012,10 @@
         const picker = document.getElementById("datePickerInput");
         if (picker) picker.value = "";
       }
+      try {
+        localStorage.setItem("kds_date_filter", type);
+        localStorage.removeItem("kds_custom_date_str");
+      } catch (e) {}
       updateDateFilterUI();
       updateKpis();
       renderOrders();
@@ -933,6 +1028,10 @@
       }
       kdsState.dateFilter = "custom";
       kdsState.customDateStr = val;
+      try {
+        localStorage.setItem("kds_date_filter", "custom");
+        localStorage.setItem("kds_custom_date_str", val);
+      } catch (e) {}
       updateDateFilterUI();
       updateKpis();
       renderOrders();
@@ -1078,6 +1177,10 @@
       });
 
       kdsState.orders = newOrders;
+      try {
+        localStorage.setItem("kds_cached_orders", JSON.stringify(newOrders));
+        localStorage.setItem("kds_known_keys", JSON.stringify([...kdsState.knownOrderKeys]));
+      } catch (e) {}
       updateKpis();
       renderOrders();
     }
@@ -1106,6 +1209,9 @@
     // ==========================================
     function setFilter(filter) {
       kdsState.activeFilter = filter;
+      try {
+        localStorage.setItem("kds_active_filter", filter);
+      } catch (e) {}
 
       ["tabActive", "tabReady", "tabCompleted", "tabAll"].forEach(id => {
         const el = document.getElementById(id);
@@ -1390,6 +1496,9 @@
       } else {
         kdsState.checkedItemKeys.delete(key);
       }
+      try {
+        localStorage.setItem("kds_checked_items", JSON.stringify([...kdsState.checkedItemKeys]));
+      } catch (e) {}
       renderOrders();
     }
 
@@ -1417,6 +1526,9 @@
 
         target.orderStatus = newStatus;
         target.status = newStatus;
+        try {
+          localStorage.setItem("kds_cached_orders", JSON.stringify(kdsState.orders));
+        } catch (e) {}
         updateKpis();
         renderOrders();
 

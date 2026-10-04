@@ -739,6 +739,27 @@
       if (startInput) startInput.value = todayStr;
       if (endInput) endInput.value = todayStr;
 
+      // 0. โหลดข้อมูลแคชและตัวกรองที่เคยเลือกไว้ทันที (หน้าจอไม่ว่างเปล่า 0ms)
+      try {
+        const savedOrders = localStorage.getItem("dash_cached_orders") || localStorage.getItem("kds_cached_orders");
+        if (savedOrders) {
+          const parsed = JSON.parse(savedOrders);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            dashState.allOrders = parsed;
+          }
+        }
+        const savedPreset = localStorage.getItem("dash_date_preset");
+        if (savedPreset) {
+          dashState.datePreset = savedPreset;
+          updatePresetButtonsUI();
+        }
+        if (dashState.allOrders.length > 0) {
+          applyDateFilter();
+        }
+      } catch (e) {
+        console.warn("Load dashboard cache error:", e);
+      }
+
       // Initial Fetch
       fetchDashboardData(false);
 
@@ -746,6 +767,16 @@
       setInterval(() => {
         fetchDashboardData(false);
       }, 15000);
+
+      // จับเหตุการณ์เมื่อสลับแอปกลับมาใช้งานใหม่บนมือถือ (PWA Resume)
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          fetchDashboardData(false);
+        }
+      });
+      window.addEventListener("pageshow", () => {
+        fetchDashboardData(false);
+      });
     });
 
     // ==========================================
@@ -780,6 +811,9 @@
           });
 
           dashState.allOrders = data.orders;
+          try {
+            localStorage.setItem("dash_cached_orders", JSON.stringify(data.orders));
+          } catch (e) {}
           applyDateFilter();
         }
       } catch (err) {
@@ -870,6 +904,9 @@
       dashState.datePreset = preset;
       dashState.customStart = "";
       dashState.customEnd = "";
+      try {
+        localStorage.setItem("dash_date_preset", preset);
+      } catch (e) {}
       updatePresetButtonsUI();
       applyDateFilter();
     }

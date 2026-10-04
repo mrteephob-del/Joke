@@ -3,9 +3,10 @@
  * รองรับการติดตั้งแบบ PWA, ทำงานออฟไลน์เบื้องต้น, และแสดงการแจ้งเตือนบนหน้าจอมือถือ (Lock Screen / Home Screen)
  */
 
-const CACHE_NAME = 'naingek-kitchen-pwa-v2';
+const CACHE_NAME = 'naingek-pwa-v3';
 const STATIC_ASSETS = [
   './',
+  'index.html',
   'kitchen.html',
   'dashboard.html',
   'manifest.json',
@@ -13,7 +14,9 @@ const STATIC_ASSETS = [
   'icons/icon-512.png',
   'icons/apple-touch-icon.png',
   'icons/favicon-32.png',
-  'js/config.js'
+  'js/config.js',
+  'js/menu-data.js',
+  'js/app.js'
 ];
 
 // 1. Install Event: Cache app shell assets

@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderMenu();
   setupEventListeners();
   loadSavedCart();
+  restoreCustomerForm(); // คืนค่าข้อมูลที่ลูกค้าเคยกรอกไว้ทั้งหมดทันที
   syncMenuFromGas();
   checkCurrentQueue();
   syncCustomerOrderStatus(); // ซิงค์สถานะออเดอร์ทันทีเมื่อเปิดเว็บ
@@ -48,7 +49,36 @@ document.addEventListener("DOMContentLoaded", async () => {
       syncCustomerOrderStatus();
     }
   }, 4000);
+
+  // จับเหตุการณ์เมื่อเปิดแอป PWA กลับมาใช้งานใหม่ (PWA Resume)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      checkCurrentQueue();
+      syncCustomerOrderStatus(false);
+    }
+  });
+  window.addEventListener("pageshow", () => {
+    checkCurrentQueue();
+    syncCustomerOrderStatus(false);
+  });
+
+  // ลงทะเบียน Service Worker สำหรับ PWA
+  initServiceWorker();
 });
+
+function initServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js", { scope: "./" })
+        .then((reg) => {
+          console.log("[PWA] Service Worker registered with scope:", reg.scope);
+        })
+        .catch((err) => {
+          console.warn("[PWA] Service Worker registration failed:", err);
+        });
+    });
+  }
+}
 
 /**
  * เริ่มต้นระบบ LINE LIFF SDK
@@ -512,12 +542,15 @@ function updateItemNote(index, note) {
 }
 
 function saveCart() {
-  localStorage.setItem("naijek_cart", JSON.stringify(state.cart));
+  try {
+    localStorage.setItem("naingek_cart", JSON.stringify(state.cart));
+    localStorage.setItem("naijek_cart", JSON.stringify(state.cart));
+  } catch (e) {}
 }
 
 function loadSavedCart() {
   try {
-    const saved = localStorage.getItem("naijek_cart");
+    const saved = localStorage.getItem("naingek_cart") || localStorage.getItem("naijek_cart");
     if (saved) {
       state.cart = JSON.parse(saved);
       updateCartUI();
@@ -551,16 +584,16 @@ function setFulfillmentType(type) {
   const deliverySection = document.getElementById("deliveryOptionsSection");
 
   if (type === "takeaway") {
-    btnTakeaway.classList.add("active");
-    btnDelivery.classList.remove("active");
-    takeawaySection.classList.remove("hidden");
-    deliverySection.classList.add("hidden");
+    btnTakeaway?.classList.add("active");
+    btnDelivery?.classList.remove("active");
+    takeawaySection?.classList.remove("hidden");
+    deliverySection?.classList.add("hidden");
     state.deliveryFee = 0;
   } else {
-    btnTakeaway.classList.remove("active");
-    btnDelivery.classList.add("active");
-    takeawaySection.classList.add("hidden");
-    deliverySection.classList.remove("hidden");
+    btnTakeaway?.classList.remove("active");
+    btnDelivery?.classList.add("active");
+    takeawaySection?.classList.add("hidden");
+    deliverySection?.classList.remove("hidden");
 
     // โหลดแผนที่สำหรับปักหมุด
     initDeliveryMap();
@@ -569,6 +602,7 @@ function setFulfillmentType(type) {
 
   calculateTotals();
   updatePromptPayPreview();
+  saveCustomerForm();
 }
 
 function initDeliveryMap() {
@@ -702,6 +736,7 @@ function updateLocationFromPin(lat, lng) {
   recalculateDeliveryFee();
   calculateTotals();
   updatePromptPayPreview();
+  saveCustomerForm();
 }
 
 function selectPickupTime(timeText) {
@@ -721,6 +756,7 @@ function selectPickupTime(timeText) {
   if (timeText !== "custom" && customInput) {
     customInput.value = "";
   }
+  saveCustomerForm();
 }
 
 function requestCurrentGps() {
@@ -906,6 +942,7 @@ function setPaymentMethod(method) {
     promptpayBox?.classList.add("hidden");
     cashNotice?.classList.remove("hidden");
   }
+  saveCustomerForm();
 }
 
 function updatePromptPayPreview() {
@@ -1166,9 +1203,10 @@ function closeOrderConfirmModal() {
 
 function saveOrderToHistory(order) {
   try {
-    let history = JSON.parse(localStorage.getItem("naijek_history") || "[]");
+    let history = JSON.parse(localStorage.getItem("naingek_history") || localStorage.getItem("naijek_history") || "[]");
     history.unshift(order);
     if (history.length > 25) history = history.slice(0, 25);
+    localStorage.setItem("naingek_history", JSON.stringify(history));
     localStorage.setItem("naijek_history", JSON.stringify(history));
   } catch (e) {
     console.warn("Save history error:", e);
@@ -1177,6 +1215,10 @@ function saveOrderToHistory(order) {
 
 function switchTab(tabId) {
   state.activeTab = tabId;
+  try {
+    localStorage.setItem("naingek_active_tab", tabId);
+  } catch (e) {}
+
   const menuView = document.getElementById("viewMenu");
   const trackView = document.getElementById("viewTrack");
   const tabMenuBtn = document.getElementById("tabBtnMenu");
@@ -1214,7 +1256,7 @@ async function syncCustomerOrderStatus(manual = false) {
   }
 
   try {
-    let history = JSON.parse(localStorage.getItem("naijek_history") || "[]");
+    let history = JSON.parse(localStorage.getItem("naingek_history") || localStorage.getItem("naijek_history") || "[]");
     if (history.length === 0) return;
 
     const res = await fetch(`${APP_CONFIG.GAS_API_URL}?action=getOrders`);
@@ -1288,6 +1330,7 @@ async function syncCustomerOrderStatus(manual = false) {
       });
 
       if (hasChange || manual) {
+        localStorage.setItem("naingek_history", JSON.stringify(history));
         localStorage.setItem("naijek_history", JSON.stringify(history));
         renderTrackView();
         if (manual) {
@@ -1308,7 +1351,7 @@ function renderTrackView() {
   const container = document.getElementById("trackOrdersList");
   if (!container) return;
 
-  const history = JSON.parse(localStorage.getItem("naijek_history") || "[]");
+  const history = JSON.parse(localStorage.getItem("naingek_history") || localStorage.getItem("naijek_history") || "[]");
   if (history.length === 0) {
     container.innerHTML = `
       <div class="text-center py-16 px-4 bg-white rounded-3xl border border-slate-200 shadow-xs">
@@ -1667,6 +1710,110 @@ function setupEventListeners() {
       recalculateDeliveryFee();
       calculateTotals();
       updatePromptPayPreview();
+      saveCustomerForm();
     });
+  }
+
+  // จดจำข้อมูลที่กรอกอัตโนมัติ (Auto-save) เมื่อพิมพ์ข้อมูลในฟอร์ม
+  const inputName = document.getElementById("customerName");
+  const inputPhone = document.getElementById("customerPhone");
+  const inputNote = document.getElementById("customerOrderNote");
+  const inputAddress = document.getElementById("deliveryAddress");
+  const inputCustomPickup = document.getElementById("customPickupTime");
+
+  [inputName, inputPhone, inputNote, inputAddress, inputCustomPickup].forEach(el => {
+    if (el) {
+      el.addEventListener("input", saveCustomerForm);
+      el.addEventListener("change", saveCustomerForm);
+    }
+  });
+}
+
+/**
+ * บันทึกข้อมูลที่ผู้ใช้กรอกค้างไว้ลง localStorage ทันที (ป้องกันข้อมูลหายเมื่อสลับแอป/ปิดหน้าจอบน PWA)
+ */
+function saveCustomerForm() {
+  try {
+    const name = document.getElementById("customerName")?.value || "";
+    const phone = document.getElementById("customerPhone")?.value || "";
+    const note = document.getElementById("customerOrderNote")?.value || "";
+    const address = document.getElementById("deliveryAddress")?.value || "";
+    const customPickup = document.getElementById("customPickupTime")?.value || "";
+    const distanceVal = document.getElementById("deliveryDistanceInput")?.value || "";
+
+    if (name) localStorage.setItem("naingek_customer_name", name);
+    if (phone) localStorage.setItem("naingek_customer_phone", phone);
+    if (note) localStorage.setItem("naingek_order_note", note);
+    else localStorage.removeItem("naingek_order_note");
+    if (address) localStorage.setItem("naingek_delivery_address", address);
+    if (customPickup) localStorage.setItem("naingek_custom_pickup_time", customPickup);
+    if (distanceVal) localStorage.setItem("naingek_delivery_distance", distanceVal);
+
+    localStorage.setItem("naingek_fulfillment_type", state.fulfillmentType);
+    localStorage.setItem("naingek_pickup_time", state.pickupTime);
+    localStorage.setItem("naingek_payment_method", state.paymentMethod);
+    localStorage.setItem("naingek_active_tab", state.activeTab);
+    if (state.customerGps) {
+      localStorage.setItem("naingek_customer_gps", JSON.stringify(state.customerGps));
+    }
+  } catch (e) {
+    console.warn("Save customer form error:", e);
+  }
+}
+
+/**
+ * คืนค่าข้อมูลที่ผู้ใช้เคยกรอกไว้ทั้งหมดทันทีเมื่อเปิดแอป PWA หรือสลับกลับมา
+ */
+function restoreCustomerForm() {
+  try {
+    const savedName = localStorage.getItem("naingek_customer_name");
+    const savedPhone = localStorage.getItem("naingek_customer_phone");
+    const savedNote = localStorage.getItem("naingek_order_note");
+    const savedAddress = localStorage.getItem("naingek_delivery_address");
+    const savedCustomPickup = localStorage.getItem("naingek_custom_pickup_time");
+    const savedDistance = localStorage.getItem("naingek_delivery_distance");
+    const savedFulfillment = localStorage.getItem("naingek_fulfillment_type");
+    const savedPickupTime = localStorage.getItem("naingek_pickup_time");
+    const savedPaymentMethod = localStorage.getItem("naingek_payment_method");
+    const savedTab = localStorage.getItem("naingek_active_tab");
+    const savedGps = localStorage.getItem("naingek_customer_gps");
+
+    const inputName = document.getElementById("customerName");
+    const inputPhone = document.getElementById("customerPhone");
+    const inputNote = document.getElementById("customerOrderNote");
+    const inputAddress = document.getElementById("deliveryAddress");
+    const inputCustomPickup = document.getElementById("customPickupTime");
+    const inputDistance = document.getElementById("deliveryDistanceInput");
+
+    if (savedName && inputName && !inputName.value) inputName.value = savedName;
+    if (savedPhone && inputPhone && !inputPhone.value) inputPhone.value = savedPhone;
+    if (savedNote && inputNote) inputNote.value = savedNote;
+    if (savedAddress && inputAddress) inputAddress.value = savedAddress;
+    if (savedCustomPickup && inputCustomPickup) inputCustomPickup.value = savedCustomPickup;
+    if (savedDistance && inputDistance) inputDistance.value = savedDistance;
+
+    if (savedGps) {
+      try {
+        state.customerGps = JSON.parse(savedGps);
+      } catch (e) {}
+    }
+
+    if (savedFulfillment && (savedFulfillment === "takeaway" || savedFulfillment === "delivery")) {
+      setFulfillmentType(savedFulfillment);
+    }
+
+    if (savedPickupTime) {
+      selectPickupTime(savedPickupTime);
+    }
+
+    if (savedPaymentMethod && (savedPaymentMethod === "promptpay" || savedPaymentMethod === "cash")) {
+      setPaymentMethod(savedPaymentMethod);
+    }
+
+    if (savedTab === "track") {
+      switchTab("track");
+    }
+  } catch (e) {
+    console.warn("Restore customer form error:", e);
   }
 }
