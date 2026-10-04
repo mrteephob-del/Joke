@@ -3,7 +3,7 @@
  * รองรับการติดตั้งแบบ PWA, ทำงานออฟไลน์เบื้องต้น, และแสดงการแจ้งเตือนบนหน้าจอมือถือ (Lock Screen / Home Screen)
  */
 
-const CACHE_NAME = 'naingek-kitchen-pwa-v1';
+const CACHE_NAME = 'naingek-kitchen-pwa-v2';
 const STATIC_ASSETS = [
   './',
   'kitchen.html',
@@ -51,8 +51,13 @@ self.addEventListener('fetch', (event) => {
     return; // Pass through straight to network
   }
 
-  // Network-first for HTML pages so latest changes are immediately reflected
-  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+  // Network-first for HTML pages and JS scripts so latest code is immediately reflected
+  if (
+    event.request.mode === 'navigate' ||
+    event.request.destination === 'document' ||
+    event.request.destination === 'script' ||
+    requestUrl.pathname.endsWith('.js')
+  ) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {

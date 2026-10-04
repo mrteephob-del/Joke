@@ -1604,6 +1604,9 @@ function highlightInput(id) {
 }
 
 function showToast(message, type = "info") {
+  // ไม่แสดงแจ้งเตือนการเพิ่มอาหารลงตะกร้า
+  if (!message || message.includes("ตะกร้า")) return;
+
   const container = document.getElementById("toastContainer");
   if (!container) return;
 
