@@ -69,15 +69,27 @@
 </head>
 <body class="min-h-screen pb-20 select-none">
 
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2"></div>
+
   <!-- Top Notification Audio Permission Banner (Required by browsers before first interaction) -->
-  <div id="audioUnlockBanner" class="bg-gradient-to-r from-orange-600 to-amber-600 text-white px-4 py-2.5 text-xs font-semibold flex items-center justify-between shadow-md">
+  <div id="audioUnlockBanner" class="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 text-white px-4 py-2.5 text-xs font-semibold flex flex-col sm:flex-row items-center justify-between gap-2 shadow-md sticky top-0 z-40 transition-all duration-300">
     <div class="flex items-center gap-2">
-      <i class="fa-solid fa-bell text-sm animate-bounce"></i>
-      <span>แตะปุ่มนี้ 1 ครั้ง เพื่อเปิดระบบเสียงกระดิ่งแจ้งเตือนเมื่อมีออเดอร์เข้า</span>
+      <div class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center animate-bounce shrink-0">
+        <i class="fa-solid fa-bell text-sm text-yellow-200"></i>
+      </div>
+      <span>แตะปุ่มเพื่อเปิดเสียงกระดิ่งแจ้งเตือนออเดอร์เข้าอัตโนมัติ (หรือแตะที่ใดก็ได้บนหน้าจอ)</span>
     </div>
-    <button onclick="unlockAudio()" class="bg-white text-orange-700 px-3 py-1 rounded-lg font-bold text-xs hover:bg-orange-50 shadow-xs">
-      เปิดเสียงกระดิ่ง 🔔
-    </button>
+    <div class="flex items-center gap-2 shrink-0">
+      <button onclick="testSoundAlert()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 border border-white/30 transition-all cursor-pointer">
+        <i class="fa-solid fa-volume-high text-xs"></i>
+        <span>ทดสอบเสียง</span>
+      </button>
+      <button onclick="unlockAudio(true)" class="bg-white text-orange-700 px-3.5 py-1.5 rounded-xl font-black text-xs hover:bg-orange-50 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+        <i class="fa-solid fa-bell text-xs"></i>
+        <span>เปิดเสียงกระดิ่งทันที 🔔</span>
+      </button>
+    </div>
   </div>
 
   <!-- Header -->
@@ -100,7 +112,7 @@
           </div>
           <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5">
             <span id="syncIndicator" class="inline-flex items-center gap-1 text-emerald-600 font-medium">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ระบบซิงค์สดทุก 6 วิ
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ระบบซิงค์สดทุก 3.5 วิ
             </span>
             <span>•</span>
             <span id="lastUpdatedTime" class="text-slate-400">อัปเดตล่าสุด: กำลังโหลด...</span>
@@ -109,12 +121,12 @@
       </div>
 
       <!-- Action Bar -->
-      <div class="flex items-center gap-2 self-end md:self-auto">
-        <!-- Sound Toggle & Test Button -->
+      <div class="flex items-center gap-2 self-end md:self-auto flex-wrap">
+        <!-- Sound Toggle & Status -->
         <button 
           id="soundToggleBtn"
           onclick="toggleSound()" 
-          class="px-3 py-2 rounded-xl text-xs font-bold bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 flex items-center gap-1.5 transition-colors shadow-xs"
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
         >
           <i id="soundIcon" class="fa-solid fa-volume-high text-xs"></i>
           <span id="soundText">เสียงกระดิ่ง: เปิด</span>
@@ -122,18 +134,19 @@
 
         <!-- Test Chime Button -->
         <button 
-          onclick="playOrderChime(true)" 
-          class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5 transition-colors"
-          title="ทดสอบระดับเสียง"
+          id="headerTestSoundBtn"
+          onclick="testSoundAlert()" 
+          class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer"
+          title="กดเพื่อทดสอบว่าลำโพงมีเสียงหรือไม่"
         >
-          <i class="fa-solid fa-bell text-xs text-orange-600"></i>
+          <i class="fa-solid fa-bell text-xs text-yellow-100"></i>
           <span>ทดสอบเสียง</span>
         </button>
 
         <!-- Manual Refresh Button -->
         <button 
           onclick="fetchOrders(true)" 
-          class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center justify-center transition-colors"
+          class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center justify-center transition-colors cursor-pointer"
           title="รีเฟรชข้อมูลเดี๋ยวนี้"
         >
           <i id="refreshIcon" class="fa-solid fa-rotate text-xs"></i>
@@ -144,8 +157,8 @@
           href="index.html" 
           class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-white hover:bg-slate-900 flex items-center gap-1.5 transition-colors shadow-xs"
         >
-          <i class="fa-solid fa-arrow-left text-xs"></i>
-          <span>หน้าสั่งอาหาร</span>
+          <i class="fa-solid fa-store text-xs text-orange-400"></i>
+          <span>หน้าร้าน/สั่งอาหาร</span>
         </a>
       </div>
 
@@ -276,41 +289,288 @@
   <script src="js/config.js"></script>
 
   <script>
-    // State
+    // ==========================================
+    // State & Dual-Engine Audio Notification System
+    // ==========================================
     const kdsState = {
       orders: [],
-      knownOrderIds: new Set(),
+      knownOrderKeys: new Set(),
+      acknowledgedOrderKeys: new Set(),
       activeFilter: "active", // active, ready, completed, all
       soundEnabled: true,
+      audioUnlocked: false,
       audioContext: null,
+      wavAudioUrl: null,
       repeatAlertInterval: null,
+      titleFlashInterval: null,
+      originalTitle: document.title,
       isFirstLoad: true
     };
 
     // Initialize
     document.addEventListener("DOMContentLoaded", () => {
-      fetchOrders();
-      // Auto-poll every 6 seconds
+      // 1. Pre-synthesize loud 16-bit WAV chime for instant HTML5 Audio fallback
+      initWavChime();
+
+      // 2. Initial fetch
+      fetchOrders(false);
+
+      // 3. Auto-poll every 3.5 seconds
       setInterval(() => {
         fetchOrders(false);
-      }, 6000);
+      }, 3500);
     });
 
     // ==========================================
-    // 1. Web Audio Bell Synthesizer (Zero External Dependencies)
+    // 1. Dual-Engine Restaurant Bell Synthesizer
+    //    (HTML5 Audio WAV + Web Audio API Oscillators)
     // ==========================================
-    function unlockAudio() {
+
+    /**
+     * สังเคราะห์เสียงกระดิ่งร้านอาหารแบบ 16-bit PCM WAV (ติ๊ง-หน่อง! ติ๊ง-หน่อง!)
+     * ทำงานเป็นอิสระ 100% ไม่ต้องพึ่งพาไฟล์เสียงจากภายนอก
+     */
+    function initWavChime() {
       try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) {
-          kdsState.audioContext = new AudioContext();
-          kdsState.audioContext.resume();
+        if (kdsState.wavAudioUrl) return;
+        const sampleRate = 22050;
+        const duration = 1.4; // 1.4 วินาที
+        const numSamples = Math.floor(sampleRate * duration);
+        const buffer = new ArrayBuffer(44 + numSamples * 2);
+        const view = new DataView(buffer);
+
+        function writeString(offset, string) {
+          for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+          }
         }
-        document.getElementById("audioUnlockBanner").classList.add("hidden");
-        playOrderChime(true);
+
+        // Header WAV RIFF
+        writeString(0, "RIFF");
+        view.setUint32(4, 36 + numSamples * 2, true);
+        writeString(8, "WAVE");
+        writeString(12, "fmt ");
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true); // PCM
+        view.setUint16(22, 1, true); // Mono
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeString(36, "data");
+        view.setUint32(40, numSamples * 2, true);
+
+        // ดนตรีกระดิ่งร้านอาหาร: "ติ๊ง" (D6 + harmonics) -> "หน่อง" (A5 + harmonics)
+        const tDing = 0.42;
+        for (let i = 0; i < numSamples; i++) {
+          const t = i / sampleRate;
+          let sample = 0;
+          if (t < tDing) {
+            // Ding: 1174.66 Hz + overtone 2349 Hz + 3242 Hz
+            const env = Math.exp(-t * 6.5);
+            sample = (
+              Math.sin(2 * Math.PI * 1174.66 * t) * 0.65 +
+              Math.sin(2 * Math.PI * 2349.32 * t) * 0.25 +
+              Math.sin(2 * Math.PI * 3242.00 * t) * 0.10
+            ) * env;
+          } else {
+            // Dong: 880.00 Hz + overtone 1760 Hz + 2428 Hz
+            const t2 = t - tDing;
+            const env = Math.exp(-t2 * 4.5);
+            sample = (
+              Math.sin(2 * Math.PI * 880.00 * t2) * 0.70 +
+              Math.sin(2 * Math.PI * 1760.00 * t2) * 0.20 +
+              Math.sin(2 * Math.PI * 2428.80 * t2) * 0.10
+            ) * env;
+          }
+          const intSample = Math.max(-1, Math.min(1, sample)) * 32767;
+          view.setInt16(44 + i * 2, intSample, true);
+        }
+
+        const blob = new Blob([buffer], { type: "audio/wav" });
+        kdsState.wavAudioUrl = URL.createObjectURL(blob);
+      } catch (err) {
+        console.warn("Init WAV error:", err);
+      }
+    }
+
+    /**
+     * ปลดล็อกระบบเสียงทั้ง Web Audio และ HTML5 Audio ทันทีที่มีการแตะหน้าจอ
+     */
+    function unlockAudio(playTest = false) {
+      kdsState.audioUnlocked = true;
+
+      // 1. Un-suspend Web Audio
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          if (!kdsState.audioContext) {
+            kdsState.audioContext = new AudioContextClass();
+          }
+          if (kdsState.audioContext.state === "suspended") {
+            kdsState.audioContext.resume();
+          }
+        }
       } catch (e) {
         console.warn(e);
       }
+
+      // 2. Hide Top Banner
+      const banner = document.getElementById("audioUnlockBanner");
+      if (banner) {
+        banner.classList.add("hidden");
+      }
+
+      // 3. Play test chime if requested
+      if (playTest) {
+        playOrderChime(true);
+      }
+    }
+
+    // แตะที่ใดก็ได้บนหน้าจอเพื่อปลดล็อกเสียงของเบราว์เซอร์อัตโนมัติ
+    ["click", "touchstart", "touchend", "pointerdown", "keydown"].forEach(evt => {
+      window.addEventListener(evt, () => {
+        if (!kdsState.audioUnlocked) {
+          unlockAudio(false);
+        }
+      }, { passive: true });
+    });
+
+    /**
+     * เล่นเสียงผ่าน HTML5 Audio Element (เสถียรที่สุดบน Mobile Safari & Android Chrome)
+     */
+    function playHtml5Chime() {
+      try {
+        if (!kdsState.wavAudioUrl) initWavChime();
+        if (!kdsState.wavAudioUrl) return;
+
+        const audio = new Audio(kdsState.wavAudioUrl);
+        audio.volume = 1.0;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => {
+            console.warn("HTML5 audio auto-play policy blocked:", err);
+          });
+        }
+      } catch (err) {
+        console.warn("HTML5 chime error:", err);
+      }
+    }
+
+    /**
+     * เล่นเสียงผ่าน Web Audio API Synthesizer (เสียงกระดิ่งกังวานใสระดับ Hi-Fi)
+     */
+    async function playWebAudioChime() {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        if (!kdsState.audioContext) {
+          kdsState.audioContext = new AudioContextClass();
+        }
+
+        const ctx = kdsState.audioContext;
+        if (ctx.state === "suspended") {
+          await ctx.resume();
+        }
+
+        // กำหนดเวลาเริ่มล่วงหน้า 40ms เพื่อป้องกันการหลุดเฟรมของฮาร์ดแวร์
+        const now = ctx.currentTime + 0.04;
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(1.0, now);
+        masterGain.connect(ctx.destination);
+
+        function playStrike(freq, startTime, duration, vol = 0.85) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, startTime);
+
+          // Bell envelope
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(vol, startTime + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+          osc.connect(gain);
+          gain.connect(masterGain);
+
+          osc.start(startTime);
+          osc.stop(startTime + duration);
+
+          // Overtone harmonic
+          const ot = ctx.createOscillator();
+          const otGain = ctx.createGain();
+          ot.type = "sine";
+          ot.frequency.setValueAtTime(freq * 2.756, startTime);
+          otGain.gain.setValueAtTime(0, startTime);
+          otGain.gain.linearRampToValueAtTime(vol * 0.3, startTime + 0.01);
+          otGain.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.5);
+
+          ot.connect(otGain);
+          otGain.connect(masterGain);
+
+          ot.start(startTime);
+          ot.stop(startTime + duration * 0.5);
+        }
+
+        // Restaurant Ding-Dong Chime:
+        playStrike(1174.66, now, 0.45, 0.85);        // D6 (Ding)
+        playStrike(880.00, now + 0.22, 0.75, 0.95);  // A5 (Dong)
+
+        // Echo strike
+        playStrike(1174.66, now + 0.70, 0.45, 0.85);
+        playStrike(880.00, now + 0.92, 0.95, 1.0);
+      } catch (err) {
+        console.warn("WebAudio chime error:", err);
+      }
+    }
+
+    /**
+     * ฟังก์ชันหลักในการส่งเสียงแจ้งเตือนออเดอร์ (Dual Engine: HTML5 + Web Audio + ระบบสั่น)
+     */
+    function playOrderChime(force = false) {
+      if (!kdsState.soundEnabled && !force) return;
+
+      // 1. เล่นผ่าน HTML5 Audio
+      playHtml5Chime();
+
+      // 2. เล่นผ่าน Web Audio API
+      playWebAudioChime();
+
+      // 3. ระบบสั่นสำหรับมือถือ / แท็บเล็ต
+      if (navigator.vibrate) {
+        try {
+          navigator.vibrate([350, 150, 350, 150, 600]);
+        } catch (e) {}
+      }
+    }
+
+    /**
+     * ทดสอบเสียงกระดิ่งพร้อมแจ้งเตือนผู้ใช้
+     */
+    function testSoundAlert() {
+      unlockAudio(false);
+      playOrderChime(true);
+      showToast("🔊 ส่งเสียงกระดิ่งแล้ว! หากได้ยินเสียง แสดงว่าระบบเสียงทำงานสมบูรณ์ 100%");
+    }
+
+    function showToast(message) {
+      const container = document.getElementById("toastContainer");
+      if (!container) return;
+
+      const toast = document.createElement("div");
+      toast.className = "bg-slate-900/95 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-2 transform transition-all duration-300 translate-y-[-10px] opacity-0";
+      toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i><span>${message}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove("translate-y-[-10px]", "opacity-0");
+      });
+
+      setTimeout(() => {
+        toast.classList.add("translate-y-[-10px]", "opacity-0");
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
     }
 
     function toggleSound() {
@@ -324,70 +584,25 @@
         text.textContent = "เสียงกระดิ่ง: เปิด";
         btn.classList.add("bg-orange-50", "text-orange-700", "border-orange-200");
         btn.classList.remove("bg-slate-100", "text-slate-500", "border-slate-200");
-        playOrderChime(true);
+        testSoundAlert();
       } else {
         icon.className = "fa-solid fa-volume-xmark text-xs";
         text.textContent = "เสียงกระดิ่ง: ปิด";
         btn.classList.remove("bg-orange-50", "text-orange-700", "border-orange-200");
         btn.classList.add("bg-slate-100", "text-slate-500", "border-slate-200");
         stopRepeatingAlert();
-      }
-    }
-
-    /**
-     * สังเคราะห์เสียงกระดิ่งออเดอร์ร้านอาหารอันไพเราะ (C6 -> E6 -> G6 -> C7)
-     */
-    function playOrderChime(force = false) {
-      if (!kdsState.soundEnabled && !force) return;
-
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-
-        if (!kdsState.audioContext) {
-          kdsState.audioContext = new AudioContext();
-        }
-
-        if (kdsState.audioContext.state === "suspended") {
-          kdsState.audioContext.resume();
-        }
-
-        const ctx = kdsState.audioContext;
-        const now = ctx.currentTime;
-
-        function playTone(freq, startTime, duration, volume = 0.5) {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(freq, startTime);
-
-          gain.gain.setValueAtTime(0, startTime);
-          gain.gain.linearRampToValueAtTime(volume, startTime + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-
-          osc.start(startTime);
-          osc.stop(startTime + duration);
-        }
-
-        // Restaurant Melody Chime
-        playTone(1046.50, now, 0.35, 0.5);          // C6
-        playTone(1318.51, now + 0.14, 0.35, 0.5);   // E6
-        playTone(1567.98, now + 0.28, 0.45, 0.6);   // G6
-        playTone(2093.00, now + 0.42, 0.75, 0.6);   // C7
-      } catch (err) {
-        console.warn("Chime synth error:", err);
+        stopTitleFlash();
+        showToast("🔇 ปิดเสียงกระดิ่งแจ้งเตือนแล้ว");
       }
     }
 
     function startRepeatingAlert() {
       stopRepeatingAlert();
       playOrderChime();
+      // ส่งเสียงซ้ำทุก 6 วินาทีจนกว่าจะกดรับออเดอร์
       kdsState.repeatAlertInterval = setInterval(() => {
         playOrderChime();
-      }, 7000);
+      }, 6000);
     }
 
     function stopRepeatingAlert() {
@@ -397,18 +612,52 @@
       }
     }
 
+    function startTitleFlash(alertText) {
+      stopTitleFlash();
+      let toggle = false;
+      kdsState.titleFlashInterval = setInterval(() => {
+        document.title = toggle ? alertText : kdsState.originalTitle;
+        toggle = !toggle;
+      }, 1000);
+    }
+
+    function stopTitleFlash() {
+      if (kdsState.titleFlashInterval) {
+        clearInterval(kdsState.titleFlashInterval);
+        kdsState.titleFlashInterval = null;
+      }
+      document.title = kdsState.originalTitle;
+    }
+
     function dismissIncomingBanner() {
-      document.getElementById("incomingOrderBanner").classList.add("hidden");
+      const banner = document.getElementById("incomingOrderBanner");
+      if (banner) banner.classList.add("hidden");
       stopRepeatingAlert();
+      stopTitleFlash();
     }
 
     function acknowledgeOrder() {
       dismissIncomingBanner();
+      // มาร์กว่ารับทราบออเดอร์รอยืนยันทั้งหมดในปัจจุบันแล้ว
+      kdsState.orders.forEach(o => {
+        if (o.orderStatus === "รอยืนยัน") {
+          kdsState.acknowledgedOrderKeys.add(getOrderKey(o));
+        }
+      });
     }
 
     // ==========================================
-    // 2. Fetch Orders from GAS API
+    // 2. Fetch Orders & Reliable Order Detection
     // ==========================================
+
+    /**
+     * คืนค่า Unique Key ประจำออเดอร์ (ไม่ขึ้นกับแค่ orderId เพียงอย่างเดียว)
+     */
+    function getOrderKey(order) {
+      if (!order) return "";
+      return `${order.orderId || ''}__${order.orderDate || ''}__${order.customerPhone || ''}__${order.itemsSummary || ''}`;
+    }
+
     async function fetchOrders(manual = false) {
       const refreshIcon = document.getElementById("refreshIcon");
       if (manual && refreshIcon) refreshIcon.classList.add("fa-spin");
@@ -437,45 +686,59 @@
     }
 
     function handleIncomingOrders(newOrders) {
+      const pendingOrders = newOrders.filter(o => o.orderStatus === "รอยืนยัน");
       let newlyDetectedOrder = null;
 
-      if (!kdsState.isFirstLoad) {
-        // ตรวจจับว่ามีออเดอร์ใหม่ที่เพิ่งเข้ามาหรือไม่
-        for (const order of newOrders) {
-          if (!kdsState.knownOrderIds.has(order.orderId)) {
-            newlyDetectedOrder = order;
-            break;
+      if (kdsState.isFirstLoad) {
+        // บันทึกออเดอร์ทั้งหมดที่มีอยู่เดิมในระบบ
+        newOrders.forEach(o => kdsState.knownOrderKeys.add(getOrderKey(o)));
+        kdsState.isFirstLoad = false;
+
+        // ถ้าเปิดหน้าจอมาครั้งแรกแล้วพบว่ามีออเดอร์สถานะ "รอยืนยัน" ค้างอยู่
+        if (pendingOrders.length > 0) {
+          const unack = pendingOrders.find(o => !kdsState.acknowledgedOrderKeys.has(getOrderKey(o)));
+          if (unack) {
+            triggerNewOrderAlert(unack, pendingOrders.length);
           }
+        }
+      } else {
+        // ตรวจจับออเดอร์ใหม่จากรอบนี้
+        for (const order of newOrders) {
+          const key = getOrderKey(order);
+          if (!kdsState.knownOrderKeys.has(key)) {
+            kdsState.knownOrderKeys.add(key);
+            // ถ้าเป็นออเดอร์ใหม่ที่สถานะรอยืนยัน
+            if (order.orderStatus === "รอยืนยัน" && !newlyDetectedOrder) {
+              newlyDetectedOrder = order;
+            }
+          }
+        }
+
+        // มีออเดอร์ใหม่เข้ามา! ส่งเสียงแจ้งเตือนทันที
+        if (newlyDetectedOrder) {
+          triggerNewOrderAlert(newlyDetectedOrder, pendingOrders.length);
         }
       }
 
-      // อัปเดต Known IDs
-      newOrders.forEach(o => kdsState.knownOrderIds.add(o.orderId));
       kdsState.orders = newOrders;
-      kdsState.isFirstLoad = false;
-
       updateKpis();
       renderOrders();
-
-      // มีออเดอร์ใหม่! ส่งเสียงและแสดงแบนเนอร์
-      if (newlyDetectedOrder) {
-        triggerNewOrderAlert(newlyDetectedOrder);
-      }
     }
 
-    function triggerNewOrderAlert(order) {
+    function triggerNewOrderAlert(order, pendingTotal = 1) {
       const banner = document.getElementById("incomingOrderBanner");
       const bannerQueue = document.getElementById("bannerQueue");
       const bannerDetails = document.getElementById("bannerDetails");
 
       bannerQueue.textContent = `คิวที่ ${order.queueNo}`;
       bannerDetails.innerHTML = `
-        <span>${order.customerName} (${order.customerPhone})</span>
-        <span class="font-bold text-orange-400">฿${order.grandTotal}</span>
+        <span>ลูกค้า: ${order.customerName} (${order.customerPhone})</span>
+        <span class="font-bold text-orange-400">฿${Number(order.grandTotal).toLocaleString()}</span>
       `;
 
       banner.classList.remove("hidden");
       startRepeatingAlert();
+      startTitleFlash(`🔔 [คิว ${order.queueNo}] มีออเดอร์ใหม่เข้า!`);
     }
 
     // ==========================================
@@ -691,6 +954,11 @@
     // ==========================================
     async function changeOrderStatus(orderId, newStatus) {
       if (!APP_CONFIG.GAS_API_URL) return;
+
+      // ปิดเสียงกระดิ่งและแบนเนอร์ทันทีเมื่อมีการกดรับออเดอร์
+      dismissIncomingBanner();
+      stopRepeatingAlert();
+      stopTitleFlash();
 
       // Optimistic update in UI
       const target = kdsState.orders.find(o => o.orderId === orderId);
