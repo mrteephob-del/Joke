@@ -324,7 +324,6 @@ function quickAddToCart(itemId) {
   saveCart();
   updateCartUI();
   renderMenu();
-  showToast(`เพิ่ม "${item.name}" ลงในตะกร้าแล้ว`, "success");
 }
 
 function decrementCartItemById(itemId) {
@@ -399,7 +398,6 @@ function openOptionModal(itemId) {
     saveCart();
     updateCartUI();
     renderMenu();
-    showToast(`เพิ่ม "${item.name} (${selectedOption || 'ปกติ'})" แล้ว`, "success");
   };
 
   modal.classList.remove("hidden");
