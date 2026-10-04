@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ร้านข้าวต้มนายเจ๊ก วงเวียนตาคลี | สั่งอาหารออนไลน์</title>
+  <meta name="description" content="ระบบสั่งซื้ออาหารออนไลน์ ร้านข้าวต้มนายเจ๊ก บริเวณวงเวียนตาคลี หน้าร้านธนชาต กับข้าวต้มกุ๊ยรอบดึก สด สะอาด อร่อย ส่งฟรี 3 กม. แรก">
+
+  <!-- Google Fonts: Prompt & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+            display: ['Kanit', 'sans-serif'],
+          },
+          colors: {
+            amber: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-32 select-none">
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm pointer-events-none flex flex-col gap-2"></div>
+
+  <!-- Header / Navigation Bar -->
+  <header class="sticky top-0 z-30 glass-panel border-b border-slate-800/80 px-4 py-3 hero-glow">
+    <div class="max-w-xl mx-auto flex items-center justify-between">
+      <!-- Brand & Shop Info -->
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20 text-slate-950 text-xl font-black">
+          <i class="fa-solid fa-bowl-rice"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-extrabold font-display tracking-tight text-white flex items-center gap-1.5">
+              <span>ข้าวต้มนายเจ๊ก</span>
+            </h1>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> เปิดบริการ
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+            <i class="fa-solid fa-location-dot text-amber-400 text-[10px]"></i>
+            <span>วงเวียนตาคลี หน้าร้านธนชาต</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- User Profile / Call Button -->
+      <div class="flex items-center gap-2">
+        <a href="tel:0642793664" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-amber-400 transition-colors shadow-sm" title="โทรหาร้าน">
+          <i class="fa-solid fa-phone text-xs"></i>
+        </a>
+        <div class="flex items-center gap-2 pl-1">
+          <img id="userAvatar" src="" alt="LINE User" class="w-9 h-9 rounded-xl border border-amber-500/50 object-cover hidden" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Queue Notice Bar -->
+    <div class="max-w-xl mx-auto mt-2.5 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+      <div id="liveQueueBadge" class="text-slate-300 font-medium flex items-center gap-1.5">
+        <i class="fa-solid fa-fire text-amber-400 text-xs"></i>
+        <span>ระบบพร้อมรับออเดอร์ ทำสดใหม่ร้อนๆ ทุกจาน</span>
+      </div>
+      <div class="text-amber-400/90 font-medium flex items-center gap-1">
+        <i class="fa-solid fa-clock text-[10px]"></i>
+        <span>16:30 - 23:30 น.</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-xl mx-auto px-4 mt-3">
+
+    <!-- Top View Switcher (Tabs) -->
+    <div class="flex border-b border-slate-800 mb-4">
+      <button 
+        id="tabBtnMenu"
+        onclick="switchTab('menu')" 
+        class="flex-1 pb-2.5 text-center text-sm font-bold text-amber-400 border-b-2 border-amber-400 transition-all flex items-center justify-center gap-2"
+      >
+        <i class="fa-solid fa-utensils text-xs"></i>
+        <span>สั่งอาหาร</span>
+      </button>
+      <button 
+        id="tabBtnTrack"
+        onclick="switchTab('track')" 
+        class="flex-1 pb-2.5 text-center text-sm font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all flex items-center justify-center gap-2"
+      >
+        <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+        <span>ติดตามออเดอร์ / คิว</span>
+      </button>
+    </div>
+
+    <!-- ==================== VIEW 1: MENU & ORDERING ==================== -->
+    <section id="viewMenu">
+      
+      <!-- Fulfillment Mode Switcher Card -->
+      <div class="glass-card rounded-2xl p-3.5 mb-4 border border-slate-700/80 shadow-lg">
+        <div class="text-xs font-semibold text-slate-400 mb-2.5 flex items-center justify-between">
+          <span class="flex items-center gap-1.5 text-slate-300">
+            <i class="fa-solid fa-bag-shopping text-amber-400"></i> เลือกรูปแบบการรับอาหาร:
+          </span>
+          <span class="text-[11px] text-emerald-400 font-medium">
+            <i class="fa-solid fa-bolt"></i> รวดเร็วทันใจ
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+          <button 
+            id="btnModeTakeaway"
+            onclick="setFulfillmentType('takeaway')"
+            class="mode-btn active py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all"
+          >
+            <i class="fa-solid fa-store text-sm"></i>
+            <div>
+              <div class="leading-tight">มารับที่ร้าน</div>
+              <div class="text-[10px] opacity-80 font-normal">ฟรีค่าจัดส่ง 0.-</div>
+            </div>
+          </button>
+
+          <button 
+            id="btnModeDelivery"
+            onclick="setFulfillmentType('delivery')"
+            class="mode-btn py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-white"
+          >
+            <i class="fa-solid fa-motorcycle text-sm"></i>
+            <div>
+              <div class="leading-tight">เดลิเวอรี</div>
+              <div class="text-[10px] text-emerald-400 font-normal">ส่งฟรี 3 กม. แรก</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Takeaway Options: Pickup Time -->
+        <div id="takeawayOptionsSection" class="mt-3 pt-3 border-t border-slate-800/80">
+          <label class="block text-xs font-medium text-slate-300 mb-2 flex items-center justify-between">
+            <span><i class="fa-regular fa-clock text-amber-400 mr-1"></i> เวลานัดรับอาหารล่วงหน้า:</span>
+            <span class="text-[11px] text-slate-400">ร้านเตรียมอาหารตามคิว</span>
+          </label>
+          <div class="grid grid-cols-3 gap-1.5 mb-2">
+            <button 
+              type="button" 
+              onclick="selectPickupTime('อีก 20 นาที (เร็วที่สุด)')"
+              data-time="อีก 20 นาที (เร็วที่สุด)"
+              class="pickup-time-btn py-1.5 px-2 rounded-lg text-[11px] font-bold bg-amber-500 text-slate-950 transition-all text-center border border-amber-500/40"
+            >
+              อีก 20 นาที
+            </button>
+            <button 
+              type="button" 
+              onclick="selectPickupTime('อีก 30 นาที')"
+              data-time="อีก 30 นาที"
+              class="pickup-time-btn py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-800 text-slate-300 hover:text-white transition-all text-center border border-slate-700"
+            >
+              อีก 30 นาที
+            </button>
+            <button 
+              type="button" 
+              onclick="selectPickupTime('อีก 45 นาที')"
+              data-time="อีก 45 นาที"
+              class="pickup-time-btn py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-800 text-slate-300 hover:text-white transition-all text-center border border-slate-700"
+            >
+              อีก 45 นาที
+            </button>
+          </div>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="customPickupTime" 
+              placeholder="หรือระบุเวลาที่สะดวกรับ (เช่น 19:30 น.)"
+              class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+            />
+          </div>
+        </div>
+
+        <!-- Delivery Options: GPS & Distance Calculator -->
+        <div id="deliveryOptionsSection" class="mt-3 pt-3 border-t border-slate-800/80 hidden">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-location-dot text-amber-400"></i> ระบุระยะทางจัดส่ง:
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+              3 กม. แรก 0.- | ถัดไป 5.-/กม.
+            </span>
+          </div>
+
+          <!-- GPS Button -->
+          <button 
+            type="button" 
+            id="btnGetGps"
+            onclick="requestCurrentGps()"
+            class="w-full py-2.5 px-3 bg-gradient-to-r from-slate-800 to-slate-800/90 hover:from-slate-700 hover:to-slate-700 border border-amber-500/40 rounded-xl text-xs font-medium text-slate-200 flex items-center justify-center gap-2 transition-all shadow-sm"
+          >
+            <i class="fa-solid fa-location-crosshairs text-amber-400"></i>
+            <span>ปักหมุดตำแหน่งปัจจุบันของฉัน (GPS คำนวณอัตโนมัติ)</span>
+          </button>
+
+          <p id="gpsStatusText" class="text-[11px] text-slate-400 mt-1.5 text-center hidden"></p>
+
+          <!-- Distance input & Fee display -->
+          <div class="mt-2.5 grid grid-cols-2 gap-2 items-center bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-1">ระยะทางจากร้าน (กม.):</label>
+              <div class="flex items-center gap-1.5">
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  min="0" 
+                  max="40" 
+                  id="deliveryDistanceInput" 
+                  placeholder="เช่น 2.5" 
+                  class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-400 font-bold focus:outline-none focus:border-amber-500"
+                />
+                <span class="text-xs text-slate-400 font-medium">กม.</span>
+              </div>
+            </div>
+
+            <div class="text-right">
+              <span class="text-[10px] text-slate-400 block">ค่าจัดส่งคำนวณได้</span>
+              <div id="deliveryFeeBreakdown" class="text-xs mt-0.5">
+                <span class="text-emerald-400 font-bold">ฟรี (0 บาท)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Address Input -->
+          <div class="mt-2.5">
+            <textarea 
+              id="deliveryAddress" 
+              rows="2" 
+              placeholder="ที่อยู่จัดส่งโดยละเอียด (บ้านเลขที่, ซอย, จุดสังเกตเด่น, สถานที่ใกล้เคียง)..."
+              class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="relative mb-3">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+        <input 
+          type="text" 
+          id="menuSearchInput" 
+          placeholder="ค้นหาชื่อเมนู เช่น ผัดผักบุ้ง, หมูสามชั้น, ต้มยำ..." 
+          class="w-full bg-slate-900/90 border border-slate-800 rounded-2xl pl-9 pr-9 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/80 transition-all shadow-inner"
+        />
+        <button id="clearSearchBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 hidden text-xs">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Categories Horizontal Scroller -->
+      <div class="mb-4 overflow-x-auto no-scrollbar py-1">
+        <div id="categoryContainer" class="flex gap-2">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Menu Items Grid -->
+      <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="menuEmptyState" class="hidden text-center py-16 px-4">
+        <div class="w-16 h-16 rounded-full bg-slate-800/60 flex items-center justify-center mx-auto text-slate-500 text-2xl mb-3">
+          <i class="fa-solid fa-bowl-food"></i>
+        </div>
+        <p class="text-slate-300 font-medium text-sm">ไม่พบเมนูที่คุณค้นหา</p>
+        <p class="text-xs text-slate-500 mt-1">ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่นดูนะครับ</p>
+      </div>
+
+    </section>
+
+    <!-- ==================== VIEW 2: TRACK ORDERS ==================== -->
+    <section id="viewTrack" class="hidden">
+      <div class="glass-card rounded-2xl p-4 mb-4 border border-slate-700/60">
+        <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2 mb-1">
+          <i class="fa-solid fa-satellite-dish text-amber-400"></i>
+          <span>สถานะคำสั่งซื้อ & คิวของคุณ</span>
+        </h2>
+        <p class="text-xs text-slate-400">
+          สามารถตรวจสอบสถานะการปรุงและเวลาจัดส่งของออเดอร์ล่าสุดได้แบบเรียลไทม์
+        </p>
+      </div>
+
+      <!-- Track List Container -->
+      <div id="trackOrdersList">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FLOATING BOTTOM CART BAR ==================== -->
+  <div 
+    id="floatingCartBar" 
+    class="fixed bottom-4 left-0 right-0 max-w-xl mx-auto px-4 z-40 translate-y-28 transition-transform duration-300 pointer-events-auto"
+  >
+    <div 
+      onclick="openCartDrawer()"
+      class="glass-panel floating-bar bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 rounded-2xl p-3 flex items-center justify-between text-slate-950 cursor-pointer shadow-2xl active:scale-[0.99] transition-transform"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-slate-950/20 backdrop-blur-md flex items-center justify-center relative font-bold text-lg text-slate-950">
+          <i class="fa-solid fa-basket-shopping"></i>
+          <span 
+            id="floatingCartCount" 
+            class="absolute -top-1.5 -right-1.5 bg-slate-950 text-amber-400 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-amber-400 shadow-md"
+          >
+            0
+          </span>
+        </div>
+        <div>
+          <span class="text-xs font-semibold text-slate-950/80 block leading-tight">ตะกร้าสั่งอาหาร</span>
+          <div id="floatingCartTotal" class="text-base font-black text-slate-950 leading-tight">฿0</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 bg-slate-950 text-amber-400 px-4 py-2 rounded-xl text-xs font-bold shadow-sm">
+        <span>ดูรายการ & สั่งเลย</span>
+        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CART DRAWER / BOTTOM SHEET ==================== -->
+  <div id="cartDrawerBackdrop" class="drawer-backdrop fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50"></div>
+  
+  <div 
+    id="cartDrawerSheet" 
+    class="drawer-sheet fixed bottom-0 left-0 right-0 max-w-xl mx-auto bg-slate-900 border-t border-slate-700/80 rounded-t-[28px] z-50 max-h-[90vh] flex flex-col shadow-2xl"
+  >
+    <!-- Handle bar -->
+    <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mt-3 mb-1"></div>
+
+    <!-- Drawer Header -->
+    <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-utensils"></i>
+        </div>
+        <h2 class="text-base font-bold text-slate-100 font-display">สรุปรายการในตะกร้า</h2>
+      </div>
+      <button onclick="closeCartDrawer()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Scrollable Content -->
+    <div class="px-5 py-4 overflow-y-auto flex-1 flex flex-col gap-4">
+
+      <!-- Items List -->
+      <div id="cartItemsList" class="flex flex-col gap-2.5">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Empty State inside cart -->
+      <div id="cartEmptyState" class="hidden text-center py-10">
+        <i class="fa-solid fa-cart-shopping text-3xl text-slate-600 mb-2"></i>
+        <p class="text-slate-400 text-sm">ยังไม่มีรายการอาหารในตะกร้า</p>
+      </div>
+
+      <!-- Checkout Details Section -->
+      <div id="cartCheckoutSection" class="flex flex-col gap-3 pt-3 border-t border-slate-800">
+        
+        <!-- Customer Info -->
+        <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-slate-800">
+          <h3 class="text-xs font-bold text-amber-400 mb-2.5 flex items-center gap-1.5">
+            <i class="fa-solid fa-id-card"></i> ข้อมูลผู้สั่งอาหาร:
+          </h3>
+          <div class="space-y-2">
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">ชื่อผู้สั่ง *</label>
+              <input 
+                type="text" 
+                id="customerName" 
+                placeholder="ระบุชื่อของคุณ" 
+                class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
+              <input 
+                type="tel" 
+                id="customerPhone" 
+                placeholder="เช่น 0812345678" 
+                class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">หมายเหตุเพิ่มเติมถึงร้าน (ถ้ามี)</label>
+              <input 
+                type="text" 
+                id="customerOrderNote" 
+                placeholder="เช่น ขอช้อนส้อม, แยกน้ำปลาพริก" 
+                class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-slate-800 space-y-2 text-xs">
+          <div class="flex justify-between text-slate-400">
+            <span>รวมค่าอาหาร:</span>
+            <span id="drawerSubtotal" class="font-semibold text-slate-200">฿0</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>ค่าจัดส่ง:</span>
+            <span id="drawerDeliveryFee" class="font-semibold text-emerald-400">ฟรี (0฿)</span>
+          </div>
+          <div class="pt-2 border-t border-slate-800 flex justify-between items-center text-sm font-bold text-slate-100">
+            <span>ยอดชำระสุทธิ:</span>
+            <span id="drawerGrandTotal" class="text-base text-amber-400">฿0</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Drawer Footer / Submit CTA -->
+    <div class="p-4 border-t border-slate-800 bg-slate-900/95">
+      <button 
+        id="btnConfirmOrder"
+        onclick="submitOrder()"
+        class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition-all"
+      >
+        <span>ยืนยันการสั่งซื้อ</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== OPTION MODAL (เนื้อสัตว์/ความเผ็ด) ==================== -->
+  <div id="optionModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="glass-card bg-slate-900 border border-slate-700/80 rounded-3xl w-full max-w-sm p-5 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">เลือกตัวเลือกอาหาร</span>
+          <h3 id="optionModalTitle" class="text-base font-bold text-slate-100 font-display">ชื่อเมนู</h3>
+        </div>
+        <button onclick="closeOptionModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-300">เลือกประเภทเนื้อสัตว์:</label>
+        <div id="optionListContainer" class="flex flex-col gap-1.5 max-h-52 overflow-y-auto pr-1">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">หมายเหตุพิเศษ:</label>
+        <input 
+          type="text" 
+          id="optionModalNote" 
+          placeholder="เช่น เผ็ดน้อย, ไม่ใส่กระเทียม, ใส่ใบกะเพราเยอะๆ" 
+          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+        />
+      </div>
+
+      <button 
+        id="confirmOptionAddBtn"
+        class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+      >
+        <i class="fa-solid fa-plus text-xs"></i>
+        <span>เพิ่มลงในตะกร้า</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== ORDER CONFIRMATION MODAL ==================== -->
+  <div id="orderConfirmModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="glass-card bg-slate-900 border border-amber-500/40 rounded-3xl w-full max-w-sm p-6 shadow-2xl flex flex-col text-center">
+      
+      <!-- Icon Success -->
+      <div class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-3xl mx-auto shadow-lg shadow-emerald-500/30 mb-3">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+
+      <h3 class="text-lg font-black text-white font-display">สั่งอาหารสำเร็จแล้ว!</h3>
+      <p class="text-xs text-slate-400 mt-0.5">ทางร้านได้รับออเดอร์ของท่านเรียบร้อยแล้วครับ</p>
+
+      <!-- Queue Box -->
+      <div class="my-4 p-4 rounded-2xl bg-gradient-to-b from-amber-500/20 to-amber-500/5 border border-amber-500/40">
+        <span class="text-xs font-semibold text-amber-300 block">หมายเลขคิวของคุณ</span>
+        <div id="confirmQueueNo" class="text-4xl font-black text-amber-400 tracking-tight my-1 font-display">Q01</div>
+        <div class="text-[11px] font-mono text-slate-400" id="confirmOrderId">JK-XXXXXXXX-XXX</div>
+      </div>
+
+      <!-- Receipt summary preview -->
+      <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800 text-left text-xs space-y-1.5 mb-4">
+        <div class="flex justify-between text-slate-400">
+          <span>ผู้สั่ง:</span>
+          <span id="confirmCustomer" class="font-medium text-slate-200">-</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>รูปแบบ:</span>
+          <span id="confirmMode" class="font-medium text-slate-200">-</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>สถานที่/เวลา:</span>
+          <span id="confirmDestination" class="font-medium text-slate-200 truncate max-w-[170px]">-</span>
+        </div>
+        <div id="confirmItemsList" class="pt-1.5 border-t border-slate-800 max-h-24 overflow-y-auto space-y-1">
+          <!-- Items List -->
+        </div>
+        <div class="pt-1.5 border-t border-slate-800 flex justify-between font-bold text-slate-100">
+          <span>ยอดชำระสุทธิ:</span>
+          <span id="confirmGrandTotal" class="text-amber-400 text-sm">฿0</span>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex flex-col gap-2">
+        <button 
+          onclick="closeOrderConfirmModal(); switchTab('track');"
+          class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+        >
+          <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+          <span>ดูสถานะคิวและการจัดส่ง</span>
+        </button>
+
+        <a 
+          href="tel:0642793664"
+          class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
+        >
+          <i class="fa-solid fa-phone text-amber-400"></i>
+          <span>โทรติดต่อร้าน: 064-279-3664</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINE LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <!-- Application Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/menu-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
