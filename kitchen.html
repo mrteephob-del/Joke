@@ -705,6 +705,10 @@
         const url = `${APP_CONFIG.GAS_API_URL}?action=updateOrderStatus&orderId=${encodeURIComponent(orderId)}&newStatus=${encodeURIComponent(newStatus)}`;
         await fetch(url);
         console.log(`Updated ${orderId} to ${newStatus}`);
+        // รีเฟรชยืนยันข้อมูลจาก Google Sheets อีกครั้งหลังผ่านไป 1 วินาที
+        setTimeout(() => {
+          fetchOrders(false);
+        }, 1200);
       } catch (e) {
         console.warn("Update status error:", e);
       }

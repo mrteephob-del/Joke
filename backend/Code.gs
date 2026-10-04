@@ -127,21 +127,47 @@ function handleCreateOrder(data) {
   const dateStr = Utilities.formatDate(now, CONFIG.TIMEZONE, "yyyyMMdd");
   const timeStr = Utilities.formatDate(now, CONFIG.TIMEZONE, "dd/MM/yyyy HH:mm:ss");
 
-  // นับจำนวนออเดอร์ในวันนี้เพื่อออกหมายเลขคิวตามจริง
+  // ป้องกันการแย่งสร้างออเดอร์พร้อมกันด้วย ScriptLock
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch (err) {
+    console.warn("Lock warning:", err);
+  }
+
+  // คำนวณลำดับคิวและเลขที่ออเดอร์ของวันนี้อย่างแม่นยำ (ตรวจจาก Order ID: JK-YYYYMMDD-XXX)
   const lastRow = ordersSheet.getLastRow();
-  let todayCount = 0;
+  let maxSeq = 0;
+  const prefix = "JK-" + dateStr + "-";
 
   if (lastRow > 1) {
-    const datesColumn = ordersSheet.getRange(2, 3, lastRow - 1, 1).getValues();
-    const todayPrefix = Utilities.formatDate(now, CONFIG.TIMEZONE, "dd/MM/yyyy");
-    for (let i = 0; i < datesColumn.length; i++) {
-      if (datesColumn[i][0] && datesColumn[i][0].toString().indexOf(todayPrefix) === 0) {
-        todayCount++;
+    const orderIdVals = ordersSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (let i = 0; i < orderIdVals.length; i++) {
+      const val = orderIdVals[i][0] ? orderIdVals[i][0].toString().trim() : "";
+      if (val.indexOf(prefix) === 0) {
+        const numPart = parseInt(val.substring(prefix.length), 10);
+        if (!isNaN(numPart) && numPart > maxSeq) {
+          maxSeq = numPart;
+        }
+      }
+    }
+
+    // กรณีมีข้อมูลคิวแต่ ID ไม่ได้ขึ้นต้นด้วย JK-YYYYMMDD ตรวจสอบคอลัมน์คิวที่ (Q01, Q02)
+    if (maxSeq === 0) {
+      const queueVals = ordersSheet.getRange(2, 2, lastRow - 1, 1).getValues();
+      for (let i = 0; i < queueVals.length; i++) {
+        const qVal = queueVals[i][0] ? queueVals[i][0].toString().trim() : "";
+        if (qVal.indexOf("Q") === 0) {
+          const qNum = parseInt(qVal.substring(1), 10);
+          if (!isNaN(qNum) && qNum > maxSeq) {
+            maxSeq = qNum;
+          }
+        }
       }
     }
   }
 
-  const seq = todayCount + 1;
+  const seq = maxSeq + 1;
   const queueNo = "Q" + (seq < 10 ? "0" + seq : seq);
   const orderId = "JK-" + dateStr + "-" + ("000" + seq).slice(-3);
 
@@ -164,7 +190,7 @@ function handleCreateOrder(data) {
 
   // ข้อมูลวิธีชำระเงิน
   const paymentMethod = data.paymentMethod || "พร้อมเพย์ (064-279-3664)";
-  const paymentStatus = data.paymentStatus || (paymentMethod.indexOf("พร้อมเพย์") > -1 ? "รอตรวจสอบการโอน" : "ชำระเงินสด");
+  const paymentStatus = data.paymentStatus || (paymentMethod.indexOf("พร้อมเพย์") > -1 ? "โอนผ่านพร้อมเพย์" : "ชำระเงินสด");
 
   // บันทึกแถวใหม่ลงในตาราง Orders
   const rowData = [
@@ -191,6 +217,11 @@ function handleCreateOrder(data) {
   ];
 
   ordersSheet.appendRow(rowData);
+
+  // ปลด lock
+  try {
+    lock.releaseLock();
+  } catch (err) {}
 
   // นับจำนวนคิวที่ยังไม่เสร็จ
   const queueWaitCount = countActiveQueues(ordersSheet);
@@ -271,6 +302,7 @@ function getMenuData() {
 
 /**
  * ค้นหาประวัติออเดอร์ตามเงื่อนไข (LINE UID, เบอร์โทร, หรือ Order ID)
+ * ค้นหาตำแหน่งคอลัมน์แบบไดนามิกเพื่อความเข้ากันได้ 100%
  */
 function getOrdersData(userId, phone, orderId) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -280,25 +312,40 @@ function getOrdersData(userId, phone, orderId) {
     return { success: true, orders: [] };
   }
 
-  const data = ordersSheet.getDataRange().getValues();
-  if (data.length <= 1) {
+  const lastRow = ordersSheet.getLastRow();
+  if (lastRow <= 1) {
     return { success: true, orders: [] };
   }
 
+  // อ่านหัวตารางเพื่อ Map คอลัมน์แบบไดนามิก
+  const headers = ordersSheet.getRange(1, 1, 1, ordersSheet.getLastColumn()).getValues()[0];
+  const colMap = {};
+  headers.forEach((h, idx) => {
+    if (h) colMap[h.toString().trim()] = idx;
+  });
+
+  const getCol = (name, fallbackIdx, row) => {
+    const idx = colMap[name] !== undefined ? colMap[name] : fallbackIdx;
+    return row[idx] !== undefined ? row[idx] : "";
+  };
+
+  const data = ordersSheet.getDataRange().getValues();
   const matched = [];
+
   for (let i = data.length - 1; i >= 1; i--) {
     const row = data[i];
-    const rowOrderId = row[0] ? row[0].toString() : "";
-    const rowUserId = row[3] ? row[3].toString() : "";
-    const rowPhone = row[5] ? row[5].toString() : "";
+    const rowOrderId = row[0] ? row[0].toString().trim() : "";
+    const rowUserId = row[3] ? row[3].toString().trim() : "";
+    const rowPhone = row[5] ? row[5].toString().trim() : "";
 
     let isMatch = false;
-    if (orderId && rowOrderId.toLowerCase() === orderId.toLowerCase()) isMatch = true;
-    else if (userId && rowUserId === userId) isMatch = true;
+    if (orderId && rowOrderId.toLowerCase() === orderId.toLowerCase().trim()) isMatch = true;
+    else if (userId && rowUserId === userId.trim()) isMatch = true;
     else if (phone && rowPhone.replace(/[^0-9]/g, "") === phone.replace(/[^0-9]/g, "")) isMatch = true;
     else if (!orderId && !userId && !phone) isMatch = true;
 
     if (isMatch) {
+      const statusVal = getCol("สถานะออเดอร์", 16, row) || "รอยืนยัน";
       matched.push({
         orderId: row[0],
         queueNo: row[1],
@@ -313,15 +360,16 @@ function getOrdersData(userId, phone, orderId) {
         deliveryFee: row[10],
         itemsSubtotal: row[11],
         grandTotal: row[12],
-        paymentMethod: row[13] || "พร้อมเพย์",
-        paymentStatus: row[14] || "-",
-        itemsSummary: row[15],
-        orderStatus: row[16],
-        customerNote: row[17],
-        updatedAt: row[18]
+        paymentMethod: getCol("วิธีชำระเงิน", 13, row) || "พร้อมเพย์",
+        paymentStatus: getCol("สถานะการชำระเงิน", 14, row) || "-",
+        itemsSummary: getCol("รายการอาหาร", 15, row),
+        orderStatus: statusVal.toString().trim(),
+        status: statusVal.toString().trim(), // รองรับทั้งสองชื่อ
+        customerNote: getCol("หมายเหตุจากลูกค้า", 17, row),
+        updatedAt: getCol("อัปเดตล่าสุด", 18, row)
       });
 
-      if (matched.length >= 25) break;
+      if (matched.length >= 35) break;
     }
   }
 
@@ -351,12 +399,10 @@ function countActiveQueues(ordersSheet) {
   const lastRow = ordersSheet.getLastRow();
   if (lastRow <= 1) return 0;
 
-  // ตรวจสอบตำแหน่งคอลัมน์สถานะ (Col 15 หรือ 17)
   const cols = ordersSheet.getRange(2, 1, lastRow - 1, Math.min(20, ordersSheet.getLastColumn())).getValues();
   let count = 0;
   for (let i = 0; i < cols.length; i++) {
     const row = cols[i];
-    // ตรวจสอบสถานะในแถว
     const isPending = row.some(function(val) {
       return val === "รอยืนยัน" || val === "กำลังปรุง";
     });
@@ -366,15 +412,15 @@ function countActiveQueues(ordersSheet) {
 }
 
 /**
- * อัปเดตสถานะออเดอร์
+ * อัปเดตสถานะออเดอร์ (ค้นหาคอลัมน์แบบไดนามิก และอัปเดตออเดอร์เป้าหมายอย่างแม่นยำ)
  */
 function handleUpdateStatus(data) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const ordersSheet = ss.getSheetByName(CONFIG.SHEET_ORDERS);
   if (!ordersSheet) return { success: false, message: "Orders sheet not found" };
 
-  const targetOrderId = data.orderId;
-  const newStatus = data.newStatus;
+  const targetOrderId = data.orderId ? data.orderId.toString().trim() : "";
+  const newStatus = data.newStatus ? data.newStatus.toString().trim() : "";
   if (!targetOrderId || !newStatus) {
     return { success: false, message: "Missing orderId or newStatus" };
   }
@@ -382,19 +428,37 @@ function handleUpdateStatus(data) {
   const lastRow = ordersSheet.getLastRow();
   if (lastRow <= 1) return { success: false, message: "No orders found" };
 
+  // ค้นหาตำแหน่งคอลัมน์แบบไดนามิกจากหัวตาราง
+  const headers = ordersSheet.getRange(1, 1, 1, ordersSheet.getLastColumn()).getValues()[0];
+  let statusColIdx = 17; // ค่าเริ่มต้น Col 17
+  let updateColIdx = 19; // ค่าเริ่มต้น Col 19
+  for (let c = 0; c < headers.length; c++) {
+    const h = headers[c] ? headers[c].toString().trim() : "";
+    if (h === "สถานะออเดอร์" || h === "สถานะ") statusColIdx = c + 1;
+    if (h === "อัปเดตล่าสุด") updateColIdx = c + 1;
+  }
+
   const orderIds = ordersSheet.getRange(2, 1, lastRow - 1, 1).getValues();
   const now = Utilities.formatDate(new Date(), CONFIG.TIMEZONE, "dd/MM/yyyy HH:mm:ss");
 
-  for (let i = 0; i < orderIds.length; i++) {
-    if (orderIds[i][0] && orderIds[i][0].toString() === targetOrderId.toString()) {
+  // ค้นหาแถวที่ตรงกับ Order ID (ค้นหาจากล่างขึ้นบน เพื่อจับออเดอร์ล่าสุด)
+  for (let i = orderIds.length - 1; i >= 0; i--) {
+    if (orderIds[i][0] && orderIds[i][0].toString().trim() === targetOrderId) {
       const rowIdx = i + 2;
-      ordersSheet.getRange(rowIdx, 17).setValue(newStatus);
-      ordersSheet.getRange(rowIdx, 19).setValue(now);
-      return { success: true, message: "อัปเดตสถานะออเดอร์ " + targetOrderId + " เป็น " + newStatus + " สำเร็จ" };
+      ordersSheet.getRange(rowIdx, statusColIdx).setValue(newStatus);
+      if (updateColIdx > 0) {
+        ordersSheet.getRange(rowIdx, updateColIdx).setValue(now);
+      }
+      return { 
+        success: true, 
+        orderId: targetOrderId, 
+        newStatus: newStatus,
+        message: "อัปเดตสถานะออเดอร์ " + targetOrderId + " เป็น " + newStatus + " สำเร็จ" 
+      };
     }
   }
 
-  return { success: false, message: "Order ID not found" };
+  return { success: false, message: "Order ID not found: " + targetOrderId };
 }
 
 /**

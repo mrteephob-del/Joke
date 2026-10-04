@@ -40,6 +40,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadSavedCart();
   syncMenuFromGas();
   checkCurrentQueue();
+  syncCustomerOrderStatus(); // ซิงค์สถานะออเดอร์ทันทีเมื่อเปิดเว็บ
+
+  // ตรวจสอบและอัปเดตสถานะออเดอร์อัตโนมัติทุกๆ 4 วินาทีเมื่ออยู่หน้าติดตามคิว
+  setInterval(() => {
+    if (state.activeTab === "track") {
+      syncCustomerOrderStatus();
+    }
+  }, 4000);
 });
 
 /**
@@ -1050,6 +1058,63 @@ function switchTab(tabId) {
     tabMenuBtn?.classList.remove("text-orange-600", "border-orange-600");
     tabMenuBtn?.classList.add("text-slate-400", "border-transparent");
     renderTrackView();
+    // ดึงสถานะออเดอร์ล่าสุดจาก Google Sheets ทันทีที่เปิดแท็บ
+    syncCustomerOrderStatus(false);
+  }
+}
+
+/**
+ * ดึงสถานะออเดอร์ล่าสุดจาก Google Sheets แบบ Real-time
+ */
+async function syncCustomerOrderStatus(manual = false) {
+  if (!APP_CONFIG.GAS_API_URL) return;
+
+  const refreshBtn = document.getElementById("manualTrackSyncBtn");
+  if (manual && refreshBtn) {
+    refreshBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-orange-600"></i> <span>กำลังอัปเดต...</span>`;
+  }
+
+  try {
+    let history = JSON.parse(localStorage.getItem("naijek_history") || "[]");
+    if (history.length === 0) return;
+
+    const res = await fetch(`${APP_CONFIG.GAS_API_URL}?action=getOrders`);
+    const data = await res.json();
+
+    if (data && data.success && Array.isArray(data.orders)) {
+      let hasChange = false;
+
+      // ตรวจสอบออเดอร์ของลูกค้าและอัปเดตสถานะให้ตรงกับ Google Sheets
+      history.forEach(localOrder => {
+        const remoteOrder = data.orders.find(r => r.orderId === localOrder.orderId);
+        if (remoteOrder) {
+          const remoteStatus = remoteOrder.orderStatus || remoteOrder.status;
+          if (remoteStatus && remoteStatus !== localOrder.status) {
+            localOrder.status = remoteStatus;
+            localOrder.orderStatus = remoteStatus;
+            hasChange = true;
+          }
+          if (remoteOrder.queueNo && remoteOrder.queueNo !== localOrder.queueNo) {
+            localOrder.queueNo = remoteOrder.queueNo;
+            hasChange = true;
+          }
+        }
+      });
+
+      if (hasChange || manual) {
+        localStorage.setItem("naijek_history", JSON.stringify(history));
+        renderTrackView();
+        if (manual) {
+          showToast("อัปเดตสถานะออเดอร์ล่าสุดเรียบร้อยแล้ว", "success");
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Sync customer status error:", err);
+  } finally {
+    if (manual && refreshBtn) {
+      refreshBtn.innerHTML = `<i class="fa-solid fa-rotate text-orange-600"></i> <span>อัปเดตสถานะเดี๋ยวนี้</span>`;
+    }
   }
 }
 
@@ -1060,13 +1125,13 @@ function renderTrackView() {
   const history = JSON.parse(localStorage.getItem("naijek_history") || "[]");
   if (history.length === 0) {
     container.innerHTML = `
-      <div class="text-center py-16 px-4">
+      <div class="text-center py-16 px-4 bg-white rounded-3xl border border-slate-200 shadow-xs">
         <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400 text-2xl mb-3">
           <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
         <p class="text-slate-700 font-bold text-sm">ยังไม่มีประวัติการสั่งอาหาร</p>
         <p class="text-xs text-slate-400 mt-1">รายการอาหารที่คุณสั่งจะปรากฏที่นี่</p>
-        <button onclick="switchTab('menu')" class="mt-4 px-5 py-2.5 bg-orange-600 text-white font-bold text-xs rounded-xl shadow-sm">
+        <button onclick="switchTab('menu')" class="mt-4 px-5 py-2.5 bg-orange-600 text-white font-bold text-xs rounded-xl shadow-xs">
           เริ่มสั่งอาหารเลย
         </button>
       </div>
@@ -1074,68 +1139,174 @@ function renderTrackView() {
     return;
   }
 
-  container.innerHTML = history.map(order => `
-    <div class="minimal-card rounded-2xl p-4 mb-3 border border-slate-200">
-      <div class="flex items-start justify-between">
-        <div>
-          <span class="text-[11px] font-mono text-slate-400">เลขที่ ${order.orderId}</span>
-          <div class="text-lg font-black text-slate-800 flex items-center gap-2 mt-0.5">
-            <span>คิวที่ ${order.queueNo}</span>
-            <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-orange-100 text-orange-700">
-              ${order.status || 'กำลังปรุง'}
-            </span>
-          </div>
-          <span class="text-[11px] text-slate-400">${order.orderDate}</span>
-        </div>
-
-        <div class="text-right">
-          <div class="text-base font-extrabold text-orange-600">฿${order.grandTotal.toLocaleString()}</div>
-          <span class="text-[11px] text-slate-500">${order.fulfillmentType === 'delivery' ? '🛵 เดลิเวอรี' : '🛍️ รับที่ร้าน'}</span>
-        </div>
-      </div>
-
-      <!-- Stepper Status -->
-      <div class="mt-3.5 pt-3 border-t border-slate-100">
-        <div class="flex items-center justify-between text-center text-[10px]">
-          <div class="flex-1 text-emerald-600 font-bold flex flex-col items-center">
-            <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1">
-              <i class="fa-solid fa-check text-[10px]"></i>
-            </div>
-            <span>รับออเดอร์</span>
-          </div>
-          <div class="flex-1 text-orange-600 font-bold flex flex-col items-center">
-            <div class="w-6 h-6 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center mb-1 pulse-badge">
-              <i class="fa-solid fa-fire-burner text-[10px]"></i>
-            </div>
-            <span>กำลังปรุง</span>
-          </div>
-          <div class="flex-1 text-slate-400 flex flex-col items-center">
-            <div class="w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-1">
-              <i class="fa-solid fa-box text-[10px]"></i>
-            </div>
-            <span>พร้อมส่ง/รับ</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-3 text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-        <div class="flex justify-between mb-1">
-          <span class="text-slate-400">วิธีชำระเงิน:</span>
-          <span class="font-medium text-slate-700">${order.paymentMethod}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-400">จุดนัดรับ / ที่อยู่:</span>
-          <span class="font-medium text-slate-700 text-right truncate max-w-[200px]">${order.destination}</span>
-        </div>
-      </div>
-
-      <div class="mt-3">
-        <a href="tel:0642793664" class="block w-full py-2 text-center text-xs font-bold bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 border border-slate-200 transition-colors">
-          <i class="fa-solid fa-phone mr-1 text-orange-600"></i> โทรสอบถามร้าน (064-279-3664)
-        </a>
-      </div>
+  // แถบด้านบนสำหรับกดรีเฟรชสถานะทันที
+  const topSyncBar = `
+    <div class="flex items-center justify-between mb-3 px-1">
+      <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+        <i class="fa-solid fa-circle text-[8px] text-emerald-500 animate-pulse"></i> ซิงค์สถานะสดจากร้าน
+      </span>
+      <button 
+        id="manualTrackSyncBtn"
+        onclick="syncCustomerOrderStatus(true)" 
+        class="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1.5 bg-orange-50 px-2.5 py-1 rounded-xl border border-orange-200 transition-colors shadow-2xs"
+      >
+        <i class="fa-solid fa-rotate text-[11px]"></i>
+        <span>อัปเดตสถานะเดี๋ยวนี้</span>
+      </button>
     </div>
-  `).join("");
+  `;
+
+  const orderCards = history.map(order => {
+    const rawStatus = (order.orderStatus || order.status || "รอยืนยัน").trim();
+
+    const isNew = rawStatus === "รอยืนยัน";
+    const isCooking = rawStatus === "กำลังปรุง";
+    const isReady = rawStatus === "พร้อมส่ง/รับ" || rawStatus === "พร้อมส่ง" || rawStatus === "พร้อมรับ";
+    const isDone = rawStatus === "สำเร็จ";
+    const isCancelled = rawStatus === "ยกเลิก";
+
+    // กำหนดสีและสเต็ปของ Stepper ตามสถานะจริง
+    let step1Bg = "bg-slate-200 text-slate-500";
+    let step2Bg = "bg-slate-200 text-slate-500";
+    let step3Bg = "bg-slate-200 text-slate-500";
+
+    let step1Line = "bg-slate-200";
+    let step2Line = "bg-slate-200";
+
+    let statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-orange-100 text-orange-700 border border-orange-200">รอยืนยัน</span>`;
+    let statusNotice = `
+      <div class="mt-3 p-3 rounded-xl bg-orange-50 border border-orange-200 text-xs text-orange-800 flex items-center gap-2">
+        <i class="fa-solid fa-hourglass-half text-orange-600"></i>
+        <span>ร้านได้รับคำสั่งซื้อแล้ว กำลังจัดคิวเข้าเตาครับ</span>
+      </div>
+    `;
+
+    if (isNew) {
+      step1Bg = "bg-orange-600 text-white font-bold ring-4 ring-orange-100";
+    } else if (isCooking) {
+      step1Bg = "bg-emerald-600 text-white";
+      step1Line = "bg-emerald-500";
+      step2Bg = "bg-sky-600 text-white font-bold ring-4 ring-sky-100 pulse-badge";
+      statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-sky-100 text-sky-800 border border-sky-300 pulse-badge">กำลังปรุงอาหาร 🔥</span>`;
+      statusNotice = `
+        <div class="mt-3 p-3 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-900 flex items-center gap-2">
+          <i class="fa-solid fa-fire-burner text-sky-600 text-sm animate-bounce"></i>
+          <span><strong>พ่อครัวกำลังปรุงอาหาร</strong> ทำสดใหม่ร้อนๆ ให้คุณอยู่ครับ!</span>
+        </div>
+      `;
+    } else if (isReady) {
+      step1Bg = "bg-emerald-600 text-white";
+      step1Line = "bg-emerald-500";
+      step2Bg = "bg-emerald-600 text-white";
+      step2Line = "bg-emerald-500";
+      step3Bg = "bg-emerald-600 text-white font-bold ring-4 ring-emerald-100 animate-bounce";
+      statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">พร้อมรับ/ส่งแล้ว! 🎉</span>`;
+      statusNotice = `
+        <div class="mt-3 p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-900 flex items-center gap-2 shadow-xs">
+          <i class="fa-solid fa-bell text-emerald-600 text-sm"></i>
+          <span><strong>อาหารเสร็จเรียบร้อยแล้ว!</strong> พร้อมรับหน้าร้านหรือเตรียมจัดส่งครับ</span>
+        </div>
+      `;
+    } else if (isDone) {
+      step1Bg = "bg-emerald-600 text-white";
+      step1Line = "bg-emerald-500";
+      step2Bg = "bg-emerald-600 text-white";
+      step2Line = "bg-emerald-500";
+      step3Bg = "bg-emerald-600 text-white";
+      statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">สำเร็จเรียบร้อย ✅</span>`;
+      statusNotice = `
+        <div class="mt-3 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
+          <span>ออเดอร์นี้เสร็จสมบูรณ์แล้ว ขอบคุณที่อุดหนุนร้านข้าวต้มนายเจ๊กครับ 🙏</span>
+        </div>
+      `;
+    } else if (isCancelled) {
+      statusBadge = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-rose-100 text-rose-700 border border-rose-200">ยกเลิกแล้ว ❌</span>`;
+      statusNotice = `
+        <div class="mt-3 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2">
+          <i class="fa-solid fa-circle-xmark text-rose-600 text-sm"></i>
+          <span>ออเดอร์นี้ถูกยกเลิกแล้ว สอบถามเพิ่มเติม โทร 064-279-3664</span>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="minimal-card rounded-2xl p-4 mb-3.5 border border-slate-200 shadow-xs">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-mono text-slate-400">เลขที่ ${order.orderId}</span>
+            <div class="text-lg font-black text-slate-800 flex items-center gap-2 mt-0.5">
+              <span>คิวที่ ${order.queueNo}</span>
+              ${statusBadge}
+            </div>
+            <span class="text-[11px] text-slate-400">${order.orderDate}</span>
+          </div>
+
+          <div class="text-right">
+            <div class="text-base font-extrabold text-orange-600">฿${Number(order.grandTotal).toLocaleString()}</div>
+            <span class="text-[11px] text-slate-500">${order.fulfillmentType === 'delivery' ? '🛵 เดลิเวอรี' : '🛍️ รับที่ร้าน'}</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Stepper Component -->
+        <div class="mt-3.5 pt-3 border-t border-slate-100">
+          <div class="relative flex items-center justify-between text-center text-[10px]">
+            <!-- Progress Line 1 -->
+            <div class="absolute left-[18%] right-[50%] top-3 h-0.5 ${step1Line} -z-0 transition-colors duration-300"></div>
+            <!-- Progress Line 2 -->
+            <div class="absolute left-[50%] right-[18%] top-3 h-0.5 ${step2Line} -z-0 transition-colors duration-300"></div>
+
+            <!-- Step 1 -->
+            <div class="flex-1 flex flex-col items-center relative z-10">
+              <div class="w-6 h-6 rounded-full ${step1Bg} flex items-center justify-center mb-1 text-[10px] shadow-xs transition-colors duration-300">
+                ${isCooking || isReady || isDone ? '<i class="fa-solid fa-check"></i>' : '1'}
+              </div>
+              <span class="font-bold ${isNew ? 'text-orange-600' : 'text-slate-600'}">รับออเดอร์</span>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex-1 flex flex-col items-center relative z-10">
+              <div class="w-6 h-6 rounded-full ${step2Bg} flex items-center justify-center mb-1 text-[10px] shadow-xs transition-colors duration-300">
+                ${isReady || isDone ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-fire-burner text-[9px]"></i>'}
+              </div>
+              <span class="font-bold ${isCooking ? 'text-sky-600' : 'text-slate-600'}">กำลังปรุง</span>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex-1 flex flex-col items-center relative z-10">
+              <div class="w-6 h-6 rounded-full ${step3Bg} flex items-center justify-center mb-1 text-[10px] shadow-xs transition-colors duration-300">
+                ${isDone ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-box text-[9px]"></i>'}
+              </div>
+              <span class="font-bold ${isReady || isDone ? 'text-emerald-600' : 'text-slate-600'}">พร้อมรับ/ส่ง</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Status Notice Banner -->
+        ${statusNotice}
+
+        <!-- Details -->
+        <div class="mt-3 text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1">
+          <div class="flex justify-between">
+            <span class="text-slate-400">วิธีชำระเงิน:</span>
+            <span class="font-semibold text-slate-700">${order.paymentMethod || 'พร้อมเพย์'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">จุดนัดรับ / ที่อยู่:</span>
+            <span class="font-semibold text-slate-700 text-right truncate max-w-[200px]">${order.destination}</span>
+          </div>
+        </div>
+
+        <div class="mt-2.5">
+          <a href="tel:0642793664" class="block w-full py-2 text-center text-xs font-bold bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 border border-slate-200 transition-colors">
+            <i class="fa-solid fa-phone mr-1 text-orange-600"></i> โทรสอบถามร้าน (064-279-3664)
+          </a>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML = topSyncBar + orderCards;
 }
 
 // ==========================================
