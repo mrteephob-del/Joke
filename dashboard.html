@@ -52,8 +52,8 @@
   <style>
     body {
       font-family: 'Prompt', sans-serif;
-      background-color: #0f172a;
-      color: #f1f5f9;
+      background-color: #f8fafc;
+      color: #1e293b;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -67,65 +67,61 @@
         display: none !important;
       }
       .print-card {
-        border: 1px solid #cbd5e1 !important;
+        border: 1px solid #e2e8f0 !important;
         box-shadow: none !important;
         background: #ffffff !important;
-        color: #0f172a !important;
-      }
-      .print-dark-text {
-        color: #0f172a !important;
       }
     }
 
-    /* Custom subtle scrollbars */
+    /* Minimalist smooth scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #1e293b;
+      background: #f1f5f9;
     }
     ::-webkit-scrollbar-thumb {
-      background: #475569;
+      background: #cbd5e1;
       border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
+      background: #94a3b8;
     }
 
-    /* Glowing card hover */
-    .glow-card {
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Minimalist card hover */
+    .minimal-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .glow-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px -8px rgba(234, 88, 12, 0.18);
+    .minimal-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.05);
     }
   </style>
 </head>
 <body class="min-h-screen pb-16">
 
   <!-- ========================================== -->
-  <!-- Top Navigation Bar -->
+  <!-- Top Navigation Bar (Minimalist Light) -->
   <!-- ========================================== -->
-  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between flex-wrap gap-3">
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between flex-wrap gap-3">
       
       <!-- Brand & Title -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
-          <i class="fa-solid fa-chart-line text-lg"></i>
+        <div class="w-10 h-10 rounded-2xl bg-orange-50 border border-orange-200/80 flex items-center justify-center text-orange-600 shadow-xs">
+          <i class="fa-solid fa-chart-pie text-lg"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-base sm:text-lg font-black font-display text-white tracking-wide">
+            <h1 class="text-base sm:text-lg font-black font-display text-slate-800 tracking-tight">
               แดชบอร์ดภาพรวมร้านค้า
             </h1>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">
-              Live Analytics
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 border border-orange-200">
+              Live Data
             </span>
           </div>
-          <p class="text-xs text-slate-400 font-medium">
+          <p class="text-xs text-slate-500 font-medium">
             ร้านข้าวต้มนายเจ็ก วงเวียนตาคลี
           </p>
         </div>
@@ -134,7 +130,7 @@
       <!-- Quick Action Buttons -->
       <div class="flex items-center gap-2 flex-wrap">
         <!-- Live Status Pill -->
-        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs text-slate-300">
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="lastUpdatedTime">อัปเดต: กำลังโหลด...</span>
         </div>
@@ -143,27 +139,27 @@
         <button 
           onclick="fetchDashboardData(true)" 
           id="refreshBtn"
-          class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition-all flex items-center gap-1.5 cursor-pointer"
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
           title="ซิงค์ข้อมูลล่าสุดจาก Google Sheets"
         >
-          <i id="refreshIcon" class="fa-solid fa-rotate text-xs text-orange-400"></i>
+          <i id="refreshIcon" class="fa-solid fa-rotate text-xs text-orange-600"></i>
           <span class="hidden sm:inline">รีเฟรช</span>
         </button>
 
         <!-- Print Report Button -->
         <button 
           onclick="window.print()" 
-          class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition-all flex items-center gap-1.5 cursor-pointer"
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
           title="พิมพ์สรุปรายงาน / บันทึกเป็น PDF"
         >
-          <i class="fa-solid fa-print text-xs text-sky-400"></i>
+          <i class="fa-solid fa-print text-xs text-slate-500"></i>
           <span class="hidden sm:inline">พิมพ์รายงาน</span>
         </button>
 
         <!-- Link to Kitchen KDS -->
         <a 
           href="kitchen.html" 
-          class="px-3 py-2 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white transition-all shadow-sm flex items-center gap-1.5"
+          class="px-3.5 py-2 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white shadow-xs transition-all flex items-center gap-1.5"
           title="กลับไปยังหน้าจอห้องครัว & แคชเชียร์"
         >
           <i class="fa-solid fa-kitchen-set text-xs"></i>
@@ -173,10 +169,10 @@
         <!-- Link to Customer Menu -->
         <a 
           href="index.html" 
-          class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all flex items-center gap-1.5"
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs transition-all flex items-center gap-1.5"
           title="ไปหน้าเมนูสั่งอาหารของลูกค้า"
         >
-          <i class="fa-solid fa-store text-xs text-amber-400"></i>
+          <i class="fa-solid fa-store text-xs text-amber-600"></i>
           <span class="hidden md:inline">หน้าร้านสั่งอาหาร</span>
         </a>
       </div>
@@ -187,66 +183,66 @@
   <!-- ========================================== -->
   <!-- Main Dashboard Content Container -->
   <!-- ========================================== -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-5 space-y-6">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-5 space-y-5">
 
-    <!-- Date Range Filter Bar (เรียกดูออเดอร์เป็นรายวัน & ช่วงเวลา) -->
-    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl space-y-4 no-print">
+    <!-- Date Range Filter Bar (มินิมอล สีสว่าง สบายตา) -->
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs space-y-3.5 no-print">
       <div class="flex items-center justify-between flex-wrap gap-3">
         
         <!-- Filter Presets -->
         <div class="flex items-center gap-1.5 flex-wrap">
-          <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5 mr-1">
-            <i class="fa-regular fa-calendar-days text-orange-500"></i>
-            <span>ช่วงเวลา:</span>
+          <span class="text-xs font-bold text-slate-600 flex items-center gap-1.5 mr-1">
+            <i class="fa-regular fa-calendar-days text-orange-600"></i>
+            <span>เลือกช่วงเวลา:</span>
           </span>
           <button onclick="setDashboardDatePreset('today')" id="dashBtnToday" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow-xs transition-all cursor-pointer">
             วันนี้
           </button>
-          <button onclick="setDashboardDatePreset('yesterday')" id="dashBtnYesterday" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+          <button onclick="setDashboardDatePreset('yesterday')" id="dashBtnYesterday" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer">
             เมื่อวาน
           </button>
-          <button onclick="setDashboardDatePreset('7days')" id="dashBtn7days" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+          <button onclick="setDashboardDatePreset('7days')" id="dashBtn7days" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer">
             7 วันล่าสุด
           </button>
-          <button onclick="setDashboardDatePreset('30days')" id="dashBtn30days" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+          <button onclick="setDashboardDatePreset('30days')" id="dashBtn30days" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer">
             30 วันล่าสุด
           </button>
-          <button onclick="setDashboardDatePreset('month')" id="dashBtnMonth" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+          <button onclick="setDashboardDatePreset('month')" id="dashBtnMonth" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer">
             เดือนนี้
           </button>
-          <button onclick="setDashboardDatePreset('all')" id="dashBtnAll" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+          <button onclick="setDashboardDatePreset('all')" id="dashBtnAll" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer">
             ทั้งหมด
           </button>
         </div>
 
         <!-- Custom Date Range Inputs -->
         <div class="flex items-center gap-2 flex-wrap">
-          <div class="flex items-center gap-1.5 bg-slate-800/80 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs">
-            <span class="text-slate-400 font-medium">จาก:</span>
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs">
+            <span class="text-slate-500 font-medium">จาก:</span>
             <input 
               type="date" 
               id="customStartDate" 
-              class="bg-transparent text-white font-bold focus:outline-none cursor-pointer text-xs"
+              class="bg-transparent text-slate-800 font-bold focus:outline-none cursor-pointer text-xs"
             />
           </div>
-          <div class="flex items-center gap-1.5 bg-slate-800/80 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs">
-            <span class="text-slate-400 font-medium">ถึง:</span>
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs">
+            <span class="text-slate-500 font-medium">ถึง:</span>
             <input 
               type="date" 
               id="customEndDate" 
-              class="bg-transparent text-white font-bold focus:outline-none cursor-pointer text-xs"
+              class="bg-transparent text-slate-800 font-bold focus:outline-none cursor-pointer text-xs"
             />
           </div>
           <button 
             onclick="applyCustomDateRange()" 
-            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600/90 hover:bg-orange-600 text-white transition-all cursor-pointer"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white shadow-xs transition-all cursor-pointer"
           >
             กรอง
           </button>
           <button 
             onclick="setDashboardDatePreset('today')" 
             id="dashResetBtn"
-            class="hidden px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 bg-slate-800 border border-slate-700 transition-all cursor-pointer"
+            class="hidden px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 border border-slate-200 transition-all cursor-pointer"
             title="ล้างตัวกรองและกลับมาดูวันนี้"
           >
             <i class="fa-solid fa-rotate-left"></i>
@@ -256,120 +252,131 @@
       </div>
 
       <!-- Active Filter Status Banner -->
-      <div class="flex items-center justify-between flex-wrap gap-2 pt-3 border-t border-slate-800 text-xs">
-        <div class="flex items-center gap-2 text-slate-300">
-          <i class="fa-solid fa-circle-info text-orange-500 text-sm"></i>
-          <span>ช่วงเวลาที่แสดง: <strong id="filterSummaryText" class="font-bold text-white">วันนี้ (กำลังโหลด...)</strong></span>
+      <div class="flex items-center justify-between flex-wrap gap-2 pt-3 border-t border-slate-100 text-xs">
+        <div class="flex items-center gap-2 text-slate-600">
+          <i class="fa-solid fa-circle-info text-orange-600 text-xs"></i>
+          <span>ช่วงเวลาที่แสดง: <strong id="filterSummaryText" class="font-bold text-slate-800">วันนี้ (กำลังโหลด...)</strong></span>
         </div>
-        <div class="flex items-center gap-3 text-slate-400 text-[11px]">
-          <span>ออเดอร์ในช่วงนี้: <strong id="filterOrderCount" class="text-orange-400 font-bold">0 บิล</strong></span>
+        <div class="flex items-center gap-3 text-slate-500 text-[11px]">
+          <span>ออเดอร์ในช่วงนี้: <strong id="filterOrderCount" class="text-orange-600 font-bold">0 บิล</strong></span>
           <span>•</span>
-          <span>ยอดขายสุทธิ: <strong id="filterRevenueSum" class="text-emerald-400 font-bold">฿0</strong></span>
+          <span>ยอดขายสุทธิ: <strong id="filterRevenueSum" class="text-emerald-700 font-bold">฿0</strong></span>
         </div>
       </div>
     </section>
 
     <!-- ========================================== -->
-    <!-- Executive KPI Summary Cards (6 Cards) -->
+    <!-- Executive KPI Summary Cards (6 Cards Minimalist White) -->
     <!-- ========================================== -->
     <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
       
       <!-- Card 1: ยอดขายรวมสุทธิ -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
-        <div class="absolute -right-3 -top-3 w-16 h-16 bg-orange-500/10 rounded-full blur-xl pointer-events-none"></div>
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-400">ยอดขายรวมสุทธิ</span>
-          <div class="w-7 h-7 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-coins"></i>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 minimal-card shadow-xs print-card flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-slate-500">ยอดขายรวมสุทธิ</span>
+            <div class="w-7 h-7 rounded-xl bg-orange-50 text-orange-600 border border-orange-200/60 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-coins"></i>
+            </div>
+          </div>
+          <div class="text-xl sm:text-2xl font-black font-display text-slate-900 tracking-tight" id="kpiRevenue">
+            ฿0
           </div>
         </div>
-        <div class="text-xl sm:text-2xl font-black font-display text-white tracking-tight" id="kpiRevenue">
-          ฿0
-        </div>
-        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
-          <span>ค่าอาหาร: <strong class="text-slate-300 font-semibold" id="kpiFoodSubtotal">฿0</strong></span>
-          <span>ค่าส่ง: <strong class="text-slate-300 font-semibold" id="kpiDeliveryTotal">฿0</strong></span>
+        <div class="mt-2.5 text-[10px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
+          <span>ค่าอาหาร: <strong class="text-slate-700 font-semibold" id="kpiFoodSubtotal">฿0</strong></span>
+          <span>ค่าส่ง: <strong class="text-slate-700 font-semibold" id="kpiDeliveryTotal">฿0</strong></span>
         </div>
       </div>
 
       <!-- Card 2: จำนวนออเดอร์ -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-400">จำนวนออเดอร์</span>
-          <div class="w-7 h-7 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-receipt"></i>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 minimal-card shadow-xs print-card flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-slate-500">จำนวนออเดอร์</span>
+            <div class="w-7 h-7 rounded-xl bg-sky-50 text-sky-600 border border-sky-200/60 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+          </div>
+          <div class="text-xl sm:text-2xl font-black font-display text-slate-900 tracking-tight" id="kpiTotalOrders">
+            0
           </div>
         </div>
-        <div class="text-xl sm:text-2xl font-black font-display text-white tracking-tight" id="kpiTotalOrders">
-          0
-        </div>
-        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
-          <span class="text-emerald-400 font-semibold">สำเร็จ: <strong id="kpiCompletedOrders">0</strong></span>
-          <span class="text-amber-400 font-semibold">รอดำเนินการ: <strong id="kpiPendingOrders">0</strong></span>
+        <div class="mt-2.5 text-[10px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
+          <span class="text-emerald-700 font-semibold">สำเร็จ: <strong id="kpiCompletedOrders">0</strong></span>
+          <span class="text-amber-700 font-semibold">รอดำเนินการ: <strong id="kpiPendingOrders">0</strong></span>
         </div>
       </div>
 
       <!-- Card 3: ยอดเฉลี่ยต่อบิล (AOV) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-400">เฉลี่ยต่อบิล (AOV)</span>
-          <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-calculator"></i>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 minimal-card shadow-xs print-card flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-slate-500">เฉลี่ยต่อบิล (AOV)</span>
+            <div class="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-calculator"></i>
+            </div>
+          </div>
+          <div class="text-xl sm:text-2xl font-black font-display text-slate-900 tracking-tight" id="kpiAov">
+            ฿0
           </div>
         </div>
-        <div class="text-xl sm:text-2xl font-black font-display text-white tracking-tight" id="kpiAov">
-          ฿0
-        </div>
-        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
-          <span>เฉลี่ย/จาน: <strong class="text-slate-300 font-semibold" id="kpiAvgDishPerOrder">0 จาน</strong></span>
+        <div class="mt-2.5 text-[10px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
+          <span>เฉลี่ย/จาน: <strong class="text-slate-700 font-semibold" id="kpiAvgDishPerOrder">0 จาน</strong></span>
         </div>
       </div>
 
       <!-- Card 4: ลูกค้าทั้งหมด -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-400">ลูกค้าทั้งหมด</span>
-          <div class="w-7 h-7 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-users"></i>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 minimal-card shadow-xs print-card flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-slate-500">ลูกค้าทั้งหมด</span>
+            <div class="w-7 h-7 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-users"></i>
+            </div>
+          </div>
+          <div class="text-xl sm:text-2xl font-black font-display text-slate-900 tracking-tight" id="kpiCustomers">
+            0
           </div>
         </div>
-        <div class="text-xl sm:text-2xl font-black font-display text-white tracking-tight" id="kpiCustomers">
-          0
-        </div>
-        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
-          <span class="text-purple-400 font-semibold">สั่งซ้ำ/VIP: <strong id="kpiRepeatCustomers">0</strong></span>
+        <div class="mt-2.5 text-[10px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
+          <span class="text-purple-700 font-semibold">สั่งซ้ำ/VIP: <strong id="kpiRepeatCustomers">0</strong></span>
         </div>
       </div>
 
       <!-- Card 5: สัดส่วนชำระเงิน -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-400">การชำระเงิน</span>
-          <div class="w-7 h-7 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-qrcode"></i>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 minimal-card shadow-xs print-card flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-slate-500">การชำระเงิน</span>
+            <div class="w-7 h-7 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-qrcode"></i>
+            </div>
+          </div>
+          <div class="text-sm font-bold text-slate-800 tracking-tight" id="kpiPromptPayShare">
+            พร้อมเพย์ 0%
           </div>
         </div>
-        <div class="text-sm font-bold text-white tracking-tight flex items-baseline gap-2">
-          <span id="kpiPromptPayShare">พร้อมเพย์ 0%</span>
-        </div>
-        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
-          <span>เงินสด: <strong class="text-slate-300 font-semibold" id="kpiCashShare">0%</strong></span>
+        <div class="mt-2.5 text-[10px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
+          <span>เงินสด: <strong class="text-slate-700 font-semibold" id="kpiCashShare">0%</strong></span>
         </div>
       </div>
 
       <!-- Card 6: ช่องทางรับอาหาร -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 glow-card relative overflow-hidden print-card">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-400">รูปแบบรับอาหาร</span>
-          <div class="w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-motorcycle"></i>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 minimal-card shadow-xs print-card flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-slate-500">รูปแบบรับอาหาร</span>
+            <div class="w-7 h-7 rounded-xl bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-motorcycle"></i>
+            </div>
+          </div>
+          <div class="text-sm font-bold text-slate-800 tracking-tight" id="kpiStorePickupShare">
+            หน้าร้าน 0%
           </div>
         </div>
-        <div class="text-sm font-bold text-white tracking-tight flex items-baseline gap-2">
-          <span id="kpiStorePickupShare">หน้าร้าน 0%</span>
-        </div>
-        <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-800">
-          <span>จัดส่ง: <strong class="text-slate-300 font-semibold" id="kpiDeliveryShare">0%</strong></span>
+        <div class="mt-2.5 text-[10px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
+          <span>จัดส่ง: <strong class="text-slate-700 font-semibold" id="kpiDeliveryShare">0%</strong></span>
         </div>
       </div>
 
@@ -378,42 +385,42 @@
     <!-- ========================================== -->
     <!-- Two-Column Analytics: Best-Selling Menus & Top Customers -->
     <!-- ========================================== -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
       <!-- ========================================== -->
       <!-- SECTION 1: เมนูที่มีคนซื้อมากที่สุด (Top Best-Selling Menus) -->
       <!-- ========================================== -->
-      <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-col justify-between print-card">
+      <section class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between print-card">
         <div>
           <!-- Section Header -->
-          <div class="flex items-center justify-between pb-3.5 border-b border-slate-800 flex-wrap gap-2">
+          <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 flex-wrap gap-2">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+              <div class="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 border border-orange-200/70 flex items-center justify-center text-sm">
                 <i class="fa-solid fa-fire"></i>
               </div>
               <div>
-                <h2 class="text-sm sm:text-base font-bold font-display text-white">
+                <h2 class="text-sm sm:text-base font-bold font-display text-slate-800">
                   เมนูที่มีคนซื้อมากที่สุด (Best Sellers)
                 </h2>
-                <p class="text-[11px] text-slate-400">
+                <p class="text-[11px] text-slate-500">
                   อันดับเมนูยอดฮิตตามจำนวนจานและยอดขายรวม
                 </p>
               </div>
             </div>
 
-            <!-- Ranking Metric Toggle -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-xl text-[11px] no-print">
+            <!-- Ranking Metric Toggle (Minimalist Segmented Control) -->
+            <div class="flex items-center bg-slate-100 p-1 rounded-xl text-[11px] no-print">
               <button 
                 onclick="setMenuRankSort('qty')" 
                 id="menuSortQtyBtn"
-                class="px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer"
+                class="px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-xs transition-all cursor-pointer"
               >
                 ตามจำนวน (จาน)
               </button>
               <button 
                 onclick="setMenuRankSort('revenue')" 
                 id="menuSortRevBtn"
-                class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer"
+                class="px-2.5 py-1 rounded-lg font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
               >
                 ตามรายได้ (฿)
               </button>
@@ -422,8 +429,8 @@
 
           <!-- Top Menus Table / List Container -->
           <div class="mt-3 overflow-x-auto">
-            <div id="topMenusList" class="space-y-2.5">
-              <div class="text-center py-8 text-xs text-slate-500">
+            <div id="topMenusList" class="space-y-2">
+              <div class="text-center py-8 text-xs text-slate-400">
                 <i class="fa-solid fa-spinner fa-spin text-lg mb-2 text-orange-500"></i>
                 <p>กำลังคำนวณอันดับเมนูขายดี...</p>
               </div>
@@ -431,46 +438,46 @@
           </div>
         </div>
 
-        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-          <span>รวมเมนูที่ถูกสั่งซื้อ: <strong id="totalUniqueDishes" class="text-slate-300 font-bold">0</strong> รายการ</span>
-          <span>ปริมาณรวม: <strong id="totalDishPortions" class="text-orange-400 font-bold">0</strong> ชาม/จาน</span>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <span>รวมเมนูที่ถูกสั่งซื้อ: <strong id="totalUniqueDishes" class="text-slate-800 font-bold">0</strong> รายการ</span>
+          <span>ปริมาณรวม: <strong id="totalDishPortions" class="text-orange-600 font-bold">0</strong> ชาม/จาน</span>
         </div>
       </section>
 
       <!-- ========================================== -->
       <!-- SECTION 2: ลูกค้าที่ซื้อมากที่สุด (Top Spending Customers & VIPs) -->
       <!-- ========================================== -->
-      <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-col justify-between print-card">
+      <section class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between print-card">
         <div>
           <!-- Section Header -->
-          <div class="flex items-center justify-between pb-3.5 border-b border-slate-800 flex-wrap gap-2">
+          <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 flex-wrap gap-2">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm">
+              <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/70 flex items-center justify-center text-sm">
                 <i class="fa-solid fa-crown"></i>
               </div>
               <div>
-                <h2 class="text-sm sm:text-base font-bold font-display text-white">
+                <h2 class="text-sm sm:text-base font-bold font-display text-slate-800">
                   ลูกค้าที่ซื้อมากที่สุด (VIP Regulars)
                 </h2>
-                <p class="text-[11px] text-slate-400">
+                <p class="text-[11px] text-slate-500">
                   จัดอันดับลูกค้าประจำยอดใช้จ่ายสะสมสูงสุด
                 </p>
               </div>
             </div>
 
-            <!-- Customer Sorting Toggle -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-xl text-[11px] no-print">
+            <!-- Customer Sorting Toggle (Minimalist Segmented Control) -->
+            <div class="flex items-center bg-slate-100 p-1 rounded-xl text-[11px] no-print">
               <button 
                 onclick="setCustomerSort('spend')" 
                 id="custSortSpendBtn"
-                class="px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer"
+                class="px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-xs transition-all cursor-pointer"
               >
                 ยอดใช้จ่าย (฿)
               </button>
               <button 
                 onclick="setCustomerSort('orders')" 
                 id="custSortOrdersBtn"
-                class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer"
+                class="px-2.5 py-1 rounded-lg font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
               >
                 สั่งบ่อยสุด (บิล)
               </button>
@@ -479,8 +486,8 @@
 
           <!-- Top Customers Table / List Container -->
           <div class="mt-3 overflow-x-auto">
-            <div id="topCustomersList" class="space-y-2.5">
-              <div class="text-center py-8 text-xs text-slate-500">
+            <div id="topCustomersList" class="space-y-2">
+              <div class="text-center py-8 text-xs text-slate-400">
                 <i class="fa-solid fa-spinner fa-spin text-lg mb-2 text-purple-500"></i>
                 <p>กำลังคำนวณลูกค้า VIP...</p>
               </div>
@@ -488,8 +495,8 @@
           </div>
         </div>
 
-        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-          <span>ฐานลูกค้าทั้งหมด: <strong id="totalCustomerProfiles" class="text-slate-300 font-bold">0</strong> ท่าน</span>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <span>ฐานลูกค้าทั้งหมด: <strong id="totalCustomerProfiles" class="text-slate-800 font-bold">0</strong> ท่าน</span>
           <span>แตะเบอร์โทรเพื่อโทรหาลูกค้าได้ทันที 📞</span>
         </div>
       </section>
@@ -499,24 +506,24 @@
     <!-- ========================================== -->
     <!-- SECTION 3: วิเคราะห์ช่วงเวลาขายดี (Peak Ordering Hours Distribution) -->
     <!-- ========================================== -->
-    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl print-card">
-      <div class="flex items-center justify-between pb-3.5 border-b border-slate-800 flex-wrap gap-2">
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs print-card">
+      <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 flex-wrap gap-2">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm">
+          <div class="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 border border-orange-200/70 flex items-center justify-center text-sm">
             <i class="fa-solid fa-clock"></i>
           </div>
           <div>
-            <h2 class="text-sm sm:text-base font-bold font-display text-white">
+            <h2 class="text-sm sm:text-base font-bold font-display text-slate-800">
               ช่วงเวลาที่ขายดีที่สุดในแต่ละวัน (Peak Hours)
             </h2>
-            <p class="text-[11px] text-slate-400">
+            <p class="text-[11px] text-slate-500">
               กราฟแท่งแจกแจงปริมาณออเดอร์ในแต่ละชั่วโมงของวัน
             </p>
           </div>
         </div>
 
-        <div id="peakHourBadge" class="px-3 py-1 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
-          <i class="fa-solid fa-bolt text-amber-400"></i>
+        <div id="peakHourBadge" class="px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5">
+          <i class="fa-solid fa-bolt text-amber-600"></i>
           <span>ช่วงเวลาพีค: กำลังคำนวณ...</span>
         </div>
       </div>
@@ -532,19 +539,19 @@
     <!-- ========================================== -->
     <!-- SECTION 4: ตารางบันทึกประวัติออเดอร์ทั้งหมด (Order Ledger & Audit) -->
     <!-- ========================================== -->
-    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl print-card">
+    <section class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs print-card">
       
       <!-- Table Controls -->
-      <div class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-800">
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-100">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-sm">
+          <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 border border-sky-200/70 flex items-center justify-center text-sm">
             <i class="fa-solid fa-list-check"></i>
           </div>
           <div>
-            <h2 class="text-sm sm:text-base font-bold font-display text-white">
+            <h2 class="text-sm sm:text-base font-bold font-display text-slate-800">
               บันทึกรายการออเดอร์ (Order Ledger)
             </h2>
-            <p class="text-[11px] text-slate-400">
+            <p class="text-[11px] text-slate-500">
               รายละเอียดออเดอร์ทั้งหมดในช่วงเวลาที่เลือก
             </p>
           </div>
@@ -556,7 +563,7 @@
           <select 
             id="tableStatusFilter" 
             onchange="renderOrdersLedgerTable()"
-            class="bg-slate-800 text-xs text-slate-200 border border-slate-700 rounded-xl px-3 py-2 focus:outline-none cursor-pointer"
+            class="bg-slate-50 text-xs text-slate-700 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-orange-500 cursor-pointer"
           >
             <option value="all">สถานะ: ทั้งหมด</option>
             <option value="สำเร็จ">เฉพาะ: สำเร็จ</option>
@@ -568,13 +575,13 @@
 
           <!-- Search Input -->
           <div class="relative">
-            <i class="fa-solid fa-search absolute left-3 top-2.5 text-xs text-slate-500"></i>
+            <i class="fa-solid fa-search absolute left-3 top-2.5 text-xs text-slate-400"></i>
             <input 
               type="text" 
               id="tableSearchInput" 
               oninput="renderOrdersLedgerTable()"
               placeholder="ค้นหาคิว, เลขบิล, ลูกค้า, เบอร์..." 
-              class="bg-slate-800 text-xs text-white placeholder-slate-500 pl-8 pr-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-orange-500 w-48 sm:w-64"
+              class="bg-slate-50 text-xs text-slate-800 placeholder-slate-400 pl-8 pr-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-orange-500 w-48 sm:w-64"
             />
           </div>
         </div>
@@ -584,7 +591,7 @@
       <div class="overflow-x-auto mt-3">
         <table class="w-full text-left text-xs border-collapse">
           <thead>
-            <tr class="text-slate-400 border-b border-slate-800 text-[11px] font-semibold">
+            <tr class="bg-slate-50/80 text-slate-500 border-b border-slate-200 text-[11px] font-semibold">
               <th class="py-2.5 px-3">คิว / เลขที่บิล</th>
               <th class="py-2.5 px-3">วัน-เวลา</th>
               <th class="py-2.5 px-3">ลูกค้า & เบอร์ติดต่อ</th>
@@ -595,20 +602,20 @@
               <th class="py-2.5 px-3 text-center no-print">การจัดการ</th>
             </tr>
           </thead>
-          <tbody id="ordersLedgerBody" class="divide-y divide-slate-800/60 text-slate-200">
+          <tbody id="ordersLedgerBody" class="divide-y divide-slate-100 text-slate-700">
             <!-- Populated by JavaScript -->
           </tbody>
         </table>
         
-        <div id="tableEmptyState" class="hidden text-center py-10 text-xs text-slate-500">
-          <i class="fa-solid fa-inbox text-2xl mb-2 text-slate-600 block"></i>
+        <div id="tableEmptyState" class="hidden text-center py-10 text-xs text-slate-400">
+          <i class="fa-solid fa-inbox text-2xl mb-2 text-slate-300 block"></i>
           ไม่พบออเดอร์ตามเงื่อนไขที่เลือก
         </div>
       </div>
 
       <!-- Table Footer / Count -->
-      <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-        <span>แสดง <strong id="tableShowingCount" class="text-slate-300 font-bold">0</strong> จากทั้งหมด <strong id="tableTotalCount" class="text-slate-300 font-bold">0</strong> ออเดอร์</span>
+      <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+        <span>แสดง <strong id="tableShowingCount" class="text-slate-800 font-bold">0</strong> จากทั้งหมด <strong id="tableTotalCount" class="text-slate-800 font-bold">0</strong> ออเดอร์</span>
         <span>ระบบซิงค์ข้อมูลกับคลาวด์ Google Sheets แบบเรียลไทม์</span>
       </div>
     </section>
@@ -616,52 +623,52 @@
   </main>
 
   <!-- ========================================== -->
-  <!-- Order Receipt Modal -->
+  <!-- Order Receipt Modal (Clean Minimalist Light) -->
   <!-- ========================================== -->
-  <div id="orderModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-3xl p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+  <div id="orderModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 w-full max-w-lg rounded-3xl p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
       
       <!-- Close Button -->
       <button 
         onclick="closeOrderModal()" 
-        class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm transition-colors cursor-pointer"
+        class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm transition-colors cursor-pointer"
       >
         <i class="fa-solid fa-xmark"></i>
       </button>
 
       <!-- Modal Header -->
-      <div class="border-b border-slate-800 pb-3">
+      <div class="border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2">
-          <span id="modalQueueNo" class="text-2xl font-black font-display text-orange-400">Q00</span>
-          <span id="modalStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">สำเร็จ</span>
+          <span id="modalQueueNo" class="text-2xl font-black font-display text-orange-600">Q00</span>
+          <span id="modalStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">สำเร็จ</span>
         </div>
-        <p id="modalOrderId" class="text-xs font-mono text-slate-400 mt-1">JK-XXXXXXXX-XXX</p>
-        <p id="modalOrderDate" class="text-[11px] text-slate-500 mt-0.5">วันเวลา...</p>
+        <p id="modalOrderId" class="text-xs font-mono text-slate-500 mt-1">JK-XXXXXXXX-XXX</p>
+        <p id="modalOrderDate" class="text-[11px] text-slate-400 mt-0.5">วันเวลา...</p>
       </div>
 
       <!-- Customer Info Card -->
-      <div class="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/60 text-xs space-y-1.5">
+      <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 text-xs space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-slate-400 font-medium">ลูกค้า:</span>
-          <strong id="modalCustomerName" class="text-white font-bold">-</strong>
+          <span class="text-slate-500 font-medium">ลูกค้า:</span>
+          <strong id="modalCustomerName" class="text-slate-800 font-bold">-</strong>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-slate-400 font-medium">เบอร์โทรศัพท์:</span>
-          <a id="modalCustomerPhone" href="#" class="text-orange-400 font-bold hover:underline">-</a>
+          <span class="text-slate-500 font-medium">เบอร์โทรศัพท์:</span>
+          <a id="modalCustomerPhone" href="#" class="text-orange-600 font-bold hover:underline">-</a>
         </div>
         <div class="flex items-start justify-between">
-          <span class="text-slate-400 font-medium">รูปแบบ / ที่อยู่:</span>
-          <span id="modalDestination" class="text-right text-slate-300 max-w-[65%]">-</span>
+          <span class="text-slate-500 font-medium">รูปแบบ / ที่อยู่:</span>
+          <span id="modalDestination" class="text-right text-slate-700 max-w-[65%]">-</span>
         </div>
-        <div class="flex items-center justify-between pt-1 border-t border-slate-700/50">
-          <span class="text-slate-400 font-medium">การชำระเงิน:</span>
-          <span id="modalPaymentMethod" class="text-emerald-400 font-semibold">-</span>
+        <div class="flex items-center justify-between pt-1 border-t border-slate-200/60">
+          <span class="text-slate-500 font-medium">การชำระเงิน:</span>
+          <span id="modalPaymentMethod" class="text-emerald-700 font-semibold">-</span>
         </div>
       </div>
 
       <!-- Items Ordered -->
       <div>
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
           รายการอาหารที่สั่ง:
         </span>
         <div id="modalItemsList" class="space-y-1.5 text-xs">
@@ -670,24 +677,24 @@
       </div>
 
       <!-- Customer Note (If any) -->
-      <div id="modalNoteBox" class="hidden p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200">
-        <strong class="block mb-0.5">หมายเหตุจากลูกค้า:</strong>
+      <div id="modalNoteBox" class="hidden p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+        <strong class="block mb-0.5 font-bold">หมายเหตุจากลูกค้า:</strong>
         <span id="modalCustomerNoteText">-</span>
       </div>
 
       <!-- Pricing Summary -->
-      <div class="bg-slate-800/50 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-1">
-        <div class="flex items-center justify-between text-slate-400">
+      <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 text-xs space-y-1">
+        <div class="flex items-center justify-between text-slate-500">
           <span>ค่าอาหารรวม:</span>
-          <span id="modalSubtotal" class="text-slate-200 font-semibold">฿0</span>
+          <span id="modalSubtotal" class="text-slate-800 font-semibold">฿0</span>
         </div>
-        <div class="flex items-center justify-between text-slate-400">
+        <div class="flex items-center justify-between text-slate-500">
           <span>ค่าจัดส่ง:</span>
-          <span id="modalDeliveryFee" class="text-slate-200 font-semibold">฿0</span>
+          <span id="modalDeliveryFee" class="text-slate-800 font-semibold">฿0</span>
         </div>
-        <div class="flex items-center justify-between text-sm pt-2 border-t border-slate-700 text-white font-bold">
+        <div class="flex items-center justify-between text-sm pt-2 border-t border-slate-200 text-slate-800 font-bold">
           <span>ยอดรวมทั้งสิ้น:</span>
-          <span id="modalGrandTotal" class="text-orange-400 font-black font-display text-base">฿0</span>
+          <span id="modalGrandTotal" class="text-orange-600 font-black font-display text-base">฿0</span>
         </div>
       </div>
 
@@ -695,7 +702,7 @@
       <div class="flex items-center justify-end gap-2 pt-2">
         <button 
           onclick="closeOrderModal()" 
-          class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+          class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
         >
           ปิดหน้าต่าง
         </button>
@@ -890,7 +897,7 @@
         all: document.getElementById("dashBtnAll")
       };
 
-      const inactive = "px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer";
+      const inactive = "px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer";
       const active = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow-xs transition-all cursor-pointer";
 
       Object.keys(buttons).forEach(k => {
@@ -1123,11 +1130,11 @@
       const qBtn = document.getElementById("menuSortQtyBtn");
       const rBtn = document.getElementById("menuSortRevBtn");
       if (metric === "qty") {
-        qBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer";
-        rBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer";
+        qBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-xs transition-all cursor-pointer";
+        rBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer";
       } else {
-        rBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer";
-        qBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer";
+        rBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-xs transition-all cursor-pointer";
+        qBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer";
       }
       renderTopMenus();
     }
@@ -1171,8 +1178,8 @@
 
       if (menuList.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-10 text-xs text-slate-500">
-            <i class="fa-solid fa-bowl-food text-2xl mb-2 text-slate-600 block"></i>
+          <div class="text-center py-10 text-xs text-slate-400">
+            <i class="fa-solid fa-bowl-food text-2xl mb-2 text-slate-300 block"></i>
             ไม่มีข้อมูลเมนูที่ขายในช่วงเวลานี้
           </div>
         `;
@@ -1184,32 +1191,32 @@
 
       container.innerHTML = menuList.slice(0, topLimit).map((item, idx) => {
         const rank = idx + 1;
-        let rankBadge = `<span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 font-bold flex items-center justify-center text-xs">${rank}</span>`;
+        let rankBadge = `<span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-xs">${rank}</span>`;
         if (rank === 1) {
-          rankBadge = `<span class="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shadow-sm shadow-amber-500/50">🥇</span>`;
+          rankBadge = `<span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 border border-amber-300 font-black flex items-center justify-center text-xs shadow-2xs">🥇</span>`;
         } else if (rank === 2) {
-          rankBadge = `<span class="w-6 h-6 rounded-lg bg-slate-300 text-slate-900 font-black flex items-center justify-center text-xs">🥈</span>`;
+          rankBadge = `<span class="w-6 h-6 rounded-lg bg-slate-200 text-slate-700 font-black flex items-center justify-center text-xs">🥈</span>`;
         } else if (rank === 3) {
-          rankBadge = `<span class="w-6 h-6 rounded-lg bg-amber-700 text-white font-black flex items-center justify-center text-xs">🥉</span>`;
+          rankBadge = `<span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-800 border border-orange-200 font-black flex items-center justify-center text-xs">🥉</span>`;
         }
 
         const pct = grandTotalFoodRevenue > 0 ? Math.round((item.revenue / grandTotalFoodRevenue) * 100) : 0;
         const barWidth = maxVal > 0 ? Math.max(8, Math.round(((dashState.menuSortBy === "qty" ? item.qty : item.revenue) / maxVal) * 100)) : 10;
 
         return `
-          <div class="p-2.5 rounded-2xl bg-slate-800/40 border border-slate-800 hover:border-slate-700 transition-all flex flex-col gap-1.5">
+          <div class="p-3 rounded-xl bg-slate-50/70 border border-slate-100 hover:bg-slate-100/70 transition-all flex flex-col gap-1.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2 min-w-0">
                 ${rankBadge}
-                <span class="text-xs font-bold text-white truncate max-w-[180px] sm:max-w-[260px]" title="${item.name}">
+                <span class="text-xs font-bold text-slate-800 truncate max-w-[180px] sm:max-w-[260px]" title="${item.name}">
                   ${item.name}
                 </span>
               </div>
               <div class="text-right flex items-center gap-3">
-                <span class="text-xs font-bold text-orange-400 font-display">
+                <span class="text-xs font-bold text-orange-600 font-display">
                   ${item.qty} ชาม
                 </span>
-                <span class="text-xs font-bold text-slate-300 font-display w-16 text-right">
+                <span class="text-xs font-bold text-slate-900 font-display w-16 text-right">
                   ฿${item.revenue.toLocaleString()}
                 </span>
               </div>
@@ -1217,10 +1224,10 @@
 
             <!-- Progress Bar -->
             <div class="flex items-center gap-2">
-              <div class="flex-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                <div class="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400 transition-all duration-500" style="width: ${barWidth}%"></div>
+              <div class="flex-1 h-1.5 rounded-full bg-slate-200/70 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-500 transition-all duration-500" style="width: ${barWidth}%"></div>
               </div>
-              <span class="text-[10px] text-slate-500 font-mono w-9 text-right">${pct}%</span>
+              <span class="text-[10px] text-slate-400 font-mono w-9 text-right">${pct}%</span>
             </div>
           </div>
         `;
@@ -1235,11 +1242,11 @@
       const sBtn = document.getElementById("custSortSpendBtn");
       const oBtn = document.getElementById("custSortOrdersBtn");
       if (metric === "spend") {
-        sBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer";
-        oBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer";
+        sBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-xs transition-all cursor-pointer";
+        oBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer";
       } else {
-        oBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-orange-600 text-white transition-all cursor-pointer";
-        sBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-all cursor-pointer";
+        oBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-xs transition-all cursor-pointer";
+        sBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer";
       }
       renderTopCustomers();
     }
@@ -1271,7 +1278,6 @@
       validOrders.forEach(order => {
         const rawPhone = getRawPhone(order.customerPhone);
         const name = (order.customerName || "ลูกค้าทั่วไป").trim();
-        // Unique grouping key: phone if exists, else name
         const key = rawPhone ? `phone_${rawPhone}` : `name_${name}`;
 
         const curr = customerMap.get(key) || {
@@ -1310,8 +1316,8 @@
 
       if (custList.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-10 text-xs text-slate-500">
-            <i class="fa-solid fa-user-xmark text-2xl mb-2 text-slate-600 block"></i>
+          <div class="text-center py-10 text-xs text-slate-400">
+            <i class="fa-solid fa-user-xmark text-2xl mb-2 text-slate-300 block"></i>
             ไม่มีข้อมูลประวัติลูกค้าในช่วงเวลานี้
           </div>
         `;
@@ -1322,37 +1328,37 @@
 
       container.innerHTML = custList.slice(0, topLimit).map((c, idx) => {
         const rank = idx + 1;
-        let vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-800 text-slate-400">#${rank}</span>`;
+        let vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-500">#${rank}</span>`;
         if (rank === 1) {
-          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-xs">👑 VIP #1</span>`;
+          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">👑 VIP #1</span>`;
         } else if (rank === 2) {
-          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-700 text-slate-200">⭐ VIP #2</span>`;
+          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">⭐ VIP #2</span>`;
         } else if (rank === 3) {
-          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-900/60 text-purple-300 border border-purple-700">VIP #3</span>`;
+          vipTag = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">VIP #3</span>`;
         }
 
         const avgSpend = c.ordersCount > 0 ? Math.round(c.totalSpend / c.ordersCount) : 0;
         const displayPhone = formatPhone(c.phone);
 
         return `
-          <div class="p-3 rounded-2xl bg-slate-800/40 border border-slate-800 hover:border-slate-700 transition-all flex items-center justify-between gap-3">
+          <div class="p-3 rounded-xl bg-slate-50/70 border border-slate-100 hover:bg-slate-100/70 transition-all flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs shrink-0">
+              <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center font-bold text-xs shrink-0">
                 ${c.name.charAt(0) || '👤'}
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-bold text-white truncate max-w-[140px] sm:max-w-[190px]" title="${c.name}">
+                  <span class="text-xs font-bold text-slate-800 truncate max-w-[140px] sm:max-w-[190px]" title="${c.name}">
                     ${c.name}
                   </span>
                   ${vipTag}
                 </div>
-                <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
                   ${c.phone ? `
-                    <a href="tel:${c.phone}" class="hover:text-orange-400 flex items-center gap-1 font-mono transition-colors">
-                      <i class="fa-solid fa-phone text-[9px] text-orange-500"></i> ${displayPhone}
+                    <a href="tel:${c.phone}" class="text-orange-600 hover:underline flex items-center gap-1 font-mono transition-colors">
+                      <i class="fa-solid fa-phone text-[9px]"></i> ${displayPhone}
                     </a>
-                  ` : `<span class="text-slate-500">ไม่ระบุเบอร์</span>`}
+                  ` : `<span class="text-slate-400">ไม่ระบุเบอร์</span>`}
                   <span>•</span>
                   <span>สั่ง ${c.ordersCount} ครั้ง</span>
                 </div>
@@ -1360,7 +1366,7 @@
             </div>
 
             <div class="text-right shrink-0">
-              <span class="text-xs font-black text-emerald-400 font-display block">
+              <span class="text-xs font-black text-slate-900 font-display block">
                 ฿${c.totalSpend.toLocaleString()}
               </span>
               <span class="text-[10px] text-slate-500 block">
@@ -1391,7 +1397,7 @@
         }
       });
 
-      // Find restaurant active hours (typically 07:00 to 23:00)
+      // Find restaurant active hours (07:00 to 23:00)
       const displayHours = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
       const maxCount = Math.max(...displayHours.map(h => hourCounts[h]), 1);
 
@@ -1407,7 +1413,7 @@
       const peakBadge = document.getElementById("peakHourBadge");
       if (peakBadge) {
         if (peakMax > 0 && peakH !== -1) {
-          peakBadge.innerHTML = `<i class="fa-solid fa-bolt text-amber-400"></i> <span>ช่วงเวลาพีค: <strong>${peakH}:00 - ${peakH + 1}:00 น.</strong> (${peakMax} บิล)</span>`;
+          peakBadge.innerHTML = `<i class="fa-solid fa-bolt text-amber-600"></i> <span>ช่วงเวลาพีค: <strong>${peakH}:00 - ${peakH + 1}:00 น.</strong> (${peakMax} บิล)</span>`;
           peakBadge.classList.remove("hidden");
         } else {
           peakBadge.innerHTML = `<span>ช่วงเวลาพีค: -</span>`;
@@ -1423,20 +1429,20 @@
         return `
           <div class="flex flex-col items-center gap-1.5 group cursor-pointer" title="${h}:00 - ${h+1}:00 น. | ${count} ออเดอร์ (฿${rev.toLocaleString()})">
             <!-- Count label above bar -->
-            <span class="text-[10px] font-bold ${count > 0 ? (isPeak ? 'text-amber-400' : 'text-slate-300') : 'text-slate-600'}">
-              ${count > 0 ? count : ''}
+            <span class="text-[10px] font-bold ${count > 0 ? (isPeak ? 'text-orange-600' : 'text-slate-700') : 'text-transparent'}">
+              ${count > 0 ? count : '0'}
             </span>
 
             <!-- The Bar -->
-            <div class="w-full max-w-[28px] h-24 bg-slate-800 rounded-xl flex items-end p-0.5 overflow-hidden">
+            <div class="w-full max-w-[28px] h-24 bg-slate-100 rounded-xl flex items-end p-0.5 overflow-hidden">
               <div 
-                class="w-full rounded-lg transition-all duration-500 ${isPeak ? 'bg-gradient-to-t from-orange-600 to-amber-400 shadow-sm shadow-amber-500/50' : count > 0 ? 'bg-orange-500/80 hover:bg-orange-500' : 'bg-transparent'}" 
+                class="w-full rounded-lg transition-all duration-500 ${isPeak ? 'bg-gradient-to-t from-orange-600 to-amber-400 shadow-2xs shadow-orange-300' : count > 0 ? 'bg-orange-500/80 hover:bg-orange-500' : 'bg-transparent'}" 
                 style="height: ${count > 0 ? heightPct : 0}%"
               ></div>
             </div>
 
             <!-- Hour label -->
-            <span class="text-[10px] ${isPeak ? 'font-black text-amber-400' : 'font-medium text-slate-500'}">
+            <span class="text-[10px] ${isPeak ? 'font-black text-orange-600' : 'font-medium text-slate-500'}">
               ${h}:00
             </span>
           </div>
@@ -1486,15 +1492,15 @@
 
       tbody.innerHTML = list.map(order => {
         const status = order.orderStatus || "รอยืนยัน";
-        let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">รอยืนยัน</span>`;
+        let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">รอยืนยัน</span>`;
         if (status === "กำลังปรุง") {
-          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">กำลังปรุง</span>`;
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">กำลังปรุง</span>`;
         } else if (status === "พร้อมส่ง/รับ") {
-          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">พร้อมรับ/ส่ง</span>`;
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">พร้อมรับ/ส่ง</span>`;
         } else if (status === "สำเร็จ") {
-          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300">สำเร็จ</span>`;
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">สำเร็จ</span>`;
         } else if (status === "ยกเลิก") {
-          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-500/20 text-rose-400 border border-rose-500/30">ยกเลิก</span>`;
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">ยกเลิก</span>`;
         }
 
         const dateStr = getOrderDateStr(order);
@@ -1507,53 +1513,53 @@
         const moreItems = items.length > 1 ? ` (+อีก ${items.length - 1} รายการ)` : "";
 
         return `
-          <tr class="hover:bg-slate-800/40 transition-colors">
+          <tr class="hover:bg-slate-50/70 transition-colors">
             <!-- Queue & ID -->
             <td class="py-3 px-3">
-              <span class="font-black text-sm font-display text-white block">${order.queueNo || '-'}</span>
+              <span class="font-black text-sm font-display text-slate-800 block">${order.queueNo || '-'}</span>
               <span class="text-[10px] font-mono text-slate-400">${order.orderId || '-'}</span>
             </td>
 
             <!-- Date & Time -->
             <td class="py-3 px-3">
-              <span class="font-medium text-slate-300 block">${formatThaiDateDisplay(dateStr)}</span>
-              <span class="text-[10px] text-slate-500">${timeStr || '-'}</span>
+              <span class="font-medium text-slate-700 block">${formatThaiDateDisplay(dateStr)}</span>
+              <span class="text-[10px] text-slate-400">${timeStr || '-'}</span>
             </td>
 
             <!-- Customer -->
             <td class="py-3 px-3">
-              <span class="font-bold text-white block">${order.customerName || 'ลูกค้าทั่วไป'}</span>
+              <span class="font-bold text-slate-800 block">${order.customerName || 'ลูกค้าทั่วไป'}</span>
               ${order.customerPhone ? `
-                <a href="tel:${order.customerPhone}" class="text-[11px] text-orange-400 hover:underline flex items-center gap-1">
+                <a href="tel:${order.customerPhone}" class="text-[11px] text-orange-600 hover:underline flex items-center gap-1">
                   <i class="fa-solid fa-phone text-[9px]"></i> ${formattedPhone}
                 </a>
-              ` : `<span class="text-[10px] text-slate-500">-</span>`}
+              ` : `<span class="text-[10px] text-slate-400">-</span>`}
             </td>
 
             <!-- Food Items -->
             <td class="py-3 px-3 max-w-xs">
-              <div class="line-clamp-2 text-slate-300" title="${order.itemsSummary || ''}">
+              <div class="line-clamp-2 text-slate-700" title="${order.itemsSummary || ''}">
                 <span class="font-medium">${firstItem}</span>
-                <span class="text-[10px] text-slate-400 font-bold">${moreItems}</span>
+                <span class="text-[10px] text-slate-500 font-bold">${moreItems}</span>
               </div>
             </td>
 
             <!-- Fulfillment & Payment -->
             <td class="py-3 px-3 text-center">
-              <span class="px-2 py-0.5 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 inline-block mb-1">
+              <span class="px-2 py-0.5 rounded-lg text-[10px] font-medium bg-slate-100 text-slate-700 inline-block mb-1">
                 ${order.fulfillmentType || 'รับหน้าร้าน'}
               </span>
-              <span class="text-[10px] text-slate-400 block">
+              <span class="text-[10px] text-slate-500 block">
                 ${order.paymentMethod ? (order.paymentMethod.includes('พร้อมเพย์') ? 'พร้อมเพย์' : 'เงินสด') : 'พร้อมเพย์'}
               </span>
             </td>
 
             <!-- Grand Total -->
             <td class="py-3 px-3 text-right">
-              <span class="font-black text-sm font-display text-orange-400 block">
+              <span class="font-black text-sm font-display text-orange-600 block">
                 ฿${Number(order.grandTotal).toLocaleString()}
               </span>
-              ${Number(order.deliveryFee) > 0 ? `<span class="text-[10px] text-slate-500">ค่าส่ง ฿${order.deliveryFee}</span>` : ''}
+              ${Number(order.deliveryFee) > 0 ? `<span class="text-[10px] text-slate-400">ค่าส่ง ฿${order.deliveryFee}</span>` : ''}
             </td>
 
             <!-- Status -->
@@ -1565,10 +1571,10 @@
             <td class="py-3 px-3 text-center no-print">
               <button 
                 onclick="openOrderReceipt('${order.orderId}')" 
-                class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1 mx-auto"
+                class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all cursor-pointer flex items-center gap-1 mx-auto shadow-2xs"
                 title="ดูบิลฉบับเต็ม"
               >
-                <i class="fa-solid fa-file-invoice text-orange-400 text-xs"></i>
+                <i class="fa-solid fa-file-invoice text-orange-600 text-xs"></i>
                 <span>ดูบิล</span>
               </button>
             </td>
@@ -1607,9 +1613,9 @@
       const items = parseOrderItems(order);
 
       itemsListEl.innerHTML = items.map(it => `
-        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
-          <span class="font-medium text-white">${it.qty}x ${it.name}</span>
-          <span class="font-bold text-slate-300 font-display">฿${it.total.toLocaleString()}</span>
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+          <span class="font-medium text-slate-800">${it.qty}x ${it.name}</span>
+          <span class="font-bold text-slate-900 font-display">฿${it.total.toLocaleString()}</span>
         </div>
       `).join("");
 
