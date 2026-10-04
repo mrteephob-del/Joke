@@ -593,18 +593,18 @@ function initDeliveryMap() {
   const shopLat = shop.lat;
   const shopLng = shop.lng;
 
-  // ตำแหน่งเริ่มต้นของหมุดลูกค้า: ถ้าเคยปักไว้ใช้พิกัดเดิม หรือเริ่มต้นห่างจากร้านเล็กน้อย
-  const initLat = state.customerGps ? state.customerGps.lat : shopLat + 0.003;
-  const initLng = state.customerGps ? state.customerGps.lng : shopLng + 0.003;
+  // ตำแหน่งเริ่มต้นของหมุดลูกค้า: ถ้าเคยปักไว้ใช้พิกัดเดิม หรือเริ่มต้นใกล้ร้านข้าวต้มนายเง็ก
+  const initLat = state.customerGps ? state.customerGps.lat : shopLat + 0.001;
+  const initLng = state.customerGps ? state.customerGps.lng : shopLng + 0.001;
 
   deliveryMap = L.map("deliveryMapContainer", {
     zoomControl: true,
     scrollWheelZoom: false,
-    tap: true
-  }).setView([initLat, initLng], 15);
+    tap: true,
+    attributionControl: false // ปิดแถบเครดิตและธงยูเครนของไลบรารี Leaflet
+  }).setView([shopLat, shopLng], 16);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; OpenStreetMap',
     maxZoom: 19
   }).addTo(deliveryMap);
 
