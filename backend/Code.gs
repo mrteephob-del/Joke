@@ -50,6 +50,10 @@ function doGet(e) {
         postData = e.parameter;
       }
       responseData = handleCreateOrder(postData);
+    } else if (action === "updateOrderStatus") {
+      const orderId = e.parameter.orderId || "";
+      const newStatus = e.parameter.newStatus || "";
+      responseData = handleUpdateStatus({ orderId: orderId, newStatus: newStatus });
     } else if (action === "setup") {
       initialSetup();
       responseData = { success: true, message: "สร้างฐานข้อมูลและเพิ่มข้อมูลเมนูพร้อมช่องรูปภาพสำเร็จเรียบร้อยแล้ว!" };
@@ -57,7 +61,7 @@ function doGet(e) {
       responseData = {
         success: true,
         message: "Khao Tom Nai Jek API is online.",
-        endpoints: ["getMenu", "getOrders", "getQueueStatus", "createOrder", "setup"]
+        endpoints: ["getMenu", "getOrders", "getQueueStatus", "createOrder", "updateOrderStatus", "setup"]
       };
     }
 
