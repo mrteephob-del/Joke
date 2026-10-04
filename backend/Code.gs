@@ -57,11 +57,13 @@ function doGet(e) {
     } else if (action === "setup") {
       initialSetup();
       responseData = { success: true, message: "สร้างฐานข้อมูลและเพิ่มข้อมูลเมนูพร้อมช่องรูปภาพสำเร็จเรียบร้อยแล้ว!" };
+    } else if (action === "addImageColumn" || action === "ensureImageColumn") {
+      responseData = ensureImageColumnExists();
     } else {
       responseData = {
         success: true,
         message: "Khao Tom Nai Jek API is online.",
-        endpoints: ["getMenu", "getOrders", "getQueueStatus", "createOrder", "updateOrderStatus", "setup"]
+        endpoints: ["getMenu", "getOrders", "getQueueStatus", "createOrder", "updateOrderStatus", "setup", "addImageColumn"]
       };
     }
 
@@ -256,9 +258,33 @@ function getMenuData() {
     menuSheet = ss.getSheetByName(CONFIG.SHEET_MENU);
   }
 
+  // Self-Healing: ตรวจสอบและเพิ่มหัวคอลัมน์ "รูปภาพ (Image URL)" ในคอลัมน์ J อัตโนมัติหากยังว่างอยู่
+  try {
+    const col10Val = menuSheet.getRange(1, 10).getValue().toString().trim();
+    if (!col10Val || (!col10Val.includes("รูป") && !col10Val.includes("image") && !col10Val.includes("ภาพ"))) {
+      menuSheet.getRange(1, 10).setValue("รูปภาพ (Image URL)");
+      const col9 = menuSheet.getRange(1, 9);
+      col9.copyTo(menuSheet.getRange(1, 10), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+      menuSheet.setColumnWidth(10, 220);
+    }
+  } catch (err) {
+    console.warn("Auto ensure image column warning:", err);
+  }
+
   const data = menuSheet.getDataRange().getValues();
   if (data.length <= 1) {
     return { success: true, items: [] };
+  }
+
+  // ตรวจหาคอลัมน์รูปภาพแบบ Dynamic (Col J = index 9 โดยค่าเริ่มต้น)
+  const headerRow = data[0];
+  let imageColIndex = 9;
+  for (let c = 0; c < headerRow.length; c++) {
+    const h = (headerRow[c] || "").toString().trim().toLowerCase();
+    if (h.includes("รูป") || h.includes("image") || h.includes("ภาพ")) {
+      imageColIndex = c;
+      break;
+    }
   }
 
   const items = [];
@@ -275,10 +301,10 @@ function getMenuData() {
       }
     }
 
-    // รองรับการอ่านรูปภาพจาก Col J (index 9) หรือ Col I ถ้าเป็น URL
+    // รองรับการอ่านรูปภาพจากคอลัมน์รูปภาพ (Col J) หรือ Col I ถ้าเป็น URL
     let imageUrl = "";
-    if (row[9] && row[9].toString().trim()) {
-      imageUrl = row[9].toString().trim();
+    if (row[imageColIndex] && row[imageColIndex].toString().trim()) {
+      imageUrl = row[imageColIndex].toString().trim();
     } else if (row[8] && row[8].toString().indexOf("http") === 0) {
       imageUrl = row[8].toString().trim();
     }
@@ -659,4 +685,74 @@ function initialSetup() {
 function createJsonResponse(data) {
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * เมนูลัดพิเศษบน Google Sheets เมื่อเปิดไฟล์สเปรดชีต
+ */
+function onOpen() {
+  try {
+    const ui = SpreadsheetApp.getUi();
+    ui.createMenu("🍚 ร้านข้าวต้มนายเจ๊ก")
+      .addItem("🖼️ เพิ่มช่องใส่รูปภาพ (Column J)", "menuAddImageColumn")
+      .addItem("⚙️ ตรวจสอบการตั้งค่าระบบชีต", "initialSetup")
+      .addToUi();
+  } catch (err) {
+    console.warn("onOpen UI warning:", err);
+  }
+}
+
+/**
+ * กดจากเมนูเพื่อเพิ่มช่องรูปภาพอาหารในชีต Menu
+ */
+function menuAddImageColumn() {
+  const res = ensureImageColumnExists();
+  try {
+    SpreadsheetApp.getUi().alert("✅ เพิ่มช่องรูปภาพอาหารเรียบร้อยแล้ว!\n\nคอลัมน์ " + res.columnLetter + " หัวตาราง 'รูปภาพ (Image URL)' พร้อมให้ท่านนำลิงก์รูปภาพมาวางได้ทันทีครับ");
+  } catch (e) {}
+}
+
+/**
+ * ฟังก์ชันตรวจสอบและเพิ่มคอลัมน์ "รูปภาพ (Image URL)" ในชีต Menu อัตโนมัติ
+ * และคัดลอกสไตล์สี/ฟอนต์จากคอลัมน์ก่อนหน้าให้สวยงามกลมกลืนกัน
+ */
+function ensureImageColumnExists() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let menuSheet = ss.getSheetByName(CONFIG.SHEET_MENU);
+  if (!menuSheet) {
+    initialSetup();
+    menuSheet = ss.getSheetByName(CONFIG.SHEET_MENU);
+  }
+
+  // อ่านหัวตารางแถวที่ 1
+  const maxCols = Math.max(12, menuSheet.getLastColumn());
+  const headerValues = menuSheet.getRange(1, 1, 1, maxCols).getValues()[0];
+  
+  let imgCol = -1;
+  for (let c = 0; c < headerValues.length; c++) {
+    const val = (headerValues[c] || "").toString().trim().toLowerCase();
+    if (val.includes("รูป") || val.includes("image") || val.includes("ภาพ")) {
+      imgCol = c + 1;
+      break;
+    }
+  }
+
+  // หากยังไม่มีคอลัมน์รูปภาพ ให้เพิ่มที่ Column J (คอลัมน์ที่ 10)
+  if (imgCol === -1) {
+    const targetCell = menuSheet.getRange(1, 10);
+    targetCell.setValue("รูปภาพ (Image URL)");
+    
+    // คัดลอกสีพื้นหลัง ฟอนต์ และการจัดวางจากคอลัมน์ I (คอลัมน์ที่ 9)
+    const prevHeader = menuSheet.getRange(1, 9);
+    prevHeader.copyTo(targetCell, SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+    menuSheet.setColumnWidth(10, 220);
+    imgCol = 10;
+  }
+
+  return {
+    success: true,
+    message: "เพิ่มช่องรูปภาพเรียบร้อยแล้วในคอลัมน์ " + String.fromCharCode(64 + imgCol),
+    column: imgCol,
+    columnLetter: String.fromCharCode(64 + imgCol)
+  };
 }

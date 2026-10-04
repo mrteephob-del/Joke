@@ -118,18 +118,32 @@ function enableMockOrGuestUser() {
 // ==========================================
 
 /**
- * แปลงลิงก์ Google Drive ให้ออกมาเป็น Direct Image URL อัตโนมัติ
+ * แปลงลิงก์รูปภาพจากหลากหลายแหล่ง (Google Drive, Dropbox, Imgur, ฯลฯ) ให้แสดงผลได้ทันที
  */
 function formatImageUrl(url) {
   if (!url || typeof url !== "string") return "";
   url = url.trim();
 
-  // จัดการ Google Drive share link (e.g. drive.google.com/file/d/FILE_ID/view...)
-  const driveRegex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|docs\.google\.com\/uc\?id=)([a-zA-Z0-9_-]+)/;
-  const match = url.match(driveRegex);
-  if (match && match[1]) {
-    return `https://lh3.googleusercontent.com/d/${match[1]}`;
+  // 1. Google Drive share link (e.g. drive.google.com/file/d/FILE_ID/view หรือ docs.google.com/uc?id=FILE_ID)
+  const driveRegex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|docs\.google\.com\/uc\?(?:export=view&)?id=)([a-zA-Z0-9_-]+)/;
+  const driveMatch = url.match(driveRegex);
+  if (driveMatch && driveMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
   }
+
+  // 2. Dropbox share link (เปลี่ยน ?dl=0 เป็น ?raw=1)
+  if (url.includes("dropbox.com")) {
+    return url.replace(/\?dl=0$/, "?raw=1").replace(/&dl=0$/, "&raw=1");
+  }
+
+  // 3. Imgur link ที่ไม่มีนามสกุลไฟล์
+  if (/^https?:\/\/imgur\.com\/([a-zA-Z0-9]+)$/.test(url)) {
+    const imgurMatch = url.match(/^https?:\/\/imgur\.com\/([a-zA-Z0-9]+)$/);
+    if (imgurMatch && imgurMatch[1]) {
+      return `https://i.imgur.com/${imgurMatch[1]}.jpg`;
+    }
+  }
+
   return url;
 }
 
