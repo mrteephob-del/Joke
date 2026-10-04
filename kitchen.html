@@ -1216,6 +1216,23 @@
         // Format items checklist
         const itemsLines = (order.itemsSummary || "").split("\n").filter(l => l.trim());
 
+        // Delivery detection & Google Maps Navigation URL
+        const fulfillment = (order.fulfillmentType || '').trim();
+        const isDelivery = fulfillment.includes('เดลิเวอรี') || fulfillment.includes('delivery') || fulfillment.includes('ส่ง') || (order.destination && order.destination.includes('จัดส่ง')) || (parseFloat(order.deliveryFee) > 0);
+
+        let rawGps = (order.gpsLocation || '').trim();
+        if (!rawGps && order.destination && /^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(order.destination.trim())) {
+          rawGps = order.destination.trim();
+        }
+        const hasGps = Boolean(rawGps && rawGps.includes(','));
+
+        let googleMapsUrl = '';
+        if (hasGps) {
+          googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rawGps)}`;
+        } else if (isDelivery && order.destination && order.destination !== 'รับที่ร้าน' && !order.destination.includes('นัดรับ')) {
+          googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.destination + ' ตาคลี นครสวรรค์')}`;
+        }
+
         return `
           <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between transition-all ${isNew ? 'border-orange-500 new-order-flash' : ''}">
             
@@ -1262,6 +1279,31 @@
                   <span class="text-slate-400">ชำระ: <strong>${order.paymentMethod || 'พร้อมเพย์'}</strong></span>
                   <span class="text-slate-500">ค่าส่ง: ฿${order.deliveryFee || 0}</span>
                 </div>
+
+                ${isDelivery ? `
+                  <div class="pt-2 border-t border-slate-200/80 mt-1.5 space-y-1.5">
+                    ${googleMapsUrl ? `
+                      <a 
+                        href="${googleMapsUrl}" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="w-full py-2 px-3 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
+                        title="เปิด Google Maps เพื่อดูตำแหน่งที่ลูกค้าปักหมุดหรือใช้นำทาง"
+                      >
+                        <i class="fa-solid fa-map-location-dot text-sky-600 text-sm"></i>
+                        <span>เปิดแผนที่ / นำทาง Google Maps</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-sky-500 ml-0.5"></i>
+                      </a>
+                    ` : ''}
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 px-0.5">
+                      <span class="flex items-center gap-1">
+                        <i class="fa-solid fa-motorcycle text-orange-600 text-xs"></i>
+                        <span>ระยะทาง: <strong class="text-slate-800 font-bold">${order.distanceKm && order.distanceKm !== '-' ? order.distanceKm + ' กม.' : 'ตามพิกัด'}</strong></span>
+                      </span>
+                      ${hasGps ? `<span class="font-mono text-[10px] text-slate-400">GPS: ${rawGps}</span>` : ''}
+                    </div>
+                  </div>
+                ` : ''}
               </div>
 
               <!-- Food Items Checklist -->

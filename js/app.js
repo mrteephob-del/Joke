@@ -537,8 +537,13 @@ function clearCart() {
 }
 
 // ==========================================
-// 4. Fulfillment Type & Delivery Distance
+// 4. Fulfillment Type & Interactive Delivery Map
 // ==========================================
+
+let deliveryMap = null;
+let deliveryMarker = null;
+let shopMarker = null;
+
 function setFulfillmentType(type) {
   state.fulfillmentType = type;
 
@@ -558,9 +563,145 @@ function setFulfillmentType(type) {
     btnDelivery.classList.add("active");
     takeawaySection.classList.add("hidden");
     deliverySection.classList.remove("hidden");
+
+    // โหลดแผนที่สำหรับปักหมุด
+    initDeliveryMap();
     recalculateDeliveryFee();
   }
 
+  calculateTotals();
+  updatePromptPayPreview();
+}
+
+function initDeliveryMap() {
+  const mapContainer = document.getElementById("deliveryMapContainer");
+  if (!mapContainer) return;
+
+  if (deliveryMap) {
+    setTimeout(() => {
+      deliveryMap.invalidateSize();
+    }, 150);
+    return;
+  }
+
+  if (typeof L === "undefined") {
+    console.warn("Leaflet library not loaded yet");
+    return;
+  }
+
+  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.26352, lng: 100.34445 };
+  const shopLat = shop.lat;
+  const shopLng = shop.lng;
+
+  // ตำแหน่งเริ่มต้นของหมุดลูกค้า: ถ้าเคยปักไว้ใช้พิกัดเดิม หรือเริ่มต้นห่างจากร้านเล็กน้อย
+  const initLat = state.customerGps ? state.customerGps.lat : shopLat + 0.003;
+  const initLng = state.customerGps ? state.customerGps.lng : shopLng + 0.003;
+
+  deliveryMap = L.map("deliveryMapContainer", {
+    zoomControl: true,
+    scrollWheelZoom: false,
+    tap: true
+  }).setView([initLat, initLng], 15);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; OpenStreetMap',
+    maxZoom: 19
+  }).addTo(deliveryMap);
+
+  // 1. หมุดตำแหน่งร้านข้าวต้มนายเจ็ก
+  const shopIcon = L.divIcon({
+    className: "shop-map-pin",
+    html: `
+      <div style="background:#ea580c;color:#fff;width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 3px 8px rgba(0,0,0,0.3);border:2px solid #fff;">
+        <i class="fa-solid fa-store"></i>
+      </div>
+    `,
+    iconSize: [34, 34],
+    iconAnchor: [17, 34]
+  });
+
+  shopMarker = L.marker([shopLat, shopLng], { icon: shopIcon }).addTo(deliveryMap);
+  shopMarker.bindPopup("<b>ร้านข้าวต้มนายเจ็ก วงเวียนตาคลี</b>");
+
+  // 2. หมุดปักจัดส่งของลูกค้า (ลากหมุดหรือแตะบนแผนที่ได้)
+  const customerIcon = L.divIcon({
+    className: "delivery-map-pin",
+    html: `
+      <div style="background:#dc2626;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 12px rgba(220,38,38,0.45);border:2px solid #fff;">
+        <i class="fa-solid fa-location-dot"></i>
+      </div>
+    `,
+    iconSize: [36, 36],
+    iconAnchor: [18, 36]
+  });
+
+  deliveryMarker = L.marker([initLat, initLng], {
+    draggable: true,
+    icon: customerIcon
+  }).addTo(deliveryMap);
+
+  deliveryMarker.bindTooltip("📍 ลากหมุดนี้ไปที่จุดจัดส่ง", { permanent: true, direction: "top", offset: [0, -36] });
+
+  // เมื่อลากหมุดไปปล่อย
+  deliveryMarker.on("dragend", (e) => {
+    const pos = e.target.getLatLng();
+    updateLocationFromPin(pos.lat, pos.lng);
+  });
+
+  // เมื่อแตะบนแผนที่ ให้ย้ายหมุดมาทันที
+  deliveryMap.on("click", (e) => {
+    deliveryMarker.setLatLng(e.latlng);
+    updateLocationFromPin(e.latlng.lat, e.latlng.lng);
+  });
+
+  // คำนวณค่าเริ่มต้น
+  updateLocationFromPin(initLat, initLng);
+
+  setTimeout(() => {
+    deliveryMap.invalidateSize();
+  }, 200);
+}
+
+function resetMapToShop() {
+  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.26352, lng: 100.34445 };
+  if (deliveryMap) {
+    deliveryMap.setView([shop.lat, shop.lng], 16);
+    if (shopMarker) shopMarker.openPopup();
+  }
+}
+
+function updateLocationFromPin(lat, lng) {
+  state.customerGps = { lat, lng };
+  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.26352, lng: 100.34445 };
+  const distKm = calculateHaversineDistance(shop.lat, shop.lng, lat, lng);
+  state.deliveryDistanceKm = parseFloat(distKm.toFixed(1));
+
+  const distanceInput = document.getElementById("deliveryDistanceInput");
+  if (distanceInput) distanceInput.value = state.deliveryDistanceKm;
+
+  const gpsStatusEl = document.getElementById("gpsStatusText");
+  if (gpsStatusEl) {
+    gpsStatusEl.innerHTML = `
+      <div class="flex items-center justify-between text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs flex-wrap gap-1.5">
+        <span class="flex items-center gap-1 font-medium">
+          <i class="fa-solid fa-location-dot text-rose-600"></i>
+          <span>พิกัดหมุด: <strong class="font-mono text-slate-900">${lat.toFixed(5)}, ${lng.toFixed(5)}</strong> (${state.deliveryDistanceKm} กม.)</span>
+        </span>
+        <a 
+          href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-orange-600 font-bold hover:underline flex items-center gap-1 text-[11px]"
+        >
+          <span>เปิดดูใน Google Maps</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+        </a>
+      </div>
+    `;
+    gpsStatusEl.classList.remove("hidden");
+  }
+
+  recalculateDeliveryFee();
   calculateTotals();
   updatePromptPayPreview();
 }
@@ -585,61 +726,47 @@ function selectPickupTime(timeText) {
 }
 
 function requestCurrentGps() {
-  const gpsStatusEl = document.getElementById("gpsStatusText");
-  const distanceInput = document.getElementById("deliveryDistanceInput");
   const btnGps = document.getElementById("btnGetGps");
 
   if (!navigator.geolocation) {
-    showToast("อุปกรณ์ไม่รองรับ GPS กรุณากรอกระยะทางโดยตรง", "warning");
+    showToast("อุปกรณ์ไม่รองรับ GPS โปรดแตะบนแผนที่เพื่อปักหมุดครับ", "warning");
     return;
   }
 
-  if (gpsStatusEl) {
-    gpsStatusEl.textContent = "กำลังค้นหาพิกัดดาวเทียม...";
-    gpsStatusEl.classList.remove("hidden");
-  }
   if (btnGps) {
     btnGps.disabled = true;
-    btnGps.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>กำลังระบุพิกัด...</span>`;
+    btnGps.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-orange-600"></i> <span>ค้นหา...</span>`;
   }
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
       const userLat = position.coords.latitude;
       const userLng = position.coords.longitude;
-      state.customerGps = { lat: userLat, lng: userLng };
 
-      const shop = APP_CONFIG.SHOP_COORDS;
-      const distKm = calculateHaversineDistance(shop.lat, shop.lng, userLat, userLng);
-      state.deliveryDistanceKm = parseFloat(distKm.toFixed(1));
-
-      if (distanceInput) distanceInput.value = state.deliveryDistanceKm;
-      if (gpsStatusEl) {
-        gpsStatusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> ปักหมุดสำเร็จ: ${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
+      if (deliveryMap) {
+        deliveryMap.setView([userLat, userLng], 16);
+        if (deliveryMarker) {
+          deliveryMarker.setLatLng([userLat, userLng]);
+        }
       }
 
-      recalculateDeliveryFee();
-      calculateTotals();
-      updatePromptPayPreview();
-      showToast(`ระบุพิกัดสำเร็จ ระยะทางประมาณ ${state.deliveryDistanceKm} กม.`, "success");
+      updateLocationFromPin(userLat, userLng);
+      showToast(`📍 ปักหมุดตำแหน่งปัจจุบันของคุณเรียบร้อย (${state.deliveryDistanceKm} กม.)`, "success");
 
       if (btnGps) {
         btnGps.disabled = false;
-        btnGps.innerHTML = `<i class="fa-solid fa-location-crosshairs text-orange-600"></i> <span>ปักหมุดตำแหน่งปัจจุบันอีกครั้ง</span>`;
+        btnGps.innerHTML = `<i class="fa-solid fa-location-crosshairs text-orange-600"></i> <span>ตำแหน่งฉัน</span>`;
       }
     },
     (err) => {
       console.warn("GPS error:", err);
-      if (gpsStatusEl) {
-        gpsStatusEl.innerHTML = `<span class="text-rose-500"><i class="fa-solid fa-triangle-exclamation"></i> ไม่สามารถเข้าถึง GPS ได้ (กรอกระยะทางกิโลเมตรด้านล่างได้ครับ)</span>`;
-      }
+      showToast("ไม่สามารถดึงตำแหน่ง GPS ได้ โปรดแตะบนแผนที่เพื่อปักหมุดด้วยตนเองครับ", "warning");
       if (btnGps) {
         btnGps.disabled = false;
-        btnGps.innerHTML = `<i class="fa-solid fa-location-crosshairs text-orange-600"></i> <span>ลองปักหมุดอีกครั้ง</span>`;
+        btnGps.innerHTML = `<i class="fa-solid fa-location-crosshairs text-orange-600"></i> <span>ตำแหน่งฉัน</span>`;
       }
-      showToast("กรุณาเปิดการเข้าถึงตำแหน่ง หรือกรอกระยะทางเอง", "warning");
     },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
   );
 }
 
