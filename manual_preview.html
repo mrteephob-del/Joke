@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>คู่มือการใช้งานระบบ ร้านข้าวต้มนายเง็ก วงเวียนตาคลี</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 14mm 14mm 14mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Prompt', 'Sarabun', sans-serif;
+      color: #1e293b;
+      background-color: #ffffff;
+      line-height: 1.5;
+      font-size: 13px;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2, h3, h4, h5, .font-display {
+      font-family: 'Kanit', sans-serif;
+      margin: 0;
+    }
+
+    .page {
+      page-break-after: always;
+      position: relative;
+      min-height: 260mm;
+      padding-bottom: 20px;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+
+    .avoid-break {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* Colors */
+    .bg-orange-primary { background-color: #ea580c; }
+    .bg-orange-light { background-color: #fff7ed; }
+    .text-orange-primary { color: #ea580c; }
+    .border-orange-primary { border-color: #ea580c; }
+
+    /* Cover Page */
+    .cover-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 255mm;
+      padding: 30px 20px;
+      border: 2px solid #fed7aa;
+      border-radius: 24px;
+      background: linear-gradient(145deg, #fff7ed 0%, #ffffff 50%, #f8fafc 100%);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .step-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ea580c;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin: 10px 0;
+    }
+
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #f97316;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+
+    .footer-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 6px;
+    }
+
+    .icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    ul, ol {
+      margin: 6px 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== หน้าที่ 1: หน้าปก (COVER) ==================== -->
+  <div class="page">
+    <div class="cover-container">
+      
+      <!-- Top Brand -->
+      <div style="text-align: center; padding-top: 15px;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; background: #ea580c; color: white; border-radius: 20px; font-size: 32px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(234, 88, 12, 0.25);">
+          <i class="fa-solid fa-bowl-rice"></i>
+        </div>
+        <h1 style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+          ร้านข้าวต้มนายเง็ก วงเวียนตาคลี
+        </h1>
+        <p style="font-size: 14px; color: #ea580c; font-weight: 600; margin: 0;">
+          อ.ตาคลี จ.นครสวรรค์ • บริการรับหน้าร้าน & จัดส่งเดลิเวอรี
+        </p>
+      </div>
+
+      <!-- Main Title Box -->
+      <div style="background: white; border: 1.5px solid #fdba74; border-radius: 20px; padding: 25px 20px; text-align: center; box-shadow: 0 6px 25px rgba(234, 88, 12, 0.08);">
+        <span class="badge" style="background: #ffedd5; color: #c2410c; margin-bottom: 10px;">
+          DOCUMENTATION & USER MANUAL
+        </span>
+        <h2 style="font-size: 22px; font-weight: 800; color: #1e293b; line-height: 1.3; margin-bottom: 10px;">
+          คู่มือการใช้งานระบบสั่งอาหารและบริหารจัดการร้าน
+        </h2>
+        <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.6;">
+          ครอบคลุมทั้ง <strong>ระบบสั่งซื้อสำหรับลูกค้า</strong>, <strong>หน้าจอครัว & แคชเชียร์ (KDS)</strong>,<br>
+          <strong>แดชบอร์ดสรุปยอดขายร้านค้า</strong> และ <strong>การจัดการฐานข้อมูล Google Sheets</strong>
+        </p>
+      </div>
+
+      <!-- Overview 3 Pillars Grid -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+        <div class="card" style="border-top: 4px solid #ea580c; text-align: center; padding: 12px 10px;">
+          <i class="fa-solid fa-mobile-screen-button" style="font-size: 24px; color: #ea580c; margin-bottom: 6px;"></i>
+          <h4 style="font-size: 13px; color: #0f172a; margin-bottom: 4px;">1. ฝั่งลูกค้า</h4>
+          <p style="font-size: 11px; color: #64748b; margin: 0;">สั่งอาหาร, ปักหมุดแผนที่ส่ง, จ่ายพร้อมเพย์, ติดตามคิวสด</p>
+        </div>
+        <div class="card" style="border-top: 4px solid #0284c7; text-align: center; padding: 12px 10px;">
+          <i class="fa-solid fa-fire-burner" style="font-size: 24px; color: #0284c7; margin-bottom: 6px;"></i>
+          <h4 style="font-size: 13px; color: #0f172a; margin-bottom: 4px;">2. หน้าจอครัว KDS</h4>
+          <p style="font-size: 11px; color: #64748b; margin: 0;">รันคิว, เสียงกระดิ่งเตือน, เช็กลิสต์อาหาร, กดนำทาง Maps</p>
+        </div>
+        <div class="card" style="border-top: 4px solid #059669; text-align: center; padding: 12px 10px;">
+          <i class="fa-solid fa-chart-pie" style="font-size: 24px; color: #059669; margin-bottom: 6px;"></i>
+          <h4 style="font-size: 13px; color: #0f172a; margin-bottom: 4px;">3. แดชบอร์ด & ชีต</h4>
+          <p style="font-size: 11px; color: #64748b; margin: 0;">ดูยอดขายรายวัน, เมนูขายดี, พิมพ์บิล, อัปเดตราคาและรูปภาพ</p>
+        </div>
+      </div>
+
+      <!-- Footer Meta -->
+      <div style="border-top: 1px dashed #cbd5e1; padding-top: 15px; display: flex; justify-content: space-between; font-size: 11px; color: #64748b;">
+        <div>
+          <strong>ผู้จัดทำ:</strong> ทีมพัฒนาระบบร้านข้าวต้มนายเง็ก<br>
+          <strong>ตำแหน่งร้าน:</strong> วงเวียนตาคลี (พิกัด: 15.2562408, 100.3493917)
+        </div>
+        <div style="text-align: right;">
+          <strong>เวอร์ชันระบบ:</strong> v2.6 (สไตล์มินิมอล โทนสว่าง)<br>
+          <strong>เบอร์ติดต่อร้าน:</strong> 064-279-3664
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== หน้าที่ 2: บทที่ 1 ระบบสั่งอาหารสำหรับลูกค้า ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <div>
+        <span style="font-size: 10px; font-weight: 700; color: #ea580c; text-transform: uppercase;">บทที่ 1 : ระบบสั่งอาหารสำหรับลูกค้า (Customer Web App)</span>
+        <h2 style="font-size: 17px; font-weight: 700; color: #0f172a;">ขั้นตอนการสั่งอาหารและการติดตามสถานะ</h2>
+      </div>
+      <span class="badge" style="background: #f1f5f9; color: #475569;">URL: /index.html</span>
+    </div>
+
+    <!-- Step 1 & 2 -->
+    <div class="card avoid-break">
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+        <span class="step-circle">1</span>
+        <h3 style="font-size: 14px; font-weight: 700; color: #1e293b;">เลือกรายการอาหาร และระบุตัวเลือก</h3>
+      </div>
+      <p style="color: #475569; font-size: 12px; margin-top: 0;">
+        ลูกค้าเปิดเข้าเว็บแอปพลิเคชัน (ผ่าน LINE LIFF หรือลิงก์เว็บตรง) 
+      </p>
+      <ul>
+        <li><strong>การเลือกหมวดหมู่:</strong> กดที่แถบหมวดหมู่ด้านบน เช่น <em>ทั้งหมด, เมนูแนะนำ, เมนูทอด, ยำแซ่บ, ผัดร้อนๆ, ข้าวต้ม/ข้าวสวย</em> หรือพิมพ์ชื่ออาหารในช่องค้นหา</li>
+        <li><strong>การเลือกเนื้อสัตว์/ความเผ็ด:</strong> เมนูที่มีตัวเลือกเพิ่มเติม ระบบจะเปิดหน้าต่างป๊อปอัปให้เลือกประเภทเนื้อสัตว์ (เช่น หมูชิ้น, หมูกรอบ, ทะเล) และพิมพ์หมายเหตุพิเศษได้ (เช่น ไม่ใส่กระเทียม, เผ็ดน้อย)</li>
+        <li><strong>การเพิ่มลงตะกร้า:</strong> กดปุ่ม <code>+ สั่ง</code> แถบตะกร้าลอยด้านล่างจะอัปเดตยอดรวมและจำนวนจานทันทีอย่างนุ่มนวล</li>
+      </ul>
+    </div>
+
+    <!-- Step 3: Fulfillment (Takeaway vs Delivery) -->
+    <div class="card avoid-break">
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+        <span class="step-circle">2</span>
+        <h3 style="font-size: 14px; font-weight: 700; color: #1e293b;">เลือกรูปแบบการรับอาหาร (มารับที่ร้าน หรือ ส่งเดลิเวอรี)</h3>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px;">
+          <strong style="color: #ea580c; display: flex; align-items: center; gap: 5px; font-size: 12.5px;">
+            <i class="fa-solid fa-store"></i> แบบที่ 1: มารับที่ร้าน (Takeaway)
+          </strong>
+          <p style="font-size: 11.5px; color: #64748b; margin: 4px 0 0 0;">
+            • ค่าจัดส่งฟรี 0 บาท<br>
+            • กดเลือกเวลานัดรับล่วงหน้า: อีก 20 นาที (เร็วสุด), อีก 30 นาที, อีก 45 นาที หรือพิมพ์ระบุเวลาที่สะดวกมารับเอง
+          </p>
+        </div>
+
+        <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 10px;">
+          <strong style="color: #c2410c; display: flex; align-items: center; gap: 5px; font-size: 12.5px;">
+            <i class="fa-solid fa-motorcycle"></i> แบบที่ 2: เดลิเวอรี (Delivery)
+          </strong>
+          <p style="font-size: 11.5px; color: #7c2d12; margin: 4px 0 0 0;">
+            • ส่งฟรี 3 กิโลเมตรแรก (เกิน 3 กม. คิดกิโลเมตรละ 5 บาท)<br>
+            • แผนที่ปักหมุดอินเทอร์แอคทีฟ แตะบนแผนที่หรือลากหมุดสีแดง<br>
+            • กดปุ่ม <strong>[ตำแหน่งฉัน]</strong> เพื่อดึงพิกัด GPS อัตโนมัติ<br>
+            • กรอกบ้านเลขที่ ซอย หรือจุดสังเกตเพิ่มเติมในช่องที่อยู่
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 & 5: Payment & Live Tracking -->
+    <div class="card avoid-break">
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+        <span class="step-circle">3</span>
+        <h3 style="font-size: 14px; font-weight: 700; color: #1e293b;">การชำระเงิน และการติดตามสถานะออเดอร์สด</h3>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <strong style="font-size: 12px; color: #334155;">วิธีชำระเงิน:</strong>
+          <ul style="font-size: 11.5px; color: #475569; padding-left: 16px; margin: 4px 0;">
+            <li><strong>สแกน QR พร้อมเพย์:</strong> ระบบสร้าง QR Code อัตโนมัติระบุยอดเงินสุทธิไปยังบัญชี <em>ร้านข้าวต้มนายเง็ก (064-279-3664)</em> ลูกค้าสแกนจ่ายได้ทันที</li>
+            <li><strong>ชำระเงินสด:</strong> จ่ายเงินสดเมื่อมารับอาหารหรือเมื่อไรเดอร์ไปส่งถึงที่</li>
+          </ul>
+        </div>
+        <div>
+          <strong style="font-size: 12px; color: #334155;">การติดตามสถานะ (Live Tracking):</strong>
+          <p style="font-size: 11px; color: #475569; margin: 4px 0 0 0;">
+            เมื่อสั่งสำเร็จ ลูกค้าจะได้รับ <strong>เลขคิว (Queue No.)</strong> เช่น Q01, Q02 และสามารถกดแถบ <strong>"ติดตามคิว & สถานะ"</strong> ดูสถานะอาหารสดได้ 4 ระดับ:
+          </p>
+          <div style="display: flex; gap: 4px; margin-top: 6px; font-size: 9.5px; font-weight: 700;">
+            <span style="background: #ffedd5; color: #c2410c; padding: 2px 6px; border-radius: 4px;">1. รอยืนยัน</span>
+            <span>➔</span>
+            <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">2. กำลังปรุง</span>
+            <span>➔</span>
+            <span style="background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px;">3. พร้อมรับ/ส่ง</span>
+            <span>➔</span>
+            <span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px;">4. สำเร็จ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-bar">
+      <span>คู่มือการใช้งานระบบร้านข้าวต้มนายเง็ก วงเวียนตาคลี</span>
+      <span>หน้า 2 จาก 5</span>
+    </div>
+  </div>
+
+  <!-- ==================== หน้าที่ 3: บทที่ 2 หน้าจอห้องครัว & แคชเชียร์ (KDS) ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <div>
+        <span style="font-size: 10px; font-weight: 700; color: #0284c7; text-transform: uppercase;">บทที่ 2 : หน้าจอห้องครัว & แคชเชียร์ (Kitchen Display System - KDS)</span>
+        <h2 style="font-size: 17px; font-weight: 700; color: #0f172a;">การจัดการออเดอร์, เสียงกระดิ่ง และการนำทางเดลิเวอรี</h2>
+      </div>
+      <span class="badge" style="background: #e0f2fe; color: #0284c7;">URL: /kitchen.html</span>
+    </div>
+
+    <!-- PWA Installation -->
+    <div class="card avoid-break" style="background: #f8fafc; border-left: 4px solid #ea580c;">
+      <h3 style="font-size: 13.5px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">
+        <i class="fa-solid fa-mobile-screen text-orange-primary"></i> การติดตั้งแอป PWA "ครัวนายเง็ก" บน iPad / แท็บเล็ต / มือถือ
+      </h3>
+      <p style="font-size: 11.5px; color: #475569; margin: 0 0 6px 0;">
+        หน้าจอครัวรองรับการติดตั้งเป็นแอปเปิดเต็มจอ (Standalone) ได้ทั้งบน iOS และ Android เพื่อการทำงานที่สะดวกและรวดเร็ว
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px;">
+        <div style="background: white; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <strong>บน iPad / iPhone (Safari):</strong><br>
+          เปิดหน้าเว็บ ➔ กดปุ่มแชร์ <i class="fa-solid fa-arrow-up-from-bracket text-sky-600"></i> ➔ เลือก <strong>"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</strong>
+        </div>
+        <div style="background: white; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <strong>บน Android / Chrome:</strong><br>
+          กดปุ่มสีส้ม <strong>[ ติดตั้งแอปครัว ]</strong> ด้านขวาบน ➔ กด "ติดตั้ง" (Install) เพื่อสร้างไอคอนแอป
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Workflow Table -->
+    <div class="card avoid-break">
+      <h3 style="font-size: 13.5px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
+        <i class="fa-solid fa-arrows-rotate text-sky-600"></i> วงจรขั้นตอนการทำงานของออเดอร์ (One-Tap Workflow)
+      </h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">สถานะ</th>
+            <th style="width: 38%;">การแสดงผลบนหน้าจอ</th>
+            <th style="width: 44%;">การดำเนินการของคนทำครัว / แคชเชียร์</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge" style="background: #ffedd5; color: #c2410c;">1. รอยืนยัน</span></td>
+            <td>การ์ดขอบส้มกระพริบ มีเสียงกระดิ่งเตือน ป้ายแจ้งคิวใหม่</td>
+            <td>
+              • คนครัวกด <strong>[ รับออเดอร์ (เริ่มปรุง) ]</strong><br>
+              • สถานะจะเปลี่ยนเป็นกำลังปรุงทันที ลูกค้าเห็นบนหน้าจอว่าร้านเริ่มทำอาหารแล้ว
+            </td>
+          </tr>
+          <tr>
+            <td><span class="badge" style="background: #e0f2fe; color: #0369a1;">2. กำลังปรุง</span></td>
+            <td>การ์ดขอบสีฟ้า แสดงรายการอาหารที่ต้องปรุง</td>
+            <td>
+              • ติ๊กช่องสี่เหลี่ยม <code>[✓]</code> หน้ารายการอาหารที่ปรุง/แพ็กเสร็จแล้ว เพื่อกันตกหล่น<br>
+              • เมื่อทำครบทุกจาน กดปุ่มเขียว <strong>[ ปรุงเสร็จแล้ว (พร้อมรับ/ส่ง) ]</strong>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="badge" style="background: #dcfce7; color: #15803d;">3. พร้อมรับ/ส่ง</span></td>
+            <td>การ์ดขอบสีเขียว อาหารพร้อมส่งถึงมือลูกค้า</td>
+            <td>
+              • หากเป็นลูกค้ารับที่ร้าน: รอลูกค้ามารับอาหารที่เคาน์เตอร์<br>
+              • หากเป็นเดลิเวอรี: กดปุ่มสีฟ้า <strong>[ เปิดแผนที่ / นำทาง Google Maps ↗ ]</strong> เพื่อให้ไรเดอร์ขับไปส่ง<br>
+              • เมื่อลูกค้าได้รับอาหารแล้ว กดปุ่ม <strong>[ ปิดออเดอร์ (สำเร็จ) ]</strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Delivery Map & Sound Guide -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" class="avoid-break">
+      <div class="card" style="margin-bottom: 0;">
+        <h4 style="font-size: 12.5px; color: #0f172a; margin-bottom: 4px;">
+          <i class="fa-solid fa-map-location-dot text-sky-600"></i> ปุ่มนำทาง Google Maps สำหรับเดลิเวอรี
+        </h4>
+        <p style="font-size: 11.5px; color: #475569; margin: 0;">
+          สำหรับออเดอร์เดลิเวอรี จะมีปุ่มสีฟ้าชัดเจน <strong>[ เปิดแผนที่ / นำทาง Google Maps ↗ ]</strong><br>
+          กดเพียง 1 ครั้ง จะเปิดแอป Google Maps นำทางตรงไปยังพิกัดหมุดที่ลูกค้าปักไว้ทันที ไม่ต้องพิมพ์ที่อยู่ใหม่ ป้องกันการหลงทาง 100%
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom: 0;">
+        <h4 style="font-size: 12.5px; color: #0f172a; margin-bottom: 4px;">
+          <i class="fa-solid fa-volume-high text-orange-primary"></i> ระบบเสียงเตือนออเดอร์เข้าใหม่
+        </h4>
+        <p style="font-size: 11.5px; color: #475569; margin: 0;">
+          เมื่อเปิดหน้าจอครั้งแรก ให้กดปุ่ม <strong>"แตะเพื่อเปิดเสียงแจ้งเตือน"</strong> ด้านบน เพื่ออนุญาตให้เบราว์เซอร์ส่งเสียงกระดิ่งเตือนได้<br>
+          ระบบใช้เสียงสังเคราะห์ Hi-Fi WAV ดังชัดเจน แม้หน้าจอจะตั้งทิ้งไว้ก็จะไม่พลาดออเดอร์
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-bar">
+      <span>คู่มือการใช้งานระบบร้านข้าวต้มนายเง็ก วงเวียนตาคลี</span>
+      <span>หน้า 3 จาก 5</span>
+    </div>
+  </div>
+
+  <!-- ==================== หน้าที่ 4: บทที่ 3 แดชบอร์ดสรุปยอดขาย & จัดอันดับ ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <div>
+        <span style="font-size: 10px; font-weight: 700; color: #059669; text-transform: uppercase;">บทที่ 3 : แดชบอร์ดสรุปยอดขายร้านค้า (Owner Dashboard)</span>
+        <h2 style="font-size: 17px; font-weight: 700; color: #0f172a;">การดูภาพรวมรายวัน, เมนูขายดี, ลูกค้าประจำ และการพิมพ์บิล</h2>
+      </div>
+      <span class="badge" style="background: #dcfce7; color: #059669;">URL: /dashboard.html</span>
+    </div>
+
+    <!-- KPI Cards & Date Filter -->
+    <div class="card avoid-break">
+      <h3 style="font-size: 13.5px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
+        <i class="fa-solid fa-calendar-days text-emerald-600"></i> การกรองดูข้อมูลตามช่วงเวลา และกล่องสรุปยอด (KPI)
+      </h3>
+      <p style="font-size: 11.5px; color: #475569; margin: 0 0 8px 0;">
+        ทางร้านสามารถกดปุ่มตัวกรองเพื่อดูสถิติได้แบบยืดหยุ่น: <strong>[วันนี้]</strong>, <strong>[เมื่อวาน]</strong>, <strong>[7 วันล่าสุด]</strong>, <strong>[30 วัน]</strong>, <strong>[เดือนนี้]</strong>, <strong>[ทั้งหมด]</strong> หรือระบุวันที่เอง
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center;">
+          <span style="font-size: 10px; color: #64748b; font-weight: 600;">ยอดขายรวม (Revenue)</span>
+          <div style="font-size: 15px; font-weight: 800; color: #ea580c; margin-top: 2px;">฿ ยอดเงินสุทธิ</div>
+        </div>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center;">
+          <span style="font-size: 10px; color: #64748b; font-weight: 600;">จำนวนออเดอร์ (Orders)</span>
+          <div style="font-size: 15px; font-weight: 800; color: #0284c7; margin-top: 2px;">รวมกี่บิล</div>
+        </div>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center;">
+          <span style="font-size: 10px; color: #64748b; font-weight: 600;">ยอดเฉลี่ย/บิล (Average)</span>
+          <div style="font-size: 15px; font-weight: 800; color: #059669; margin-top: 2px;">฿ ต่อออเดอร์</div>
+        </div>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; text-align: center;">
+          <span style="font-size: 10px; color: #64748b; font-weight: 600;">คิวที่รอปรุง (Active)</span>
+          <div style="font-size: 15px; font-weight: 800; color: #f59e0b; margin-top: 2px;">คิวที่ยังไม่เสร็จ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Best Sellers & Top Spenders -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" class="avoid-break">
+      <div class="card" style="margin-bottom: 0;">
+        <h4 style="font-size: 13px; color: #0f172a; margin-bottom: 6px;">
+          <i class="fa-solid fa-medal text-amber-500"></i> อันดับเมนูขายดีที่สุด (Top 5 Best Sellers)
+        </h4>
+        <p style="font-size: 11px; color: #64748b; margin: 0 0 6px 0;">
+          ระบบคำนวณจากทุกจานที่สั่ง พร้อมแถบ % สัดส่วนยอดขาย ช่วยให้ร้านรู้ว่าเมนูไหนขายดีเพื่อเตรียมของล่วงหน้า
+        </p>
+        <ul style="font-size: 11px; color: #334155; padding-left: 16px; margin: 0;">
+          <li>แสดงชื่อเมนู จำนวนจานที่ขายได้ และยอดเงินรวม</li>
+          <li>อัปเดตสถิติตามช่วงวันที่เลือกแบบอัตโนมัติ</li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-bottom: 0;">
+        <h4 style="font-size: 13px; color: #0f172a; margin-bottom: 6px;">
+          <i class="fa-solid fa-crown text-amber-500"></i> ลูกค้าประจำที่มียอดสั่งซื้อสูงสุด (Top Spenders)
+        </h4>
+        <p style="font-size: 11px; color: #64748b; margin: 0 0 6px 0;">
+          รวบรวมรายชื่อลูกค้า เบอร์โทรศัพท์ และยอดเงินสะสมทั้งหมดของลูกค้าแต่ละท่าน
+        </p>
+        <ul style="font-size: 11px; color: #334155; padding-left: 16px; margin: 0;">
+          <li>มีปุ่มโทรออก <i class="fa-solid fa-phone text-orange-600"></i> หาเบอร์ลูกค้าได้โดยตรง</li>
+          <li>ช่วยให้ร้านจำลูกค้าประจำและจัดโปรโมชันขอบคุณได้</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Receipt Modal & Printing -->
+    <div class="card avoid-break" style="margin-top: 10px;">
+      <h3 style="font-size: 13.5px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
+        <i class="fa-solid fa-file-invoice text-orange-primary"></i> การเรียกดูบิลใบเสร็จ และการพิมพ์บิล (Print Receipt)
+      </h3>
+      <p style="font-size: 11.5px; color: #475569; margin: 0 0 6px 0;">
+        ในตารางรายการออเดอร์ด้านล่าง ทุกแถวจะมีปุ่ม <strong>[ ดูบิล ]</strong> เมื่อกดแล้วจะเปิดหน้าต่างสรุปบิลฉบับเต็ม:
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px; color: #475569;">
+        <div>
+          • แสดงเลขคิว, วันเวลา, ชื่อลูกค้า, เบอร์โทร, รายการอาหารและยอดเงิน<br>
+          • สำหรับออเดอร์เดลิเวอรี มีลิงก์ <strong>"เปิดแผนที่ Google Maps ↗"</strong> ใต้ที่อยู่
+        </div>
+        <div>
+          • กดปุ่ม <strong>[ พิมพ์ใบเสร็จ (Print) ]</strong> ด้านล่างของป๊อปอัปเพื่อสั่งพิมพ์ผ่านเครื่องพิมพ์ (รองรับทั้งกระดาษ A4 และเครื่องพิมพ์ใบเสร็จความร้อน Thermal Slip)
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-bar">
+      <span>คู่มือการใช้งานระบบร้านข้าวต้มนายเง็ก วงเวียนตาคลี</span>
+      <span>หน้า 4 จาก 5</span>
+    </div>
+  </div>
+
+  <!-- ==================== หน้าที่ 5: บทที่ 4 การจัดการ Google Sheets & FAQ ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <div>
+        <span style="font-size: 10px; font-weight: 700; color: #ea580c; text-transform: uppercase;">บทที่ 4 : การจัดการข้อมูลบน GOOGLE SHEETS & คำถามพบบ่อย</span>
+        <h2 style="font-size: 17px; font-weight: 700; color: #0f172a;">การแก้ไขเมนูอาหาร, การใส่รูปภาพ และการแก้ปัญหา</h2>
+      </div>
+      <span class="badge" style="background: #fef3c7; color: #b45309;">Google Sheets Database</span>
+    </div>
+
+    <!-- Google Sheets Menu Management -->
+    <div class="card avoid-break">
+      <h3 style="font-size: 13.5px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
+        <i class="fa-solid fa-table text-emerald-600"></i> การจัดการชีต "Menu" (เพิ่ม/ลบ/เปลี่ยนราคา และใส่รูปอาหาร)
+      </h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 25%;">คอลัมน์ในชีต Menu</th>
+            <th style="width: 75%;">คำอธิบายและการใช้งาน</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>คอลัมน์ D: ชื่อเมนู & E: ราคา</strong></td>
+            <td>สามารถแก้ไขราคา หรือแก้ชื่ออาหารได้โดยตรงบนตาราง ข้อมูลในเว็บลูกค้าจะอัปเดตตามทันที</td>
+          </tr>
+          <tr>
+            <td><strong>คอลัมน์ F: สถานะสินค้า</strong></td>
+            <td>พิมพ์ว่า <code>พร้อมขาย</code> หรือ <code>หมด</code> (หากใส่วันนี้หมด ระบบจะแสดงป้าย "สินค้าหมด" และกดสั่งไม่ได้)</td>
+          </tr>
+          <tr>
+            <td><strong>คอลัมน์ G: เมนูแนะนำ</strong></td>
+            <td>ใส่ <code>TRUE</code> หรือ <code>FALSE</code> เพื่อให้มีป้าย "ยอดนิยม" สีส้มติดบนการ์ดอาหาร</td>
+          </tr>
+          <tr>
+            <td><strong>คอลัมน์ J: รูปภาพ (Image URL)</strong></td>
+            <td>
+              นำลิงก์รูปภาพอาหารมาวางในช่องนี้ (รองรับทุกลิงก์รูป เช่น เว็บฝากรูป หรือลิงก์แชร์จาก Google Drive)<br>
+              <em>*หากยังไม่มีคอลัมน์ J ให้กดเมนูบนแถบสเปรดชีต: <strong>"🍚 ร้านข้าวต้มนายเง็ก" ➔ "🖼️ เพิ่มช่องใส่รูปภาพ"</strong></em>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Updating Apps Script -->
+    <div class="card avoid-break">
+      <h3 style="font-size: 13.5px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">
+        <i class="fa-solid fa-code text-orange-primary"></i> การอัปเดตโค้ดหลังบ้าน (Google Apps Script)
+      </h3>
+      <p style="font-size: 11.5px; color: #475569; margin: 0;">
+        เมื่อมีการปรับปรุงโค้ดหลังบ้านในไฟล์ <code>backend/Code.gs</code>:<br>
+        1. เปิด Google Sheets ของร้าน ➔ ไปที่ <strong>ส่วนขยาย (Extensions)</strong> ➔ <strong>Apps Script</strong><br>
+        2. คัดลอกโค้ดทั้งหมดใน <code>backend/Code.gs</code> ไปวางทับ แล้วกดบันทึก 💾<br>
+        3. กด <strong>ทำให้ใช้งานได้ (Deploy)</strong> ➔ <strong>จัดการการทำให้ใช้งานได้ (Manage deployments)</strong> ➔ กดไอคอนดินสอ ✏️ ➔ เลือก <strong>"เวอร์ชันใหม่" (New version)</strong> แล้วกดบันทึก <em>(วิธีนี้จะไม่เปลี่ยน URL เดิม ไม่ต้องแก้โค้ดหน้าเว็บ)</em>
+      </p>
+    </div>
+
+    <!-- FAQ & Troubleshooting -->
+    <div class="card avoid-break">
+      <h3 style="font-size: 13.5px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
+        <i class="fa-solid fa-circle-question text-sky-600"></i> คำถามที่พบบ่อย & การแก้ไขปัญหาเบื้องต้น (FAQ)
+      </h3>
+      <div style="font-size: 11.5px; color: #334155; line-height: 1.6;">
+        <p style="margin: 0 0 5px 0;">
+          <strong>Q: เสียงแจ้งเตือนหน้าครัวไม่ดังเมื่อมีออเดอร์ใหม่?</strong><br>
+          <span style="color: #64748b;">A: เกิดจากเบราว์เซอร์บล็อกเสียงอัตโนมัติ ให้คนทำครัวแตะที่หน้าจอ 1 ครั้ง หรือกดปุ่ม "แตะเพื่อเปิดเสียงแจ้งเตือน" สีส้มด้านบน ระบบจะปลดล็อกเสียงให้ทันที</span>
+        </p>
+        <p style="margin: 0 0 5px 0;">
+          <strong>Q: หน้าเว็บไม่แสดงข้อมูลล่าสุด หรือยังติดภาพเดิม?</strong><br>
+          <span style="color: #64748b;">A: กดปุ่ม Hard Refresh (บนคอม: <code>Ctrl + Shift + R</code> หรือ <code>Cmd + Shift + R</code>) หรือบนมือถือให้ปิดแท็บแล้วเปิดใหม่ ระบบเวอร์ชัน v2.6 มีระบบตัดแคชอัตโนมัติรองรับเรียบร้อยแล้ว</span>
+        </p>
+        <p style="margin: 0;">
+          <strong>Q: ลูกค้าสั่งเดลิเวอรีแล้ว ปักหมุดตรงไหนดูได้อย่างไร?</strong><br>
+          <span style="color: #64748b;">A: หน้าจอครัวจะแสดงปุ่มสีฟ้า "[เปิดแผนที่ / นำทาง Google Maps ↗]" บนการ์ดออเดอร์นั้นทันที กดแล้ว Google Maps จะนำทางไปส่งถึงหน้าบ้านลูกค้าได้เลยครับ</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-bar">
+      <span>คู่มือการใช้งานระบบร้านข้าวต้มนายเง็ก วงเวียนตาคลี</span>
+      <span>หน้า 5 จาก 5 (จบเล่ม)</span>
+    </div>
+  </div>
+
+</body>
+</html>
