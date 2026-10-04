@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>หน้าจอห้องครัว & แคชเชียร์ | ร้านข้าวต้มนายเจ๊ก วงเวียนตาคลี</title>
 
+  <!-- Progressive Web App (PWA) Meta & Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ea580c">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ครัวนายเจ๊ก">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
   <!-- Google Fonts: Prompt & Kanit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -122,6 +133,39 @@
 
       <!-- Action Bar -->
       <div class="flex items-center gap-2 self-end md:self-auto flex-wrap">
+        <!-- Install PWA Button (Shows on Android, Chrome, Edge, and iOS Safari) -->
+        <button 
+          id="installPwaBtn"
+          onclick="handleInstallClick()" 
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:from-orange-700 hover:to-amber-700 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+          title="ติดตั้งเป็นแอป PWA ลงหน้าจอมือถือ"
+        >
+          <i class="fa-solid fa-mobile-screen-button text-xs"></i>
+          <span id="installPwaText">📲 ติดตั้งแอป</span>
+        </button>
+
+        <!-- Lockscreen Notification Permission Button -->
+        <button 
+          id="notifyPermBtn"
+          onclick="handleNotificationBtnClick()" 
+          class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+          title="เปิดการแจ้งเตือนบนหน้าจอมือถือ (Lock Screen / Notification Bar)"
+        >
+          <i id="notifyPermIcon" class="fa-solid fa-bell text-xs"></i>
+          <span id="notifyPermText">แจ้งเตือนจอ: กำลังตรวจ...</span>
+        </button>
+
+        <!-- Screen Wake Lock Button (Keeps screen awake in kitchen) -->
+        <button 
+          id="wakeLockBtn"
+          onclick="toggleWakeLock()" 
+          class="px-3 py-2 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+          title="เปิดค้างหน้าจอไว้ไม่ให้ดับขณะทำอาหารในครัว"
+        >
+          <i id="wakeLockIcon" class="fa-solid fa-bolt text-slate-400 text-xs"></i>
+          <span id="wakeLockText">จอไม่ดับ: ปิด</span>
+        </button>
+
         <!-- Sound Toggle & Status -->
         <button 
           id="soundToggleBtn"
@@ -129,7 +173,7 @@
           class="px-3 py-2 rounded-xl text-xs font-bold bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
         >
           <i id="soundIcon" class="fa-solid fa-volume-high text-xs"></i>
-          <span id="soundText">เสียงกระดิ่ง: เปิด</span>
+          <span id="soundText">เสียง: เปิด</span>
         </button>
 
         <!-- Test Chime Button -->
@@ -158,7 +202,7 @@
           class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-white hover:bg-slate-900 flex items-center gap-1.5 transition-colors shadow-xs"
         >
           <i class="fa-solid fa-store text-xs text-orange-400"></i>
-          <span>หน้าร้าน/สั่งอาหาร</span>
+          <span class="hidden sm:inline">หน้าร้าน/สั่งอาหาร</span>
         </a>
       </div>
 
@@ -285,6 +329,40 @@
     </button>
   </div>
 
+  <!-- iOS PWA Install Modal Guide -->
+  <div id="iosInstallModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 text-center animate-scaleIn">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl mb-3 shadow-xs">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+      </div>
+      <h3 class="text-base font-extrabold font-display text-slate-800">
+        ติดตั้งแอป "ครัวนายเจ๊ก" บน iPhone / iPad
+      </h3>
+      <p class="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
+        ติดตั้งลงหน้าจอโฮมเพื่อเปิดใช้งานแบบเต็มจอ รวดเร็ว และรับการแจ้งเตือนบนหน้าจอมือถือ (Lock Screen)
+      </p>
+
+      <div class="space-y-3 text-left text-xs bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+        <div class="flex items-start gap-2.5">
+          <div class="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</div>
+          <p class="text-slate-700">แตะปุ่ม <span class="font-bold text-blue-600 inline-flex items-center gap-1 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200"><i class="fa-solid fa-arrow-up-from-bracket text-[11px]"></i> แชร์ (Share)</span> ด้านล่างของ Safari</p>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <div class="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</div>
+          <p class="text-slate-700">เลื่อนลงมาแล้วเลือก <span class="font-bold text-slate-900 inline-flex items-center gap-1 bg-white px-1.5 py-0.5 rounded border border-slate-300"><i class="fa-regular fa-square-plus text-[11px]"></i> เพิ่มไปยังหน้าจอโฮม (Add to Home Screen)</span></p>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <div class="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</div>
+          <p class="text-slate-700">แตะปุ่ม <span class="font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">"เพิ่ม" (Add)</span> มุมขวาบน จะได้ไอคอนแอปบนหน้าจอโฮมทันที!</p>
+        </div>
+      </div>
+
+      <button onclick="closeIosInstallModal()" class="mt-4 w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer">
+        เข้าใจแล้ว / ปิดหน้าต่าง
+      </button>
+    </div>
+  </div>
+
   <!-- Include App Config -->
   <script src="js/config.js"></script>
 
@@ -312,10 +390,16 @@
       // 1. Pre-synthesize loud 16-bit WAV chime for instant HTML5 Audio fallback
       initWavChime();
 
-      // 2. Initial fetch
+      // 2. Initialize PWA, Service Worker, Notifications & Screen Wake Lock
+      initServiceWorker();
+      initPwaInstall();
+      initNotificationPermissionUI();
+      initWakeLock();
+
+      // 3. Initial fetch
       fetchOrders(false);
 
-      // 3. Auto-poll every 3.5 seconds
+      // 4. Auto-poll every 3.5 seconds
       setInterval(() => {
         fetchOrders(false);
       }, 3500);
@@ -421,9 +505,15 @@
         banner.classList.add("hidden");
       }
 
-      // 3. Play test chime if requested
+      // 3. Play test chime and request permissions if requested explicitly
       if (playTest) {
         playOrderChime(true);
+        if ("Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission().then(() => initNotificationPermissionUI());
+        }
+        if ("wakeLock" in navigator && !screenWakeLock) {
+          requestWakeLock();
+        }
       }
     }
 
@@ -759,6 +849,9 @@
       banner.classList.remove("hidden");
       startRepeatingAlert();
       startTitleFlash(`🔔 [คิว ${order.queueNo}] มีออเดอร์ใหม่เข้า!`);
+
+      // ส่งแจ้งเตือนบนหน้าจอมือถือ (Lock Screen / Notification Center)
+      sendLockscreenNotification(order);
     }
 
     // ==========================================
@@ -1001,6 +1094,292 @@
         console.warn("Update status error:", e);
       }
     }
+
+    // ==========================================
+    // 5. Progressive Web App (PWA) & Notification Suite
+    // ==========================================
+    let swRegistration = null;
+    let deferredPrompt = null;
+    let screenWakeLock = null;
+
+    /**
+     * 5.1 ลงทะเบียน Service Worker สำหรับ PWA และการแจ้งเตือนหน้าจอมือถือ
+     */
+    function initServiceWorker() {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js", { scope: "./" })
+          .then((reg) => {
+            swRegistration = reg;
+            console.log("[PWA] Service Worker registered with scope:", reg.scope);
+          })
+          .catch((err) => {
+            console.warn("[PWA] Service Worker registration failed:", err);
+          });
+      }
+    }
+
+    /**
+     * 5.2 จัดการการติดตั้ง Progressive Web App (PWA) บน Android, PC และ iOS
+     */
+    function initPwaInstall() {
+      const pwaBtn = document.getElementById("installPwaBtn");
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+
+      if (isStandalone) {
+        if (pwaBtn) {
+          pwaBtn.className = "px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 transition-colors shadow-xs";
+          pwaBtn.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i><span>เปิดผ่านแอป</span>`;
+          pwaBtn.onclick = () => showToast("✅ คุณกำลังใช้งานผ่านแอป PWA หน้าจอครัวอยู่แล้ว");
+        }
+        return;
+      }
+
+      // ตรวจจับเบราว์เซอร์ Chrome / Edge / Android ที่พร้อมให้ติดตั้งแอป
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (pwaBtn) {
+          pwaBtn.classList.remove("hidden");
+          pwaBtn.classList.add("flex");
+        }
+      });
+
+      window.addEventListener("appinstalled", () => {
+        deferredPrompt = null;
+        if (pwaBtn) {
+          pwaBtn.className = "px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 transition-colors shadow-xs";
+          pwaBtn.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i><span>ติดตั้งแล้ว</span>`;
+        }
+        showToast("🎉 ติดตั้งแอปครัวนายเจ๊กสำเร็จแล้ว! เปิดใช้งานจากหน้าจอโฮมได้เลย");
+      });
+    }
+
+    function handleInstallClick() {
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+
+      if (isStandalone) {
+        showToast("✅ คุณเปิดใช้งานในโหมดแอป PWA อยู่แล้ว");
+        return;
+      }
+
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === "accepted") {
+            console.log("User accepted install prompt");
+          }
+          deferredPrompt = null;
+        });
+      } else if (isIos) {
+        openIosInstallModal();
+      } else {
+        // เบราว์เซอร์ที่ไม่รองรับ prompt อัตโนมัติ (เช่น Safari MacOS หรือ Chrome ที่กดติดตั้งไปแล้ว)
+        showToast("📲 เพื่อติดตั้ง: กดเมนูของเบราว์เซอร์ แล้วเลือก 'ติดตั้งแอป' (Install App) หรือ เพิ่มไปยังหน้าจอโฮม");
+      }
+    }
+
+    function openIosInstallModal() {
+      const modal = document.getElementById("iosInstallModal");
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    }
+
+    function closeIosInstallModal() {
+      const modal = document.getElementById("iosInstallModal");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+    }
+
+    /**
+     * 5.3 ระบบแจ้งเตือนบนหน้าจอมือถือ (Lock Screen / Notification Bar)
+     */
+    function initNotificationPermissionUI() {
+      const btn = document.getElementById("notifyPermBtn");
+      const icon = document.getElementById("notifyPermIcon");
+      const text = document.getElementById("notifyPermText");
+
+      if (!("Notification" in window)) {
+        if (btn) btn.classList.add("hidden");
+        return;
+      }
+
+      if (!btn || !icon || !text) return;
+
+      if (Notification.permission === "granted") {
+        btn.className = "px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer";
+        icon.className = "fa-solid fa-bell text-emerald-600 text-xs";
+        text.textContent = "แจ้งเตือนจอ: เปิด";
+      } else if (Notification.permission === "denied") {
+        btn.className = "px-3 py-2 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer";
+        icon.className = "fa-solid fa-bell-slash text-rose-500 text-xs";
+        text.textContent = "แจ้งเตือนจอ: ปิดในตั้งค่า";
+      } else {
+        btn.className = "px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer animate-pulse";
+        icon.className = "fa-solid fa-bell text-amber-600 text-xs";
+        text.textContent = "เปิดแจ้งเตือนจอ";
+      }
+    }
+
+    async function handleNotificationBtnClick() {
+      if (!("Notification" in window)) {
+        showToast("⚠️ อุปกรณ์หรือเบราว์เซอร์นี้ไม่รองรับ Web Notification");
+        return;
+      }
+
+      if (Notification.permission === "granted") {
+        testLockscreenNotification();
+      } else if (Notification.permission === "denied") {
+        showToast("⚠️ การแจ้งเตือนถูกปิดกั้นไว้ โปรดแตะไอคอนกุญแจหน้ารายการ URL หรือเข้าไปเปิดใน 'การตั้งค่าเบราว์เซอร์'");
+      } else {
+        try {
+          const permission = await Notification.requestPermission();
+          initNotificationPermissionUI();
+          if (permission === "granted") {
+            showToast("🔔 เปิดการแจ้งเตือนหน้าจอโฮมและล็อกสกรีนเรียบร้อยแล้ว!");
+            testLockscreenNotification();
+          } else {
+            showToast("⚠️ ไม่ได้รับการอนุญาตแจ้งเตือน");
+          }
+        } catch (e) {
+          console.warn("Notification permission error:", e);
+        }
+      }
+    }
+
+    async function sendLockscreenNotification(order) {
+      if (!("Notification" in window)) return;
+      if (Notification.permission !== "granted") return;
+
+      const rawSummary = (order.itemsSummary || "").replace(/<[^>]*>?/gm, " ").replace(/\s+/g, " ").trim();
+      const title = `🔔 [คิวที่ ${order.queueNo}] ออเดอร์ใหม่เข้า! (฿${Number(order.grandTotal).toLocaleString()})`;
+      const body = `ลูกค้า: ${order.customerName} (${order.customerPhone})\nรายการ: ${rawSummary || "มีรายการสั่งซื้อใหม่"}`;
+
+      const options = {
+        body: body,
+        icon: "icons/icon-192.png",
+        badge: "icons/icon-192.png",
+        vibrate: [400, 200, 400, 200, 800],
+        tag: `order-${order.orderId || order.queueNo}`,
+        renotify: true,
+        requireInteraction: true,
+        data: {
+          url: "kitchen.html",
+          orderId: order.orderId
+        }
+      };
+
+      try {
+        if (navigator.serviceWorker) {
+          const reg = swRegistration || await navigator.serviceWorker.ready;
+          if (reg && reg.showNotification) {
+            await reg.showNotification(title, options);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("SW showNotification error, trying fallback:", err);
+      }
+
+      try {
+        const notif = new Notification(title, options);
+        notif.onclick = () => {
+          window.focus();
+          notif.close();
+        };
+      } catch (err) {
+        console.warn("Classic Notification fallback error:", err);
+      }
+    }
+
+    function testLockscreenNotification() {
+      const testOrder = {
+        queueNo: "TEST",
+        grandTotal: 120,
+        customerName: "ทดสอบแจ้งเตือน",
+        customerPhone: "08x-xxx-xxxx",
+        itemsSummary: "ข้าวต้มปลากะพงพิเศษ 1 ชาม",
+        orderId: "TEST-" + Date.now()
+      };
+      sendLockscreenNotification(testOrder);
+      playOrderChime(true);
+      showToast("🔔 ส่งแจ้งเตือนทดสอบแล้ว! สังเกตที่แถบแจ้งเตือน / หน้าจอมือถือได้เลยครับ");
+    }
+
+    /**
+     * 5.4 ระบบ Screen Wake Lock (ป้องกันจอดับขณะใช้งานในครัว)
+     */
+    function initWakeLock() {
+      updateWakeLockUI(false);
+    }
+
+    async function requestWakeLock() {
+      if ("wakeLock" in navigator) {
+        try {
+          screenWakeLock = await navigator.wakeLock.request("screen");
+          updateWakeLockUI(true);
+          screenWakeLock.addEventListener("release", () => {
+            screenWakeLock = null;
+            updateWakeLockUI(false);
+          });
+          return true;
+        } catch (err) {
+          console.warn("Wake Lock request error:", err);
+          updateWakeLockUI(false);
+          return false;
+        }
+      }
+      return false;
+    }
+
+    async function toggleWakeLock() {
+      if (!("wakeLock" in navigator)) {
+        showToast("⚠️ อุปกรณ์นี้ไม่รองรับ Screen Wake Lock แต่ท่านสามารถตั้งค่าเวลาพักหน้าจอใน Settings ของมือถือได้ครับ");
+        return;
+      }
+
+      if (screenWakeLock !== null) {
+        await screenWakeLock.release();
+        screenWakeLock = null;
+        updateWakeLockUI(false);
+        showToast("💤 ปิดโหมดจอเปิดตลอดแล้ว (หน้าจอจะดับตามการตั้งค่าเครื่อง)");
+      } else {
+        const success = await requestWakeLock();
+        if (success) {
+          showToast("⚡ เปิดโหมดจอเปิดตลอดแล้ว! หน้าจอจะไม่ดับขณะใช้งานในห้องครัว");
+        }
+      }
+    }
+
+    function updateWakeLockUI(active) {
+      const btn = document.getElementById("wakeLockBtn");
+      const icon = document.getElementById("wakeLockIcon");
+      const text = document.getElementById("wakeLockText");
+      if (!btn || !icon || !text) return;
+
+      if (active) {
+        btn.className = "px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer";
+        icon.className = "fa-solid fa-bolt text-emerald-500 text-xs animate-pulse";
+        text.textContent = "จอไม่ดับ: เปิด";
+      } else {
+        btn.className = "px-3 py-2 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer";
+        icon.className = "fa-solid fa-bolt text-slate-400 text-xs";
+        text.textContent = "จอไม่ดับ: ปิด";
+      }
+    }
+
+    // หากแท็บสลับกลับมาทำงาน ให้ขอ Wake Lock คืนอัตโนมัติ
+    document.addEventListener("visibilitychange", async () => {
+      if (screenWakeLock !== null && document.visibilityState === "visible") {
+        await requestWakeLock();
+      }
+    });
+
   </script>
 </body>
 </html>
