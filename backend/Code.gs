@@ -138,6 +138,7 @@ function handleCreateOrder(data) {
   // คำนวณลำดับคิวและเลขที่ออเดอร์ของวันนี้อย่างแม่นยำ (ตรวจจาก Order ID: JK-YYYYMMDD-XXX)
   const lastRow = ordersSheet.getLastRow();
   let maxSeq = 0;
+  let todayCount = 0;
   const prefix = "JK-" + dateStr + "-";
 
   if (lastRow > 1) {
@@ -145,6 +146,7 @@ function handleCreateOrder(data) {
     for (let i = 0; i < orderIdVals.length; i++) {
       const val = orderIdVals[i][0] ? orderIdVals[i][0].toString().trim() : "";
       if (val.indexOf(prefix) === 0) {
+        todayCount++;
         const numPart = parseInt(val.substring(prefix.length), 10);
         if (!isNaN(numPart) && numPart > maxSeq) {
           maxSeq = numPart;
@@ -152,22 +154,21 @@ function handleCreateOrder(data) {
       }
     }
 
-    // กรณีมีข้อมูลคิวแต่ ID ไม่ได้ขึ้นต้นด้วย JK-YYYYMMDD ตรวจสอบคอลัมน์คิวที่ (Q01, Q02)
-    if (maxSeq === 0) {
-      const queueVals = ordersSheet.getRange(2, 2, lastRow - 1, 1).getValues();
-      for (let i = 0; i < queueVals.length; i++) {
-        const qVal = queueVals[i][0] ? queueVals[i][0].toString().trim() : "";
-        if (qVal.indexOf("Q") === 0) {
-          const qNum = parseInt(qVal.substring(1), 10);
-          if (!isNaN(qNum) && qNum > maxSeq) {
-            maxSeq = qNum;
-          }
+    // ตรวจสอบคอลัมน์คิวที่ (Q01, Q02...) เพิ่มเติมเพื่อความปลอดภัย
+    const queueVals = ordersSheet.getRange(2, 2, lastRow - 1, 1).getValues();
+    for (let i = 0; i < queueVals.length; i++) {
+      const qVal = queueVals[i][0] ? queueVals[i][0].toString().trim() : "";
+      if (qVal.indexOf("Q") === 0) {
+        const qNum = parseInt(qVal.substring(1), 10);
+        if (!isNaN(qNum) && qNum > maxSeq) {
+          maxSeq = qNum;
         }
       }
     }
   }
 
-  const seq = maxSeq + 1;
+  // ใช้ค่าสูงสุดระหว่างเลขคิวสูงสุดที่เคยออก หรือจำนวนออเดอร์ของวันนี้ เพื่อไม่ให้เกิดคิวซ้ำเด็ดขาด
+  const seq = Math.max(maxSeq, todayCount) + 1;
   const queueNo = "Q" + (seq < 10 ? "0" + seq : seq);
   const orderId = "JK-" + dateStr + "-" + ("000" + seq).slice(-3);
 
