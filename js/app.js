@@ -1,6 +1,6 @@
 /**
  * ===================================================================
- * Application Logic v2: ร้านข้าวต้มนายเจ๊ก วงเวียนตาคลี
+ * Application Logic v2: ร้านข้าวต้มนายเจ็ก วงเวียนตาคลี
  * UX/UI Minimalist Light Mode
  * รองรับ: ระบบชำระเงิน PromptPay QR (064-279-3664) & เงินสด,
  * รูปภาพอาหารจาก Google Sheets (รวม Google Drive URL), และระบบคิวจริง
@@ -224,12 +224,12 @@ function renderMenu() {
             />
             <div class="hidden absolute inset-0 flex flex-col items-center justify-center text-amber-600/70">
               <i class="fa-solid ${catIcon} text-2xl mb-1"></i>
-              <span class="text-[10px] font-medium text-slate-500">ร้านข้าวต้มนายเจ๊ก</span>
+              <span class="text-[10px] font-medium text-slate-500">ร้านข้าวต้มนายเจ็ก</span>
             </div>
           ` : `
             <div class="w-full h-full flex flex-col items-center justify-center text-amber-600/60 bg-gradient-to-br from-amber-50 to-orange-100/50">
               <i class="fa-solid ${catIcon} text-2xl mb-1"></i>
-              <span class="text-[10px] font-medium text-slate-400">ร้านข้าวต้มนายเจ๊ก</span>
+              <span class="text-[10px] font-medium text-slate-400">ร้านข้าวต้มนายเจ็ก</span>
             </div>
           `}
 
@@ -247,7 +247,7 @@ function renderMenu() {
               ${item.name}
             </h3>
             <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-              ${item.description || "สูตรเด็ดร้านข้าวต้มนายเจ๊ก วงเวียนตาคลี"}
+              ${item.description || "สูตรเด็ดร้านข้าวต้มนายเจ็ก วงเวียนตาคลี"}
             </p>
           </div>
 
@@ -972,7 +972,7 @@ async function sendLineReceipt(order) {
     try {
       const modeText = order.fulfillmentType === "delivery" ? "🛵 เดลิเวอรี" : "🛍️ มารับที่ร้าน";
       const messageText = 
-        `🍲 [คำสั่งซื้อร้านข้าวต้มนายเจ๊ก]\n` +
+        `🍲 [คำสั่งซื้อร้านข้าวต้มนายเจ็ก]\n` +
         `🔖 เลขที่: ${order.orderId}\n` +
         `🔥 คิวที่: ${order.queueNo}\n` +
         `👤 คุณ: ${order.customerName} (${order.customerPhone})\n` +
@@ -1262,7 +1262,7 @@ function renderTrackView() {
       statusNotice = `
         <div class="mt-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
           <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-          <span><strong>ออเดอร์เสร็จสมบูรณ์:</strong> ขอบคุณที่อุดหนุนร้านข้าวต้มนายเจ๊กครับ ทานให้อร่อยนะครับ 🙏</span>
+          <span><strong>ออเดอร์เสร็จสมบูรณ์:</strong> ขอบคุณที่อุดหนุนร้านข้าวต้มนายเจ็กครับ ทานให้อร่อยนะครับ 🙏</span>
         </div>
       `;
     } else if (isCancelled) {
