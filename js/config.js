@@ -5,10 +5,10 @@
 
 const APP_CONFIG = {
   // 1. URL Web App บน Google Apps Script
-  GAS_API_URL: "https://script.google.com/macros/s/AKfycbz5ahQ0BH30sAXyymE1FdrnE-V44ikQxzb1kSPiV2zKL8wj656trsAIr6K3j4Oh30dOmA/exec", 
+  GAS_API_URL: "https://script.google.com/macros/s/AKfycbz5ahQ0BH30sAXyymE1FdrnE-V44ikQxzb1kSPiV2zKL8wj656trsAIr6K3j4Oh30dOmA/exec",
 
   // 2. LIFF ID จาก LINE Developers Console
-  LIFF_ID: "2011852336-aORyM5Og", 
+  LIFF_ID: "2011852336-aORyM5Og",
 
   // เปิดใช้งานโหมดจำลอง (Mock Profile) หากเปิดทดสอบบนเบราว์เซอร์ปกตินอก LINE
   ENABLE_MOCK_LIFF: false,
