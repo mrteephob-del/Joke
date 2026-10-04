@@ -11,8 +11,9 @@ const CONFIG = {
   SHOP_NAME: "ร้านข้าวต้มนายเง็ก",
   SHOP_PHONE: "064-279-3664",
   PROMPTPAY_NO: "0642793664",
-  SHOP_LAT: 15.26352,
-  SHOP_LNG: 100.34445,
+  SHOP_LAT: 15.2562408,
+  SHOP_LNG: 100.3493917,
+  SHOP_MAP_URL: "https://maps.app.goo.gl/FKiWx8xuWLdgPDbh6",
   FREE_DELIVERY_KM: 3.0,   // 3 กม. แรกส่งฟรี
   EXTRA_FEE_PER_KM: 5.0,   // เกิน 3 กม. คิดกิโลเมตรละ 5 บาท
   SHEET_MENU: "Menu",

@@ -589,7 +589,7 @@ function initDeliveryMap() {
     return;
   }
 
-  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.26352, lng: 100.34445 };
+  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.2562408, lng: 100.3493917 };
   const shopLat = shop.lat;
   const shopLng = shop.lng;
 
@@ -663,7 +663,7 @@ function initDeliveryMap() {
 }
 
 function resetMapToShop() {
-  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.26352, lng: 100.34445 };
+  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.2562408, lng: 100.3493917 };
   if (deliveryMap) {
     deliveryMap.setView([shop.lat, shop.lng], 16);
     if (shopMarker) shopMarker.openPopup();
@@ -672,7 +672,7 @@ function resetMapToShop() {
 
 function updateLocationFromPin(lat, lng) {
   state.customerGps = { lat, lng };
-  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.26352, lng: 100.34445 };
+  const shop = APP_CONFIG.SHOP_COORDS || { lat: 15.2562408, lng: 100.3493917 };
   const distKm = calculateHaversineDistance(shop.lat, shop.lng, lat, lng);
   state.deliveryDistanceKm = parseFloat(distKm.toFixed(1));
 

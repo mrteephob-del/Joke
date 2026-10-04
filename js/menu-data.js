@@ -10,9 +10,10 @@ const RESTAURANT_INFO = {
   phone: "064-279-3664",
   openHours: "เปิดทุกวัน 16:30 - 23:30 น.",
   coords: {
-    lat: 15.26352,
-    lng: 100.34445
+    lat: 15.2562408,
+    lng: 100.3493917
   },
+  mapUrl: "https://maps.app.goo.gl/FKiWx8xuWLdgPDbh6",
   deliveryPolicy: {
     freeDistanceKm: 3.0,
     extraPerKm: 5.0

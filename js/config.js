@@ -20,11 +20,12 @@ const APP_CONFIG = {
     accountName: "ร้านข้าวต้มนายเง็ก วงเวียนตาคลี"
   },
 
-  // พิกัดร้านข้าวต้มนายเง็ก (บริเวณวงเวียนตาคลี หน้าร้านธนชาต)
+  // พิกัดร้านข้าวต้มนายเง็ก จาก Google Maps (https://maps.app.goo.gl/FKiWx8xuWLdgPDbh6)
   SHOP_COORDS: {
-    lat: 15.26352,
-    lng: 100.34445,
-    name: "ร้านข้าวต้มนายเง็ก วงเวียนตาคลี"
+    lat: 15.2562408,
+    lng: 100.3493917,
+    name: "ร้านข้าวต้มนายเง็ก วงเวียนตาคลี",
+    mapUrl: "https://maps.app.goo.gl/FKiWx8xuWLdgPDbh6"
   },
 
   // กฎการคิดค่าส่ง (Delivery Policy)
