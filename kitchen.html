@@ -443,6 +443,8 @@
       orders: [],
       knownOrderKeys: new Set(),
       acknowledgedOrderKeys: new Set(),
+      optimisticStatusLocks: new Map(), // orderId -> { status: newStatus, expiresAt: timestamp }
+      checkedItemKeys: new Set(),        // orderId__itemText -> boolean
       activeFilter: "active", // active, ready, completed, all
       dateFilter: "today",    // today, yesterday, 7days, all, custom
       customDateStr: "",      // e.g. "2026-10-04"
@@ -453,7 +455,8 @@
       repeatAlertInterval: null,
       titleFlashInterval: null,
       originalTitle: document.title,
-      isFirstLoad: true
+      isFirstLoad: true,
+      pollTimer: null
     };
 
     // Initialize
@@ -470,11 +473,17 @@
       // 3. Initial fetch
       fetchOrders(false);
 
-      // 4. Auto-poll every 3.5 seconds
-      setInterval(() => {
-        fetchOrders(false);
-      }, 3500);
+      // 4. Smart Non-Blocking Poller every 3.5 seconds
+      scheduleNextPoll(3500);
     });
+
+    function scheduleNextPoll(delayMs = 3500) {
+      if (kdsState.pollTimer) clearTimeout(kdsState.pollTimer);
+      kdsState.pollTimer = setTimeout(async () => {
+        await fetchOrders(false);
+        scheduleNextPoll(3500);
+      }, delayMs);
+    }
 
     // ==========================================
     // 1. Dual-Engine Restaurant Bell Synthesizer
@@ -1050,6 +1059,24 @@
         }
       }
 
+      // ล็อคสถานะที่ผู้ใช้เพิ่งกด (Optimistic Lock) ป้องกันไม่ให้ข้อมูลเก่าจากโพลลิ่งกลับมาเขียนทับเด็ดขาด
+      const now = Date.now();
+      newOrders.forEach(o => {
+        if (kdsState.optimisticStatusLocks.has(o.orderId)) {
+          const lock = kdsState.optimisticStatusLocks.get(o.orderId);
+          if (o.orderStatus === lock.status) {
+            // เซิร์ฟเวอร์อัปเดตข้อมูลตรงแล้ว ปลดล็อคได้
+            kdsState.optimisticStatusLocks.delete(o.orderId);
+          } else if (now < lock.expiresAt) {
+            // เซิร์ฟเวอร์ยังอัปเดตไม่เสร็จ ให้ใช้สถานะใหม่ที่กดไว้ ป้องกันการเด้งกลับ 100%
+            o.orderStatus = lock.status;
+            o.status = lock.status;
+          } else {
+            kdsState.optimisticStatusLocks.delete(o.orderId);
+          }
+        }
+      });
+
       kdsState.orders = newOrders;
       updateKpis();
       renderOrders();
@@ -1245,11 +1272,18 @@
                 <div class="space-y-1.5">
                   ${itemsLines.map(line => {
                     const hasSpecial = line.includes("[") && line.includes("]");
+                    const itemKey = `${order.orderId}__${encodeURIComponent(line)}`;
+                    const isChecked = kdsState.checkedItemKeys.has(itemKey);
                     return `
-                      <label class="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50/70 border border-slate-100 hover:bg-slate-100/70 cursor-pointer">
-                        <input type="checkbox" class="mt-0.5 rounded text-orange-600 focus:ring-orange-500 w-4 h-4">
+                      <label class="flex items-start gap-2.5 p-2 rounded-xl ${isChecked ? 'bg-emerald-50/80 border border-emerald-200' : 'bg-slate-50/70 border border-slate-100'} hover:bg-slate-100/70 cursor-pointer transition-colors select-none">
+                        <input 
+                          type="checkbox" 
+                          onchange="toggleItemCheck('${order.orderId}', '${encodeURIComponent(line)}', this.checked)"
+                          ${isChecked ? 'checked' : ''}
+                          class="mt-0.5 rounded text-orange-600 focus:ring-orange-500 w-4 h-4 cursor-pointer"
+                        >
                         <div class="text-xs text-slate-800 flex-1 leading-snug">
-                          <span class="font-medium">${line}</span>
+                          <span class="font-medium ${isChecked ? 'line-through text-slate-400' : ''}">${line}</span>
                           ${hasSpecial ? `<span class="block text-[10px] text-amber-700 font-bold mt-0.5 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200 w-fit">⚠️ มีหมายเหตุพิเศษ</span>` : ''}
                         </div>
                       </label>
@@ -1271,7 +1305,7 @@
               ${isNew ? `
                 <button 
                   onclick="changeOrderStatus('${order.orderId}', 'กำลังปรุง')" 
-                  class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5"
+                  class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] touch-manipulation select-none"
                 >
                   <i class="fa-solid fa-fire-burner text-xs"></i>
                   <span>รับออเดอร์ & เริ่มปรุง</span>
@@ -1279,7 +1313,7 @@
               ` : isCooking ? `
                 <button 
                   onclick="changeOrderStatus('${order.orderId}', 'พร้อมส่ง/รับ')" 
-                  class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5"
+                  class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] touch-manipulation select-none"
                 >
                   <i class="fa-solid fa-bell text-xs"></i>
                   <span>ปรุงเสร็จแล้ว (พร้อมรับ/ส่ง)</span>
@@ -1287,7 +1321,7 @@
               ` : isReady ? `
                 <button 
                   onclick="changeOrderStatus('${order.orderId}', 'สำเร็จ')" 
-                  class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5"
+                  class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] touch-manipulation select-none"
                 >
                   <i class="fa-solid fa-check text-xs"></i>
                   <span>ลูกค้ารับแล้ว / เสร็จสิ้นออเดอร์</span>
@@ -1305,35 +1339,80 @@
     }
 
     // ==========================================
-    // 4. Update Status to GAS API
+    // 4. Update Status to GAS API (High-Performance Zero-Delay)
     // ==========================================
+    function toggleItemCheck(orderId, encodedLine, checked) {
+      const key = `${orderId}__${encodedLine}`;
+      if (checked) {
+        kdsState.checkedItemKeys.add(key);
+      } else {
+        kdsState.checkedItemKeys.delete(key);
+      }
+      renderOrders();
+    }
+
     async function changeOrderStatus(orderId, newStatus) {
       if (!APP_CONFIG.GAS_API_URL) return;
 
-      // ปิดเสียงกระดิ่งและแบนเนอร์ทันทีเมื่อมีการกดรับออเดอร์
+      // 1. ปิดเสียงกระดิ่งและแบนเนอร์ทันทีเมื่อมีการแตะ
       dismissIncomingBanner();
       stopRepeatingAlert();
       stopTitleFlash();
 
-      // Optimistic update in UI
-      const target = kdsState.orders.find(o => o.orderId === orderId);
-      if (target) {
-        target.orderStatus = newStatus;
-        updateKpis();
-        renderOrders();
+      // 2. ระบบสั่นแจ้งเตือนสัมผัส (Haptic feedback)
+      if (navigator.vibrate) {
+        try { navigator.vibrate(35); } catch (e) {}
       }
 
+      // 3. Optimistic Update ทันทีใน 0 มิลลิวินาที (ไม่รอเครือข่าย)
+      const target = kdsState.orders.find(o => o.orderId === orderId);
+      if (target) {
+        // ล็อคสถานะไว้ 25 วินาที เพื่อป้องกัน polling ดึงข้อมูลเก่ามาเขียนทับ
+        kdsState.optimisticStatusLocks.set(orderId, {
+          status: newStatus,
+          expiresAt: Date.now() + 25000
+        });
+
+        target.orderStatus = newStatus;
+        target.status = newStatus;
+        updateKpis();
+        renderOrders();
+
+        const qLabel = target.queueNo || "ออเดอร์";
+        const statusMsg = 
+          newStatus === "กำลังปรุง" ? "รับออเดอร์ & เริ่มปรุงแล้ว 🍳" :
+          newStatus === "พร้อมส่ง/รับ" ? "ปรุงเสร็จแล้ว พร้อมรับ/ส่ง 🛵" :
+          "ออเดอร์เสร็จสิ้นเรียบร้อย ✅";
+        showToast(`⚡ ${qLabel}: ${statusMsg}`);
+      }
+
+      // 4. เลื่อนรอบ polling ถัดไปออกไป เพื่อให้เครือข่ายส่งข้อมูลได้เร็วที่สุด
+      scheduleNextPoll(3500);
+
+      // 5. ส่งคำขออัปเดตไปยัง Google Apps Script เบื้องหลังพร้อมระบบ Retry อัตโนมัติ
+      syncStatusToBackend(orderId, newStatus);
+    }
+
+    async function syncStatusToBackend(orderId, newStatus, retryCount = 0) {
+      if (!APP_CONFIG.GAS_API_URL) return;
+      const url = `${APP_CONFIG.GAS_API_URL}?action=updateOrderStatus&orderId=${encodeURIComponent(orderId)}&newStatus=${encodeURIComponent(newStatus)}`;
+      
       try {
-        // Try via GET/POST
-        const url = `${APP_CONFIG.GAS_API_URL}?action=updateOrderStatus&orderId=${encodeURIComponent(orderId)}&newStatus=${encodeURIComponent(newStatus)}`;
-        await fetch(url);
-        console.log(`Updated ${orderId} to ${newStatus}`);
-        // รีเฟรชยืนยันข้อมูลจาก Google Sheets อีกครั้งหลังผ่านไป 1 วินาที
-        setTimeout(() => {
-          fetchOrders(false);
-        }, 1200);
-      } catch (e) {
-        console.warn("Update status error:", e);
+        const resp = await fetch(url, {
+          method: "GET",
+          cache: "no-store"
+        });
+        const data = await resp.json();
+        if (data && data.success) {
+          console.log(`[KDS Sync] ${orderId} successfully synced to ${newStatus}`);
+        }
+      } catch (err) {
+        console.warn(`[KDS Sync] Update failed for ${orderId} (attempt ${retryCount + 1}):`, err);
+        if (retryCount < 3) {
+          setTimeout(() => {
+            syncStatusToBackend(orderId, newStatus, retryCount + 1);
+          }, 1500 * (retryCount + 1));
+        }
       }
     }
 

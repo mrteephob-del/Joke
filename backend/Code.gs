@@ -477,8 +477,6 @@ function handleUpdateStatus(data) {
   const ordersSheet = ss.getSheetByName(CONFIG.SHEET_ORDERS);
   if (!ordersSheet) return { success: false, message: "Orders sheet not found" };
 
-  ensureOrdersSheetHeaders(ordersSheet);
-
   const targetOrderId = data.orderId ? data.orderId.toString().trim() : "";
   const newStatus = data.newStatus ? data.newStatus.toString().trim() : "";
   if (!targetOrderId || !newStatus) {
@@ -509,6 +507,8 @@ function handleUpdateStatus(data) {
       if (updateColIdx > 0) {
         ordersSheet.getRange(rowIdx, updateColIdx).setValue(now);
       }
+      // บังคับให้ Google Sheets บันทึกข้อมูลลงชีตทันที (ป้องกันการดีเลย์)
+      SpreadsheetApp.flush();
       return { 
         success: true, 
         orderId: targetOrderId, 
