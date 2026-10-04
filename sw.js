@@ -1,9 +1,9 @@
 /**
- * Service Worker สำหรับ "ร้านข้าวต้มนายเจ็ก - ครัว & แคชเชียร์"
+ * Service Worker สำหรับ "ร้านข้าวต้มนายเง็ก - ครัว & แคชเชียร์"
  * รองรับการติดตั้งแบบ PWA, ทำงานออฟไลน์เบื้องต้น, และแสดงการแจ้งเตือนบนหน้าจอมือถือ (Lock Screen / Home Screen)
  */
 
-const CACHE_NAME = 'naijek-kitchen-pwa-v1';
+const CACHE_NAME = 'naingek-kitchen-pwa-v1';
 const STATIC_ASSETS = [
   './',
   'kitchen.html',
@@ -111,7 +111,7 @@ self.addEventListener('message', (event) => {
 // 5. Push Event: Handle server push notifications if configured
 self.addEventListener('push', (event) => {
   let data = {
-    title: '🔔 [ร้านข้าวต้มนายเจ็ก] ออเดอร์ใหม่เข้า!',
+    title: '🔔 [ร้านข้าวต้มนายเง็ก] ออเดอร์ใหม่เข้า!',
     body: 'มีลูกค้ารายการสั่งซื้อเข้ามาใหม่ในระบบ โปรดตรวจสอบหน้าจอครัว'
   };
 

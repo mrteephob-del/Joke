@@ -1,14 +1,14 @@
 /**
  * ===================================================================
  * ระบบ Backend Google Apps Script (GAS) v2
- * สำหรับ: ร้านข้าวต้มนายเจ็ก วงเวียนตาคลี
+ * สำหรับ: ร้านข้าวต้มนายเง็ก วงเวียนตาคลี
  * เชื่อมโยง Google Sheets และ LINE LIFF API
  * รองรับ: ระบบคิวจริง, ระบบชำระเงิน (PromptPay / เงินสด), คอลัมน์รูปภาพอาหาร
  * ===================================================================
  */
 
 const CONFIG = {
-  SHOP_NAME: "ร้านข้าวต้มนายเจ็ก",
+  SHOP_NAME: "ร้านข้าวต้มนายเง็ก",
   SHOP_PHONE: "064-279-3664",
   PROMPTPAY_NO: "0642793664",
   SHOP_LAT: 15.26352,
@@ -697,7 +697,7 @@ function createJsonResponse(data) {
 function onOpen() {
   try {
     const ui = SpreadsheetApp.getUi();
-    ui.createMenu("🍚 ร้านข้าวต้มนายเจ็ก")
+    ui.createMenu("🍚 ร้านข้าวต้มนายเง็ก")
       .addItem("🖼️ เพิ่มช่องใส่รูปภาพ (Column J)", "menuAddImageColumn")
       .addItem("⚙️ ตรวจสอบการตั้งค่าระบบชีต", "initialSetup")
       .addToUi();
